@@ -2,10 +2,10 @@
 
 namespace App\Http\Requests\HeadOffice;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\BaseFormRequest;
 use Illuminate\Validation\Rule;
 
-class StoreHeadOfficeRequest extends FormRequest
+class StoreHeadOfficeRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

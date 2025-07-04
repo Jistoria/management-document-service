@@ -19,12 +19,28 @@ class HeadOfficeService
     /**
      * Get all active head offices
      */
-    public function getAll(): Collection
+    public function getAll(array $filters = []): Collection
     {
-        return HeadOffice::active()
-            ->with(['departments'])
-            ->orderBy('name')
-            ->get();
+        $query = HeadOffice::active()->with(['departments']);
+
+        // Apply filters
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'ILIKE', "%{$search}%")
+                    ->orWhere('code', 'ILIKE', "%{$search}%");
+            });
+        }
+
+        if (!empty($filters['code'])) {
+            $query->byCode($filters['code']);
+        }
+
+        if (!empty($filters['created_by'])) {
+            $query->where('created_by', $filters['created_by']);
+        }
+
+        return $query->orderBy('name')->get();
     }
 
     /**
@@ -80,12 +96,11 @@ class HeadOfficeService
      */
     public function create(array $data): HeadOffice
     {
-        // Validate unique code
+
         if ($this->codeExists($data['code'])) {
             throw new \InvalidArgumentException("El código '{$data['code']}' ya existe.");
         }
 
-        // Validate unique name
         if ($this->nameExists($data['name'])) {
             throw new \InvalidArgumentException("El nombre '{$data['name']}' ya existe.");
         }
@@ -104,12 +119,10 @@ class HeadOfficeService
             throw new ModelNotFoundException("Sede no encontrada.");
         }
 
-        // Validate unique code (excluding current record)
         if (isset($data['code']) && $this->codeExists($data['code'], $id)) {
             throw new \InvalidArgumentException("El código '{$data['code']}' ya existe.");
         }
 
-        // Validate unique name (excluding current record)
         if (isset($data['name']) && $this->nameExists($data['name'], $id)) {
             throw new \InvalidArgumentException("El nombre '{$data['name']}' ya existe.");
         }
@@ -241,47 +254,5 @@ class HeadOfficeService
         }
 
         return $query->exists();
-    }
-
-    /**
-     * Validate head office data
-     */
-    public function validate(array $data, ?string $excludeId = null): array
-    {
-        $errors = [];
-
-        // Required fields
-        if (empty($data['name'])) {
-            $errors['name'] = 'El nombre es requerido.';
-        }
-
-        if (empty($data['code'])) {
-            $errors['code'] = 'El código es requerido.';
-        }
-
-        // Format validations
-        if (!empty($data['code']) && !preg_match('/^[A-Z0-9_-]+$/', $data['code'])) {
-            $errors['code'] = 'El código solo puede contener letras mayúsculas, números, guiones y guiones bajos.';
-        }
-
-        // Length validations
-        if (!empty($data['name']) && strlen($data['name']) > 255) {
-            $errors['name'] = 'El nombre no puede exceder 255 caracteres.';
-        }
-
-        if (!empty($data['code']) && strlen($data['code']) > 255) {
-            $errors['code'] = 'El código no puede exceder 255 caracteres.';
-        }
-
-        // Uniqueness validations
-        if (!empty($data['code']) && $this->codeExists($data['code'], $excludeId)) {
-            $errors['code'] = 'El código ya existe.';
-        }
-
-        if (!empty($data['name']) && $this->nameExists($data['name'], $excludeId)) {
-            $errors['name'] = 'El nombre ya existe.';
-        }
-
-        return $errors;
     }
 }

@@ -3,14 +3,14 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
  * Resource for Head Office API responses
  *
  * Transforms HeadOffice model data into consistent API responses.
+ * Supports multiple transformation contexts: pagination, collections, detailed, minimal.
  */
-class HeadOfficeResource extends JsonResource
+class HeadOfficeResource extends BaseResource
 {
     /**
      * Transform the resource into an array.
@@ -30,41 +30,116 @@ class HeadOfficeResource extends JsonResource
             'updated_by' => $this->updated_by,
             'version' => $this->version,
 
-            // Conditional relationships
+            // Conditional relationships based on includes
+            'departments' => $this->when(
+                $this->shouldInclude('departments', $request),
+                function () {
+                    return $this->whenLoaded('departments', function () {
+                        return DepartmentResource::collection($this->departments);
+                    });
+                }
+            ),
+
+            'departments_count' => $this->when(
+                $this->relationLoaded('departments'),
+                fn() => $this->departments->count()
+            ),
+
+            // Statistics when requested
+            'statistics' => $this->when(
+                $this->shouldInclude('statistics', $request),
+                function () {
+                    return [
+                        'departments_count' => $this->departments()->count(),
+                        'careers_count' => $this->departments()
+                            ->withCount('careers')
+                            ->get()
+                            ->sum('careers_count'),
+                        'has_departments' => $this->departments()->exists(),
+                    ];
+                }
+            ),
+
+            // Hierarchy information when loaded
+            'hierarchy' => $this->when(
+                $this->shouldInclude('hierarchy', $request) && $this->relationLoaded('departments.careers'),
+                fn() => [
+                    'departments_count' => $this->departments->count(),
+                    'careers_count' => $this->departments->sum(function ($dept) {
+                        return $dept->careers ? $dept->careers->count() : 0;
+                    }),
+                    'departments' => DepartmentResource::collection($this->departments)
+                        ->map(function ($dept) {
+                            return array_merge($dept->toArray(request()), [
+                                'careers' => CareerResource::collection($dept->careers ?? collect())
+                            ]);
+                        }),
+                ]
+            ),
+        ];
+    }
+
+    /**
+     * Get minimal fields for listing views
+     */
+    protected function getMinimalFields(): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'code' => $this->code,
+            'departments_count' => $this->departments()->count(),
+        ];
+    }
+
+    /**
+     * Get resource type identifier
+     */
+    protected function getResourceType(): string
+    {
+        return 'head_office';
+    }
+
+    /**
+     * Transform for dropdown/select usage
+     */
+    public static function forDropdown($collection): array
+    {
+        return [
+            'options' => $collection->map(function ($headOffice) {
+                return [
+                    'value' => $headOffice->id,
+                    'label' => $headOffice->name,
+                    'code' => $headOffice->code,
+                ];
+            }),
+            'count' => count($collection)
+        ];
+    }
+
+    /**
+     * Transform for hierarchy view
+     */
+    public function withHierarchy(): array
+    {
+        return array_merge($this->toArray(request()), [
             'departments' => $this->whenLoaded('departments', function () {
                 return $this->departments->map(function ($department) {
                     return [
                         'id' => $department->id,
                         'name' => $department->name,
                         'code' => $department->code,
-                        'created_at' => $department->created_at?->toISOString(),
-                        'updated_at' => $department->updated_at?->toISOString(),
+                        'careers' => $department->careers ? $department->careers->map(function ($career) {
+                            return [
+                                'id' => $career->id,
+                                'name' => $career->name,
+                                'code' => $career->code,
+                            ];
+                        }) : [],
                     ];
                 });
             }),
-            'departments_count' => $this->when(
-                $this->relationLoaded('departments'),
-                fn() => $this->departments->count()
-            ),
-
-            // Additional computed fields
-            'has_departments' => $this->when(
-                $this->relationLoaded('departments'),
-                fn() => $this->departments->count() > 0
-            ),
-
-            // Hierarchy information when loaded
-            'hierarchy' => $this->when(
-                $this->relationLoaded('departments.careers'),
-                fn() => [
-                    'departments_count' => $this->departments->count(),
-                    'careers_count' => $this->departments->sum(function ($dept) {
-                        return $dept->careers ? $dept->careers->count() : 0;
-                    }),
-                    'total_active_departments' => $this->activeDepartments()->count(),
-                ]
-            ),
-        ];
+        ]);
     }
 
     /**
@@ -76,10 +151,7 @@ class HeadOfficeResource extends JsonResource
     public function with(Request $request): array
     {
         return [
-            'meta' => [
-                'resource_type' => 'head_office',
-                'generated_at' => now()->toISOString(),
-            ],
+            'meta' => $this->getDetailedMeta(),
         ];
     }
 }

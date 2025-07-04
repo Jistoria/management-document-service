@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\ApiResponse;
 use App\Http\Requests\HeadOffice\StoreHeadOfficeRequest;
 use App\Http\Requests\HeadOffice\UpdateHeadOfficeRequest;
+use App\Http\Resources\HeadOfficeResource;
 use App\Services\HeadOfficeService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -14,7 +14,7 @@ use function App\Helpers\catchSync;
  * Controller for Head Office operations
  *
  * Handles HTTP requests for head office CRUD operations
- * using the HeadOfficeService and catchSync helper.
+ * using the HeadOfficeService and catchSync helper with proper resources.
  */
 class HeadOfficeController extends Controller
 {
@@ -26,10 +26,110 @@ class HeadOfficeController extends Controller
     }
 
     /**
-     * Display a listing of head offices
-     *
-     * @param Request $request
-     * @return JsonResponse
+     * @OA\Get(
+     *     path="/head-offices",
+     *     operationId="getHeadOffices",
+     *     tags={"HeadOffices"},
+     *     summary="Obtener listado de sedes",
+     *     description="Retorna el listado de sedes con soporte para múltiples formatos: paginación, colección, minimal, dropdown, pluck",
+     *     @OA\Parameter(
+     *         name="paginate",
+     *         in="query",
+     *         description="Activar paginación (true/false)",
+     *         required=false,
+     *         @OA\Schema(type="boolean", example=true)
+     *     ),
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         description="Elementos por página (cuando paginate=true)",
+     *         required=false,
+     *         @OA\Schema(type="integer", example=15)
+     *     ),
+     *     @OA\Parameter(
+     *         name="minimal",
+     *         in="query",
+     *         description="Vista minimal con campos básicos (true/false)",
+     *         required=false,
+     *         @OA\Schema(type="boolean", example=true)
+     *     ),
+     *     @OA\Parameter(
+     *         name="format",
+     *         in="query",
+     *         description="Formato de respuesta (dropdown)",
+     *         required=false,
+     *         @OA\Schema(type="string", enum={"dropdown"}, example="dropdown")
+     *     ),
+     *     @OA\Parameter(
+     *         name="pluck",
+     *         in="query",
+     *         description="Campo para formato pluck (key-value)",
+     *         required=false,
+     *         @OA\Schema(type="string", example="id")
+     *     ),
+     *     @OA\Parameter(
+     *         name="pluck_label",
+     *         in="query",
+     *         description="Campo label para formato pluck",
+     *         required=false,
+     *         @OA\Schema(type="string", example="name")
+     *     ),
+     *     @OA\Parameter(
+     *         name="search",
+     *         in="query",
+     *         description="Búsqueda por nombre o código",
+     *         required=false,
+     *         @OA\Schema(type="string", example="central")
+     *     ),
+     *     @OA\Parameter(
+     *         name="code",
+     *         in="query",
+     *         description="Filtrar por código específico",
+     *         required=false,
+     *         @OA\Schema(type="string", example="CENTRAL")
+     *     ),
+     *     @OA\Parameter(
+     *         name="created_by",
+     *         in="query",
+     *         description="Filtrar por creador",
+     *         required=false,
+     *         @OA\Schema(type="string", example="system")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Listado obtenido exitosamente",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Sedes obtenidas exitosamente"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 oneOf={
+     *                     @OA\Schema(
+     *                         @OA\Property(
+     *                             property="data",
+     *                             type="array",
+     *                             @OA\Items(ref="#/components/schemas/HeadOffice")
+     *                         ),
+     *                         @OA\Property(property="count", type="integer", example=1)
+     *                     ),
+     *                     @OA\Schema(
+     *                         @OA\Property(
+     *                             property="data",
+     *                             type="array",
+     *                             @OA\Items(ref="#/components/schemas/HeadOffice")
+     *                         ),
+     *                         @OA\Property(property="pagination", ref="#/components/schemas/Pagination")
+     *                     )
+     *                 }
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Error interno del servidor",
+     *         @OA\JsonContent(ref="#/components/schemas/Error")
+     *     )
+     * )
      */
     public function index(Request $request): JsonResponse
     {
@@ -41,75 +141,310 @@ class HeadOfficeController extends Controller
                 'created_by' => $request->input('created_by')
             ];
 
+            // Check if pagination is requested
             if ($request->has('paginate') && $request->input('paginate') !== 'false') {
-                return $this->headOfficeService->getPaginated($perPage, $filters);
+                $paginated = $this->headOfficeService->getPaginated($perPage, $filters);
+                return HeadOfficeResource::paginated($paginated);
             }
 
-            return $this->headOfficeService->getAll();
+            // Check if minimal view is requested
+            if ($request->has('minimal') && $request->input('minimal') === 'true') {
+                $headOffices = $this->headOfficeService->getAll($filters);
+                return [
+                    'data' => $headOffices->map(fn($ho) => (new HeadOfficeResource($ho))->minimal()),
+                    'count' => count($headOffices)
+                ];
+            }
+
+            // Check if dropdown format is requested
+            if ($request->has('format') && $request->input('format') === 'dropdown') {
+                $headOffices = $this->headOfficeService->getAll($filters);
+                return HeadOfficeResource::forDropdown($headOffices);
+            }
+
+            // Check if pluck format is requested
+            if ($request->has('pluck')) {
+                $headOffices = $this->headOfficeService->getAll($filters);
+                $valueKey = $request->input('pluck');
+                $labelKey = $request->input('pluck_label', 'name');
+                return HeadOfficeResource::pluck($headOffices, $valueKey, $labelKey);
+            }
+
+            // Default collection
+            $headOffices = $this->headOfficeService->getAll($filters);
+            return HeadOfficeResource::simpleCollection($headOffices);
         }, 'Sedes obtenidas exitosamente');
     }
 
     /**
-     * Store a newly created head office
-     *
-     * @param StoreHeadOfficeRequest $request
-     * @return JsonResponse
+     * @OA\Post(
+     *     path="/head-offices",
+     *     operationId="createHeadOffice",
+     *     tags={"HeadOffices"},
+     *     summary="Crear nueva sede",
+     *     description="Crea una nueva sede con los datos proporcionados",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="Datos de la sede a crear",
+     *         @OA\JsonContent(
+     *             required={"name","code"},
+     *             @OA\Property(property="name", type="string", example="Sede Central", description="Nombre de la sede"),
+     *             @OA\Property(property="code", type="string", example="CENTRAL", description="Código único de la sede (alfanumérico, mayúsculas)")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Sede creada exitosamente",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Sede creada exitosamente"),
+     *             @OA\Property(property="data", ref="#/components/schemas/HeadOffice")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Error de validación",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Los datos proporcionados no son válidos."),
+     *             @OA\Property(
+     *                 property="errors",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="name",
+     *                     type="array",
+     *                     @OA\Items(type="string", example="El nombre es requerido")
+     *                 ),
+     *                 @OA\Property(
+     *                     property="code",
+     *                     type="array",
+     *                     @OA\Items(type="string", example="El código es requerido")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Error interno del servidor",
+     *         @OA\JsonContent(ref="#/components/schemas/Error")
+     *     )
+     * )
      */
     public function store(StoreHeadOfficeRequest $request): JsonResponse
     {
         return catchSync(function () use ($request) {
             $data = $request->validated();
+            $data['created_by'] = 'system';
 
             // Create head office
             $headOffice = $this->headOfficeService->create($data);
 
-            return $headOffice->load(['departments']);
+            return new HeadOfficeResource($headOffice);
         }, 'Sede creada exitosamente', 201);
     }
 
     /**
-     * Display the specified head office
-     *
-     * @param string $id
-     * @return JsonResponse
+     * @OA\Get(
+     *     path="/head-offices/{id}",
+     *     operationId="getHeadOffice",
+     *     tags={"HeadOffices"},
+     *     summary="Obtener sede por ID",
+     *     description="Retorna una sede específica con vista detallada y metadata",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID único de la sede",
+     *         required=true,
+     *         @OA\Schema(type="string", format="uuid", example="0197d795-7572-7331-903b-3aeed9fb34c2")
+     *     ),
+     *     @OA\Parameter(
+     *         name="include",
+     *         in="query",
+     *         description="Relaciones a incluir (departments, statistics, hierarchy)",
+     *         required=false,
+     *         @OA\Schema(type="string", example="departments,statistics")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Sede obtenida exitosamente",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Sede obtenida exitosamente"),
+     *             @OA\Property(property="data", ref="#/components/schemas/HeadOfficeDetailed")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Sede no encontrada",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Sede no encontrada")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Error interno del servidor",
+     *         @OA\JsonContent(ref="#/components/schemas/Error")
+     *     )
+     * )
      */
-    public function show(string $id): JsonResponse
+    public function show(Request $request, string $id): JsonResponse
     {
-        return catchSync(function () use ($id) {
+        return catchSync(function () use ($request, $id) {
             $headOffice = $this->headOfficeService->findById($id);
 
             if (!$headOffice) {
                 throw new \InvalidArgumentException('Sede no encontrada');
             }
 
-            return $headOffice;
+            // Load relationships if requested
+            $includes = $request->get('include', '');
+            if ($includes) {
+                $includeArray = explode(',', $includes);
+                $headOffice->load($includeArray);
+            }
+
+            return (new HeadOfficeResource($headOffice))->detailed();
         }, 'Sede obtenida exitosamente');
     }
 
     /**
-     * Update the specified head office
+     * @OA\Put(
+     *     path="/head-offices/{id}",
+     *     operationId="updateHeadOffice",
+     *     tags={"HeadOffices"},
+     *     summary="Actualizar sede",
+     *     description="Actualiza una sede existente con los datos proporcionados",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID único de la sede",
+     *         required=true,
+     *         @OA\Schema(type="string", format="uuid", example="0197d795-7572-7331-903b-3aeed9fb34c2")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="Datos a actualizar de la sede",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="name", type="string", example="Sede Central Actualizada", description="Nombre de la sede"),
+     *             @OA\Property(property="code", type="string", example="CENTRAL_UPD", description="Código único de la sede")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Sede actualizada exitosamente",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Sede actualizada exitosamente"),
+     *             @OA\Property(property="data", ref="#/components/schemas/HeadOffice")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Sede no encontrada",
+     *         @OA\JsonContent(ref="#/components/schemas/Error")
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Error de validación",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Error interno del servidor",
+     *         @OA\JsonContent(ref="#/components/schemas/Error")
+     *     )
+     * )
      *
-     * @param UpdateHeadOfficeRequest $request
-     * @param string $id
-     * @return JsonResponse
+     * @OA\Patch(
+     *     path="/head-offices/{id}",
+     *     operationId="patchHeadOffice",
+     *     tags={"HeadOffices"},
+     *     summary="Actualizar sede (PATCH)",
+     *     description="Actualiza parcialmente una sede existente",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID único de la sede",
+     *         required=true,
+     *         @OA\Schema(type="string", format="uuid")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="Datos a actualizar de la sede",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="name", type="string", description="Nombre de la sede"),
+     *             @OA\Property(property="code", type="string", description="Código único de la sede")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Sede actualizada exitosamente",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Sede actualizada exitosamente"),
+     *             @OA\Property(property="data", ref="#/components/schemas/HeadOffice")
+     *         )
+     *     )
+     * )
      */
     public function update(UpdateHeadOfficeRequest $request, string $id): JsonResponse
     {
         return catchSync(function () use ($request, $id) {
             $data = $request->validated();
+            $data['updated_by'] = 'system';
 
             // Update head office
             $headOffice = $this->headOfficeService->update($id, $data);
 
-            return $headOffice;
+            return new HeadOfficeResource($headOffice);
         }, 'Sede actualizada exitosamente');
     }
 
     /**
-     * Remove the specified head office
-     *
-     * @param string $id
-     * @return JsonResponse
+     * @OA\Delete(
+     *     path="/head-offices/{id}",
+     *     operationId="deleteHeadOffice",
+     *     tags={"HeadOffices"},
+     *     summary="Eliminar sede",
+     *     description="Elimina una sede (soft delete). La sede se marca como eliminada pero no se borra físicamente.",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID único de la sede",
+     *         required=true,
+     *         @OA\Schema(type="string", format="uuid", example="0197d795-7572-7331-903b-3aeed9fb34c2")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Sede eliminada exitosamente",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Sede eliminada exitosamente"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="deleted", type="boolean", example=true),
+     *                 @OA\Property(property="id", type="string", example="0197d795-7572-7331-903b-3aeed9fb34c2")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Sede no encontrada",
+     *         @OA\JsonContent(ref="#/components/schemas/Error")
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="No se puede eliminar (tiene departamentos asociados)",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Error interno del servidor",
+     *         @OA\JsonContent(ref="#/components/schemas/Error")
+     *     )
+     * )
      */
     public function destroy(string $id): JsonResponse
     {
@@ -121,44 +456,144 @@ class HeadOfficeController extends Controller
     }
 
     /**
-     * Restore the specified head office
-     *
-     * @param string $id
-     * @return JsonResponse
+     * @OA\Post(
+     *     path="/head-offices/{id}/restore",
+     *     operationId="restoreHeadOffice",
+     *     tags={"HeadOffices"},
+     *     summary="Restaurar sede",
+     *     description="Restaura una sede previamente eliminada (soft delete)",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID único de la sede eliminada",
+     *         required=true,
+     *         @OA\Schema(type="string", format="uuid", example="0197d795-7572-7331-903b-3aeed9fb34c2")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Sede restaurada exitosamente",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Sede restaurada exitosamente"),
+     *             @OA\Property(property="data", ref="#/components/schemas/HeadOffice")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Sede no encontrada",
+     *         @OA\JsonContent(ref="#/components/schemas/Error")
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="La sede no está eliminada",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Error interno del servidor",
+     *         @OA\JsonContent(ref="#/components/schemas/Error")
+     *     )
+     * )
      */
     public function restore(string $id): JsonResponse
     {
         return catchSync(function () use ($id) {
             $headOffice = $this->headOfficeService->restore($id);
 
-            return $headOffice;
+            return new HeadOfficeResource($headOffice);
         }, 'Sede restaurada exitosamente');
     }
 
     /**
-     * Get head office hierarchy with all relationships
-     *
-     * @param string $id
-     * @return JsonResponse
+     * @OA\Get(
+     *     path="/head-offices/{id}/hierarchy",
+     *     operationId="getHeadOfficeHierarchy",
+     *     tags={"HeadOffices"},
+     *     summary="Obtener jerarquía de sede",
+     *     description="Retorna la jerarquía completa de una sede con sus departamentos y carreras",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID único de la sede",
+     *         required=true,
+     *         @OA\Schema(type="string", format="uuid", example="0197d795-7572-7331-903b-3aeed9fb34c2")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Jerarquía obtenida exitosamente",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Jerarquía obtenida exitosamente"),
+     *             @OA\Property(property="data", ref="#/components/schemas/HeadOfficeHierarchy")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Sede no encontrada",
+     *         @OA\JsonContent(ref="#/components/schemas/Error")
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Error interno del servidor",
+     *         @OA\JsonContent(ref="#/components/schemas/Error")
+     *     )
+     * )
      */
     public function hierarchy(string $id): JsonResponse
     {
         return catchSync(function () use ($id) {
-            $hierarchy = $this->headOfficeService->getFullHierarchy($id);
+            $headOffice = $this->headOfficeService->getFullHierarchy($id);
 
-            if (!$hierarchy) {
+            if (!$headOffice) {
                 throw new \InvalidArgumentException('Sede no encontrada');
             }
 
-            return $hierarchy;
+            return (new HeadOfficeResource($headOffice))->withHierarchy();
         }, 'Jerarquía obtenida exitosamente');
     }
 
     /**
-     * Get head office statistics
-     *
-     * @param string $id
-     * @return JsonResponse
+     * @OA\Get(
+     *     path="/head-offices/{id}/statistics",
+     *     operationId="getHeadOfficeStatistics",
+     *     tags={"HeadOffices"},
+     *     summary="Obtener estadísticas de sede",
+     *     description="Retorna estadísticas detalladas de una sede (departamentos, carreras, etc.)",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID único de la sede",
+     *         required=true,
+     *         @OA\Schema(type="string", format="uuid", example="0197d795-7572-7331-903b-3aeed9fb34c2")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Estadísticas obtenidas exitosamente",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Estadísticas obtenidas exitosamente"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="departments_count", type="integer", example=0),
+     *                 @OA\Property(property="careers_count", type="integer", example=0),
+     *                 @OA\Property(property="created_at", type="string", format="date-time"),
+     *                 @OA\Property(property="last_updated", type="string", format="date-time"),
+     *                 @OA\Property(property="version", type="integer", example=2)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Sede no encontrada",
+     *         @OA\JsonContent(ref="#/components/schemas/Error")
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Error interno del servidor",
+     *         @OA\JsonContent(ref="#/components/schemas/Error")
+     *     )
+     * )
      */
     public function statistics(string $id): JsonResponse
     {
@@ -168,10 +603,42 @@ class HeadOfficeController extends Controller
     }
 
     /**
-     * Find head office by code
-     *
-     * @param string $code
-     * @return JsonResponse
+     * @OA\Get(
+     *     path="/head-offices/code/{code}",
+     *     operationId="findHeadOfficeByCode",
+     *     tags={"HeadOffices"},
+     *     summary="Buscar sede por código",
+     *     description="Busca y retorna una sede por su código único",
+     *     @OA\Parameter(
+     *         name="code",
+     *         in="path",
+     *         description="Código único de la sede",
+     *         required=true,
+     *         @OA\Schema(type="string", example="CENTRAL")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Sede encontrada exitosamente",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Sede encontrada exitosamente"),
+     *             @OA\Property(property="data", ref="#/components/schemas/HeadOffice")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Sede no encontrada con el código especificado",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Sede no encontrada con el código especificado")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Error interno del servidor",
+     *         @OA\JsonContent(ref="#/components/schemas/Error")
+     *     )
+     * )
      */
     public function findByCode(string $code): JsonResponse
     {
@@ -182,15 +649,67 @@ class HeadOfficeController extends Controller
                 throw new \InvalidArgumentException('Sede no encontrada con el código especificado');
             }
 
-            return $headOffice;
+            return new HeadOfficeResource($headOffice);
         }, 'Sede encontrada exitosamente');
     }
 
     /**
-     * Bulk delete head offices
-     *
-     * @param Request $request
-     * @return JsonResponse
+     * @OA\Post(
+     *     path="/head-offices/bulk-delete",
+     *     operationId="bulkDeleteHeadOffices",
+     *     tags={"HeadOffices"},
+     *     summary="Eliminación masiva de sedes",
+     *     description="Elimina múltiples sedes en una sola operación (soft delete)",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="Array de IDs de sedes a eliminar",
+     *         @OA\JsonContent(
+     *             required={"ids"},
+     *             @OA\Property(
+     *                 property="ids",
+     *                 type="array",
+     *                 @OA\Items(type="string", format="uuid"),
+     *                 example={"0197d795-7572-7331-903b-3aeed9fb34c2", "0197d795-7572-7331-903b-3aeed9fb34c3"}
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Eliminación masiva completada",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Eliminación masiva completada"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="deleted_count", type="integer", example=2, description="Número de sedes eliminadas exitosamente"),
+     *                 @OA\Property(property="total_requested", type="integer", example=3, description="Número total de sedes solicitadas para eliminar")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Error de validación",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Se requiere un array de IDs"),
+     *             @OA\Property(
+     *                 property="errors",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="ids",
+     *                     type="array",
+     *                     @OA\Items(type="string", example="Se requiere un array de IDs")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Error interno del servidor",
+     *         @OA\JsonContent(ref="#/components/schemas/Error")
+     *     )
+     * )
      */
     public function bulkDelete(Request $request): JsonResponse
     {

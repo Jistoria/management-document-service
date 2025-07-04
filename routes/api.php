@@ -1,45 +1,26 @@
 <?php
 
-use App\Http\Controllers\FacultyController;
+use App\Http\Controllers\HeadOfficeController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('faculties')->group(function () {
-    Route::get('/', [FacultyController::class, 'index'])
-        ->name('faculties.index');
-    Route::get('/{id}', [FacultyController::class, 'show'])
-        ->name('faculties.show');
-    Route::post('/', [FacultyController::class, 'store'])
-        ->name('faculties.store');
-    Route::put('/{id}', [FacultyController::class, 'update'])
-        ->name('faculties.update');
-    Route::delete('/{id}', [FacultyController::class, 'destroy'])
-        ->name('faculties.destroy');
+// Head Offices Routes
+Route::prefix('head-offices')->group(function () {
+    // Standard CRUD routes
+    Route::get('/', [HeadOfficeController::class, 'index']);
+    Route::post('/', [HeadOfficeController::class, 'store']);
+    Route::get('/{head_office}', [HeadOfficeController::class, 'show']);
+    Route::put('/{head_office}', [HeadOfficeController::class, 'update']);
+    Route::patch('/{head_office}', [HeadOfficeController::class, 'update']);
+    Route::delete('/{head_office}', [HeadOfficeController::class, 'destroy']);
+
+    // Additional routes
+    Route::post('/{head_office}/restore', [HeadOfficeController::class, 'restore']);
+    Route::get('/{head_office}/hierarchy', [HeadOfficeController::class, 'hierarchy']);
+    Route::get('/{head_office}/statistics', [HeadOfficeController::class, 'statistics']);
+    Route::get('/code/{code}', [HeadOfficeController::class, 'findByCode']);
+    Route::post('/bulk-delete', [HeadOfficeController::class, 'bulkDelete']);
 });
 
-Route::prefix('careers')->group(function () {
-    Route::get('/', [FacultyController::class, 'index'])
-        ->name('careers.index');
-    Route::get('/{id}', [FacultyController::class, 'show'])
-        ->name('careers.show');
-    Route::post('/', [FacultyController::class, 'store'])
-        ->name('careers.store');
-    Route::put('/{id}', [FacultyController::class, 'update'])
-        ->name('careers.update');
-    Route::delete('/{id}', [FacultyController::class, 'destroy'])
-        ->name('careers.destroy');
-});
-
-
-
-Route::prefix('subsystems')->group(function () {
-    Route::get('/', [FacultyController::class, 'index'])
-        ->name('subsystems.index');
-    Route::get('/{id}', [FacultyController::class, 'show'])
-        ->name('subsystems.show');
-    Route::post('/', [FacultyController::class, 'store'])
-        ->name('subsystems.store');
-    Route::put('/{id}', [FacultyController::class, 'update'])
-        ->name('subsystems.update');
-    Route::delete('/{id}', [FacultyController::class, 'destroy'])
-        ->name('subsystems.destroy');
+Route::fallback(function () {
+    return response()->json(['message' => 'API connection successful.'], 200);
 });

@@ -1,0 +1,13 @@
+<?php
+
+namespace Modules\{{module}}\Services;
+
+class {{class}}
+{
+    public function __construct()
+    {
+        //
+    }
+
+    // Aquí puedes definir la lógica de tu servicio
+}

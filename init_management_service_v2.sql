@@ -4,7 +4,8 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- === Sedes ===
 CREATE TABLE head_offices (
     id UUID PRIMARY KEY,
-    name TEXT NOT NULL
+    name TEXT NOT NULL,
+    code TEXT UNIQUE NOT NULL,
 );
 
 -- === Unidades (Facultades, Direcciones) ===

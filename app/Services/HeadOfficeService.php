@@ -265,11 +265,14 @@ class HeadOfficeService
         $resolved = [];
 
         foreach ($requestedIncludes as $include) {
+            $include = trim($include); // Clean whitespace
+
             match ($include) {
                 'departments' => $resolved[] = 'departments',
                 'hierarchy' => $resolved = array_merge($resolved, [
                     'departments.careers.subsystems',
                 ]),
+                'statistics', 'statics' => null, // These are handled by the resource, not relationships
                 default => null, // Ignora includes no válidos
             };
         }
@@ -278,5 +281,4 @@ class HeadOfficeService
             $headOffice->load(array_unique($resolved));
         }
     }
-
 }

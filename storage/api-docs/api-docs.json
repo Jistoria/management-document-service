@@ -29,19 +29,26 @@
                 "operationId": "getDepartments",
                 "parameters": [
                     {
-                        "name": "paginate",
+                        "name": "format",
                         "in": "query",
-                        "description": "Activar paginación (true/false)",
+                        "description": "Formato de respuesta",
                         "required": false,
                         "schema": {
-                            "type": "boolean",
-                            "example": true
+                            "type": "string",
+                            "enum": [
+                                "paginate",
+                                "minimal",
+                                "dropdown",
+                                "pluck",
+                                "collection"
+                            ],
+                            "example": "paginate"
                         }
                     },
                     {
                         "name": "per_page",
                         "in": "query",
-                        "description": "Elementos por página (cuando paginate=true)",
+                        "description": "Elementos por página (cuando format=paginate)",
                         "required": false,
                         "schema": {
                             "type": "integer",
@@ -49,32 +56,9 @@
                         }
                     },
                     {
-                        "name": "minimal",
+                        "name": "pluck_key",
                         "in": "query",
-                        "description": "Vista minimal con campos básicos (true/false)",
-                        "required": false,
-                        "schema": {
-                            "type": "boolean",
-                            "example": true
-                        }
-                    },
-                    {
-                        "name": "format",
-                        "in": "query",
-                        "description": "Formato de respuesta (dropdown)",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "dropdown"
-                            ],
-                            "example": "dropdown"
-                        }
-                    },
-                    {
-                        "name": "pluck",
-                        "in": "query",
-                        "description": "Campo para formato pluck (key-value)",
+                        "description": "Campo clave para formato pluck",
                         "required": false,
                         "schema": {
                             "type": "string",
@@ -84,11 +68,41 @@
                     {
                         "name": "pluck_label",
                         "in": "query",
-                        "description": "Campo label para formato pluck",
+                        "description": "Campo etiqueta para formato pluck",
                         "required": false,
                         "schema": {
                             "type": "string",
                             "example": "name"
+                        }
+                    },
+                    {
+                        "name": "paginate",
+                        "in": "query",
+                        "description": "[Legacy] Activar paginación (usar format=paginate)",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "example": true
+                        }
+                    },
+                    {
+                        "name": "minimal",
+                        "in": "query",
+                        "description": "[Legacy] Vista minimal (usar format=minimal)",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "example": true
+                        }
+                    },
+                    {
+                        "name": "pluck",
+                        "in": "query",
+                        "description": "[Legacy] Campo para pluck (usar format=pluck)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "id"
                         }
                     },
                     {
@@ -972,19 +986,26 @@
                 "operationId": "getHeadOffices",
                 "parameters": [
                     {
-                        "name": "paginate",
+                        "name": "format",
                         "in": "query",
-                        "description": "Activar paginación (true/false)",
+                        "description": "Formato de respuesta",
                         "required": false,
                         "schema": {
-                            "type": "boolean",
-                            "example": true
+                            "type": "string",
+                            "enum": [
+                                "paginate",
+                                "minimal",
+                                "dropdown",
+                                "pluck",
+                                "collection"
+                            ],
+                            "example": "paginate"
                         }
                     },
                     {
                         "name": "per_page",
                         "in": "query",
-                        "description": "Elementos por página (cuando paginate=true)",
+                        "description": "Elementos por página (cuando format=paginate)",
                         "required": false,
                         "schema": {
                             "type": "integer",
@@ -992,32 +1013,9 @@
                         }
                     },
                     {
-                        "name": "minimal",
+                        "name": "pluck_key",
                         "in": "query",
-                        "description": "Vista minimal con campos básicos (true/false)",
-                        "required": false,
-                        "schema": {
-                            "type": "boolean",
-                            "example": true
-                        }
-                    },
-                    {
-                        "name": "format",
-                        "in": "query",
-                        "description": "Formato de respuesta (dropdown)",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "dropdown"
-                            ],
-                            "example": "dropdown"
-                        }
-                    },
-                    {
-                        "name": "pluck",
-                        "in": "query",
-                        "description": "Campo para formato pluck (key-value)",
+                        "description": "Campo clave para formato pluck",
                         "required": false,
                         "schema": {
                             "type": "string",
@@ -1027,11 +1025,41 @@
                     {
                         "name": "pluck_label",
                         "in": "query",
-                        "description": "Campo label para formato pluck",
+                        "description": "Campo etiqueta para formato pluck",
                         "required": false,
                         "schema": {
                             "type": "string",
                             "example": "name"
+                        }
+                    },
+                    {
+                        "name": "paginate",
+                        "in": "query",
+                        "description": "[Legacy] Activar paginación (usar format=paginate)",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "example": true
+                        }
+                    },
+                    {
+                        "name": "minimal",
+                        "in": "query",
+                        "description": "[Legacy] Vista minimal (usar format=minimal)",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "example": true
+                        }
+                    },
+                    {
+                        "name": "pluck",
+                        "in": "query",
+                        "description": "[Legacy] Campo para pluck (usar format=pluck)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "id"
                         }
                     },
                     {

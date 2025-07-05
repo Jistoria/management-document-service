@@ -6,6 +6,7 @@ use App\Http\Requests\HeadOffice\StoreHeadOfficeRequest;
 use App\Http\Requests\HeadOffice\UpdateHeadOfficeRequest;
 use App\Http\Resources\HeadOfficeResource;
 use App\Services\HeadOfficeService;
+use App\Helpers\ApiIndexBuilder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use function App\Helpers\catchSync;
@@ -33,46 +34,53 @@ class HeadOfficeController extends Controller
      *     summary="Obtener listado de sedes",
      *     description="Retorna el listado de sedes con soporte para múltiples formatos: paginación, colección, minimal, dropdown, pluck",
      *     @OA\Parameter(
-     *         name="paginate",
+     *         name="format",
      *         in="query",
-     *         description="Activar paginación (true/false)",
+     *         description="Formato de respuesta",
      *         required=false,
-     *         @OA\Schema(type="boolean", example=true)
+     *         @OA\Schema(type="string", enum={"paginate", "minimal", "dropdown", "pluck", "collection"}, example="paginate")
      *     ),
      *     @OA\Parameter(
      *         name="per_page",
      *         in="query",
-     *         description="Elementos por página (cuando paginate=true)",
+     *         description="Elementos por página (cuando format=paginate)",
      *         required=false,
      *         @OA\Schema(type="integer", example=15)
      *     ),
      *     @OA\Parameter(
-     *         name="minimal",
+     *         name="pluck_key",
      *         in="query",
-     *         description="Vista minimal con campos básicos (true/false)",
-     *         required=false,
-     *         @OA\Schema(type="boolean", example=true)
-     *     ),
-     *     @OA\Parameter(
-     *         name="format",
-     *         in="query",
-     *         description="Formato de respuesta (dropdown)",
-     *         required=false,
-     *         @OA\Schema(type="string", enum={"dropdown"}, example="dropdown")
-     *     ),
-     *     @OA\Parameter(
-     *         name="pluck",
-     *         in="query",
-     *         description="Campo para formato pluck (key-value)",
+     *         description="Campo clave para formato pluck",
      *         required=false,
      *         @OA\Schema(type="string", example="id")
      *     ),
      *     @OA\Parameter(
      *         name="pluck_label",
      *         in="query",
-     *         description="Campo label para formato pluck",
+     *         description="Campo etiqueta para formato pluck",
      *         required=false,
      *         @OA\Schema(type="string", example="name")
+     *     ),
+     *     @OA\Parameter(
+     *         name="paginate",
+     *         in="query",
+     *         description="[Legacy] Activar paginación (usar format=paginate)",
+     *         required=false,
+     *         @OA\Schema(type="boolean", example=true)
+     *     ),
+     *     @OA\Parameter(
+     *         name="minimal",
+     *         in="query",
+     *         description="[Legacy] Vista minimal (usar format=minimal)",
+     *         required=false,
+     *         @OA\Schema(type="boolean", example=true)
+     *     ),
+     *     @OA\Parameter(
+     *         name="pluck",
+     *         in="query",
+     *         description="[Legacy] Campo para pluck (usar format=pluck)",
+     *         required=false,
+     *         @OA\Schema(type="string", example="id")
      *     ),
      *     @OA\Parameter(
      *         name="search",
@@ -134,45 +142,15 @@ class HeadOfficeController extends Controller
     public function index(Request $request): JsonResponse
     {
         return catchSync(function () use ($request) {
-            $perPage = $request->input('per_page', 15);
-            $filters = [
-                'search' => $request->input('search'),
-                'code' => $request->input('code'),
-                'created_by' => $request->input('created_by')
-            ];
+            // Filtros específicos para sedes principales
+            $filters = ApiIndexBuilder::extractFilters($request);
 
-            // Check if pagination is requested
-            if ($request->has('paginate') && $request->input('paginate') !== 'false') {
-                $paginated = $this->headOfficeService->getPaginated($perPage, $filters);
-                return HeadOfficeResource::paginated($paginated);
-            }
-
-            // Check if minimal view is requested
-            if ($request->has('minimal') && $request->input('minimal') === 'true') {
-                $headOffices = $this->headOfficeService->getAll($filters);
-                return [
-                    'data' => $headOffices->map(fn($ho) => (new HeadOfficeResource($ho))->minimal()),
-                    'count' => count($headOffices)
-                ];
-            }
-
-            // Check if dropdown format is requested
-            if ($request->has('format') && $request->input('format') === 'dropdown') {
-                $headOffices = $this->headOfficeService->getAll($filters);
-                return HeadOfficeResource::forDropdown($headOffices);
-            }
-
-            // Check if pluck format is requested
-            if ($request->has('pluck')) {
-                $headOffices = $this->headOfficeService->getAll($filters);
-                $valueKey = $request->input('pluck');
-                $labelKey = $request->input('pluck_label', 'name');
-                return HeadOfficeResource::pluck($headOffices, $valueKey, $labelKey);
-            }
-
-            // Default collection
-            $headOffices = $this->headOfficeService->getAll($filters);
-            return HeadOfficeResource::simpleCollection($headOffices);
+            return ApiIndexBuilder::build(
+                $this->headOfficeService,
+                \App\Http\Resources\HeadOfficeResource::class,
+                $request,
+                $filters
+            );
         }, 'Sedes obtenidas exitosamente');
     }
 

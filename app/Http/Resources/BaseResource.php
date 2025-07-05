@@ -156,9 +156,30 @@ abstract class BaseResource extends JsonResource
     protected function shouldInclude(string $relation, Request $request): bool
     {
         $requested = $this->getRequestedIncludes($request);
-        return in_array($relation, $requested) ||
+
+        // Handle aliases for common typos/variations
+        $aliases = [
+            'statistics' => ['statics', 'stats'],
+            'hierarchy' => ['hierarchies'],
+            'head_office' => ['headoffice', 'head-office'],
+            'careers' => ['career'],
+        ];
+
+        $found = in_array($relation, $requested) ||
             in_array('*', $requested) ||
             !empty($this->context['include_relations']) &&
             in_array($relation, $this->context['include_relations']);
+
+        // Check aliases if not found directly
+        if (!$found && isset($aliases[$relation])) {
+            foreach ($aliases[$relation] as $alias) {
+                if (in_array($alias, $requested)) {
+                    $found = true;
+                    break;
+                }
+            }
+        }
+
+        return $found;
     }
 }

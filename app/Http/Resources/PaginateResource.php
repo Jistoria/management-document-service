@@ -61,7 +61,7 @@ class PaginateResource extends JsonResource
     /**
      * Create a paginated response with specific resource class
      */
-    public static function paginate(LengthAwarePaginator $paginator, string $resourceClass = null): self
+    public static function paginate(LengthAwarePaginator $paginator, string|null $resourceClass): self
     {
         return new self($paginator, $resourceClass);
     }

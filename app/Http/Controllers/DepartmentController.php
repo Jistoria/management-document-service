@@ -6,6 +6,7 @@ use App\Http\Requests\Department\StoreDepartmentRequest;
 use App\Http\Requests\Department\UpdateDepartmentRequest;
 use App\Http\Resources\DepartmentResource;
 use App\Services\DepartmentService;
+use App\Helpers\ApiIndexBuilder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use function App\Helpers\catchSync;
@@ -33,46 +34,53 @@ class DepartmentController extends Controller
      *     summary="Obtener listado de departamentos",
      *     description="Retorna el listado de departamentos con soporte para múltiples formatos: paginación, colección, minimal, dropdown, pluck",
      *     @OA\Parameter(
-     *         name="paginate",
+     *         name="format",
      *         in="query",
-     *         description="Activar paginación (true/false)",
+     *         description="Formato de respuesta",
      *         required=false,
-     *         @OA\Schema(type="boolean", example=true)
+     *         @OA\Schema(type="string", enum={"paginate", "minimal", "dropdown", "pluck", "collection"}, example="paginate")
      *     ),
      *     @OA\Parameter(
      *         name="per_page",
      *         in="query",
-     *         description="Elementos por página (cuando paginate=true)",
+     *         description="Elementos por página (cuando format=paginate)",
      *         required=false,
      *         @OA\Schema(type="integer", example=15)
      *     ),
      *     @OA\Parameter(
-     *         name="minimal",
+     *         name="pluck_key",
      *         in="query",
-     *         description="Vista minimal con campos básicos (true/false)",
-     *         required=false,
-     *         @OA\Schema(type="boolean", example=true)
-     *     ),
-     *     @OA\Parameter(
-     *         name="format",
-     *         in="query",
-     *         description="Formato de respuesta (dropdown)",
-     *         required=false,
-     *         @OA\Schema(type="string", enum={"dropdown"}, example="dropdown")
-     *     ),
-     *     @OA\Parameter(
-     *         name="pluck",
-     *         in="query",
-     *         description="Campo para formato pluck (key-value)",
+     *         description="Campo clave para formato pluck",
      *         required=false,
      *         @OA\Schema(type="string", example="id")
      *     ),
      *     @OA\Parameter(
      *         name="pluck_label",
      *         in="query",
-     *         description="Campo label para formato pluck",
+     *         description="Campo etiqueta para formato pluck",
      *         required=false,
      *         @OA\Schema(type="string", example="name")
+     *     ),
+     *     @OA\Parameter(
+     *         name="paginate",
+     *         in="query",
+     *         description="[Legacy] Activar paginación (usar format=paginate)",
+     *         required=false,
+     *         @OA\Schema(type="boolean", example=true)
+     *     ),
+     *     @OA\Parameter(
+     *         name="minimal",
+     *         in="query",
+     *         description="[Legacy] Vista minimal (usar format=minimal)",
+     *         required=false,
+     *         @OA\Schema(type="boolean", example=true)
+     *     ),
+     *     @OA\Parameter(
+     *         name="pluck",
+     *         in="query",
+     *         description="[Legacy] Campo para pluck (usar format=pluck)",
+     *         required=false,
+     *         @OA\Schema(type="string", example="id")
      *     ),
      *     @OA\Parameter(
      *         name="search",
@@ -141,46 +149,15 @@ class DepartmentController extends Controller
     public function index(Request $request): JsonResponse
     {
         return catchSync(function () use ($request) {
-            $perPage = $request->input('per_page', 15);
-            $filters = [
-                'search' => $request->input('search'),
-                'code' => $request->input('code'),
-                'head_office_id' => $request->input('head_office_id'),
-                'created_by' => $request->input('created_by')
-            ];
+            // Filtros específicos para departamentos
+            $filters = ApiIndexBuilder::extractFilters($request, ['head_office_id']);
 
-            // Check if pagination is requested
-            if ($request->has('paginate') && $request->input('paginate') !== 'false') {
-                $paginated = $this->departmentService->getPaginated($perPage, $filters);
-                return DepartmentResource::paginated($paginated);
-            }
-
-            // Check if minimal view is requested
-            if ($request->has('minimal') && $request->input('minimal') === 'true') {
-                $departments = $this->departmentService->getAll($filters);
-                return [
-                    'data' => $departments->map(fn($dept) => (new DepartmentResource($dept))->minimal()),
-                    'count' => count($departments)
-                ];
-            }
-
-            // Check if dropdown format is requested
-            if ($request->has('format') && $request->input('format') === 'dropdown') {
-                $departments = $this->departmentService->getAll($filters);
-                return DepartmentResource::forDropdown($departments);
-            }
-
-            // Check if pluck format is requested
-            if ($request->has('pluck')) {
-                $departments = $this->departmentService->getAll($filters);
-                $valueKey = $request->input('pluck');
-                $labelKey = $request->input('pluck_label', 'name');
-                return DepartmentResource::pluck($departments, $valueKey, $labelKey);
-            }
-
-            // Default collection
-            $departments = $this->departmentService->getAll($filters);
-            return DepartmentResource::simpleCollection($departments);
+            return ApiIndexBuilder::build(
+                $this->departmentService,
+                \App\Http\Resources\DepartmentResource::class,
+                $request,
+                $filters
+            );
         }, 'Departamentos obtenidos exitosamente');
     }
 

@@ -19,6 +19,949 @@
         }
     ],
     "paths": {
+        "/departments": {
+            "get": {
+                "tags": [
+                    "Departments"
+                ],
+                "summary": "Obtener listado de departamentos",
+                "description": "Retorna el listado de departamentos con soporte para múltiples formatos: paginación, colección, minimal, dropdown, pluck",
+                "operationId": "getDepartments",
+                "parameters": [
+                    {
+                        "name": "paginate",
+                        "in": "query",
+                        "description": "Activar paginación (true/false)",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "example": true
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Elementos por página (cuando paginate=true)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 15
+                        }
+                    },
+                    {
+                        "name": "minimal",
+                        "in": "query",
+                        "description": "Vista minimal con campos básicos (true/false)",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "example": true
+                        }
+                    },
+                    {
+                        "name": "format",
+                        "in": "query",
+                        "description": "Formato de respuesta (dropdown)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "dropdown"
+                            ],
+                            "example": "dropdown"
+                        }
+                    },
+                    {
+                        "name": "pluck",
+                        "in": "query",
+                        "description": "Campo para formato pluck (key-value)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "id"
+                        }
+                    },
+                    {
+                        "name": "pluck_label",
+                        "in": "query",
+                        "description": "Campo label para formato pluck",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "name"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Búsqueda por nombre o código",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "informática"
+                        }
+                    },
+                    {
+                        "name": "code",
+                        "in": "query",
+                        "description": "Filtrar por código específico",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "INFO"
+                        }
+                    },
+                    {
+                        "name": "head_office_id",
+                        "in": "query",
+                        "description": "Filtrar por sede específica",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "created_by",
+                        "in": "query",
+                        "description": "Filtrar por creador",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "system"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Listado obtenido exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Departamentos obtenidos exitosamente"
+                                        },
+                                        "data": {
+                                            "oneOf": [
+                                                {
+                                                    "properties": {
+                                                        "data": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/components/schemas/Department"
+                                                            }
+                                                        },
+                                                        "count": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                {
+                                                    "properties": {
+                                                        "data": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/components/schemas/Department"
+                                                            }
+                                                        },
+                                                        "pagination": {
+                                                            "$ref": "#/components/schemas/Pagination"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Departments"
+                ],
+                "summary": "Crear nuevo departamento",
+                "description": "Crea un nuevo departamento con los datos proporcionados",
+                "operationId": "createDepartment",
+                "requestBody": {
+                    "description": "Datos del departamento a crear",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "head_office_id"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "description": "Nombre del departamento",
+                                        "type": "string",
+                                        "example": "Departamento de Informática"
+                                    },
+                                    "code": {
+                                        "description": "Código único del departamento (alfanumérico, mayúsculas)",
+                                        "type": "string",
+                                        "example": "INFO"
+                                    },
+                                    "head_office_id": {
+                                        "description": "ID de la sede a la que pertenece",
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "example": "0197d795-7572-7331-903b-3aeed9fb34c2"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Departamento creado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Departamento creado exitosamente"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Department"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Los datos proporcionados no son válidos."
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "name": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "El nombre es requerido"
+                                                    }
+                                                },
+                                                "head_office_id": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "La sede es requerida"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/departments/{id}": {
+            "get": {
+                "tags": [
+                    "Departments"
+                ],
+                "summary": "Obtener departamento por ID",
+                "description": "Retorna un departamento específico con vista detallada y metadata",
+                "operationId": "getDepartment",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID único del departamento",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "description": "Relaciones a incluir (head_office, careers, statistics, hierarchy)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "head_office,careers"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Departamento obtenido exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Departamento obtenido exitosamente"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Department"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Departamento no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Departments"
+                ],
+                "summary": "Actualizar departamento",
+                "description": "Actualiza un departamento existente con los datos proporcionados",
+                "operationId": "updateDepartment",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID único del departamento",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Datos del departamento a actualizar",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Departamento de Informática Actualizado"
+                                    },
+                                    "code": {
+                                        "type": "string",
+                                        "example": "INFO_UPD"
+                                    },
+                                    "head_office_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Departamento actualizado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Departamento actualizado exitosamente"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Department"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Departamento no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Departments"
+                ],
+                "summary": "Eliminar departamento",
+                "description": "Elimina (soft delete) un departamento específico",
+                "operationId": "deleteDepartment",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID único del departamento",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Departamento eliminado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Departamento eliminado exitosamente"
+                                        },
+                                        "data": {
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "No se puede eliminar el departamento porque tiene carreras activas",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Departamento no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/departments/{id}/restore": {
+            "post": {
+                "tags": [
+                    "Departments"
+                ],
+                "summary": "Restaurar departamento eliminado",
+                "description": "Restaura un departamento previamente eliminado (soft delete)",
+                "operationId": "restoreDepartment",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID único del departamento",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Departamento restaurado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Departamento restaurado exitosamente"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Department"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "El departamento no está eliminado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Departamento no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/departments/{id}/hierarchy": {
+            "get": {
+                "tags": [
+                    "Departments"
+                ],
+                "summary": "Obtener jerarquía completa del departamento",
+                "description": "Retorna la jerarquía completa del departamento incluyendo sede, carreras y subsistemas",
+                "operationId": "getDepartmentHierarchy",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID único del departamento",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Jerarquía obtenida exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Jerarquía del departamento obtenida exitosamente"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Department"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Departamento no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/departments/{id}/statistics": {
+            "get": {
+                "tags": [
+                    "Departments"
+                ],
+                "summary": "Obtener estadísticas del departamento",
+                "description": "Retorna estadísticas detalladas del departamento",
+                "operationId": "getDepartmentStatistics",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID único del departamento",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Estadísticas obtenidas exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Estadísticas del departamento obtenidas exitosamente"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "careers_count": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "head_office": {
+                                                    "type": "object"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "last_updated": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "version": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Departamento no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/departments/code/{code}": {
+            "get": {
+                "tags": [
+                    "Departments"
+                ],
+                "summary": "Obtener departamento por código",
+                "description": "Busca y retorna un departamento específico por su código único",
+                "operationId": "getDepartmentByCode",
+                "parameters": [
+                    {
+                        "name": "code",
+                        "in": "path",
+                        "description": "Código único del departamento",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "INFO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Departamento encontrado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Departamento encontrado exitosamente"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Department"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Departamento no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/departments/bulk-delete": {
+            "post": {
+                "tags": [
+                    "Departments"
+                ],
+                "summary": "Eliminación masiva de departamentos",
+                "description": "Elimina múltiples departamentos en una sola operación",
+                "operationId": "bulkDeleteDepartments",
+                "requestBody": {
+                    "description": "IDs de los departamentos a eliminar",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "ids"
+                                ],
+                                "properties": {
+                                    "ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        },
+                                        "example": [
+                                            "0197d795-7572-7331-903b-3aeed9fb34c2",
+                                            "0197d795-7572-7331-903b-3aeed9fb34c3"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Eliminación masiva completada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Eliminación masiva completada"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "deleted_count": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "total_requested": {
+                                                    "type": "integer",
+                                                    "example": 3
+                                                },
+                                                "success_rate": {
+                                                    "type": "string",
+                                                    "example": "66.67%"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/head-offices": {
             "get": {
                 "tags": [
@@ -1327,6 +2270,338 @@
                     }
                 },
                 "type": "object"
+            },
+            "Department": {
+                "title": "Department",
+                "description": "Departamento de una sede",
+                "properties": {
+                    "id": {
+                        "description": "ID único del departamento",
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "8015bc21-9a48-4b9c-a552-71d1f6f6fb15"
+                    },
+                    "head_office_id": {
+                        "description": "ID de la sede a la que pertenece",
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "0197d888-7f98-71fc-baaa-e95ee1c28c84"
+                    },
+                    "name": {
+                        "description": "Nombre del departamento",
+                        "type": "string",
+                        "example": "Departamento de Informática"
+                    },
+                    "code": {
+                        "description": "Código único del departamento",
+                        "type": "string",
+                        "example": "INFO"
+                    },
+                    "created_at": {
+                        "description": "Fecha de creación",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-07-04T22:36:25.000000Z"
+                    },
+                    "updated_at": {
+                        "description": "Fecha de última actualización",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-07-04T22:36:47.000000Z"
+                    },
+                    "created_by": {
+                        "description": "Usuario que creó el departamento",
+                        "type": "string",
+                        "example": "system"
+                    },
+                    "updated_by": {
+                        "description": "Usuario que actualizó el departamento",
+                        "type": "string",
+                        "example": "system"
+                    },
+                    "version": {
+                        "description": "Versión del registro",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "careers_count": {
+                        "description": "Número de carreras asociadas",
+                        "type": "integer",
+                        "example": 3
+                    }
+                },
+                "type": "object"
+            },
+            "DepartmentDetailed": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/Department"
+                    },
+                    {
+                        "properties": {
+                            "head_office": {
+                                "$ref": "#/components/schemas/HeadOffice"
+                            },
+                            "careers": {
+                                "description": "Carreras del departamento (incluidas condicionalmente)",
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/Career"
+                                }
+                            },
+                            "statistics": {
+                                "description": "Estadísticas del departamento (incluidas condicionalmente)",
+                                "properties": {
+                                    "careers_count": {
+                                        "type": "integer",
+                                        "example": 3
+                                    },
+                                    "has_careers": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "head_office_name": {
+                                        "type": "string",
+                                        "example": "Sede Central"
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "hierarchy": {
+                                "description": "Jerarquía completa (incluida condicionalmente)",
+                                "properties": {
+                                    "head_office": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "string",
+                                                "format": "uuid"
+                                            },
+                                            "name": {
+                                                "type": "string"
+                                            },
+                                            "code": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "careers_count": {
+                                        "type": "integer"
+                                    },
+                                    "careers": {
+                                        "type": "array",
+                                        "items": {
+                                            "$ref": "#/components/schemas/CareerWithSubsystems"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "meta": {
+                                "properties": {
+                                    "resource_type": {
+                                        "type": "string",
+                                        "example": "department"
+                                    },
+                                    "generated_at": {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    "context": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "Career": {
+                "title": "Career",
+                "description": "Carrera académica",
+                "properties": {
+                    "id": {
+                        "description": "ID único de la carrera",
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "310331bc-9201-472f-8d23-26ebcd3a8fdf"
+                    },
+                    "department_id": {
+                        "description": "ID del departamento al que pertenece",
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "8015bc21-9a48-4b9c-a552-71d1f6f6fb15"
+                    },
+                    "name": {
+                        "description": "Nombre de la carrera",
+                        "type": "string",
+                        "example": "Ingeniería de Sistemas"
+                    },
+                    "code": {
+                        "description": "Código de la carrera",
+                        "type": "string",
+                        "example": "ISIST"
+                    },
+                    "created_at": {
+                        "description": "Fecha de creación",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "description": "Fecha de última actualización",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "created_by": {
+                        "description": "Usuario que creó la carrera",
+                        "type": "string",
+                        "example": "system"
+                    },
+                    "updated_by": {
+                        "description": "Usuario que actualizó la carrera",
+                        "type": "string",
+                        "example": "system"
+                    },
+                    "version": {
+                        "description": "Versión del registro",
+                        "type": "integer",
+                        "example": 1
+                    }
+                },
+                "type": "object"
+            },
+            "CareerWithSubsystems": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/Career"
+                    },
+                    {
+                        "properties": {
+                            "subsystems": {
+                                "description": "Subsistemas asociados a la carrera",
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/Subsystem"
+                                }
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "Subsystem": {
+                "title": "Subsystem",
+                "description": "Subsistema del sistema de gestión",
+                "properties": {
+                    "id": {
+                        "description": "ID único del subsistema",
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "41091aec-4181-4546-b5dd-f97b34876015"
+                    },
+                    "name": {
+                        "description": "Nombre del subsistema",
+                        "type": "string",
+                        "example": "Subsistema de Prueba"
+                    },
+                    "code": {
+                        "description": "Código único del subsistema",
+                        "type": "string",
+                        "example": "SPRUEBA"
+                    },
+                    "created_at": {
+                        "description": "Fecha de creación",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "description": "Fecha de última actualización",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "created_by": {
+                        "description": "Usuario que creó el subsistema",
+                        "type": "string",
+                        "example": "system"
+                    },
+                    "updated_by": {
+                        "description": "Usuario que actualizó el subsistema",
+                        "type": "string",
+                        "example": "system"
+                    },
+                    "version": {
+                        "description": "Versión del registro",
+                        "type": "integer",
+                        "example": 1
+                    }
+                },
+                "type": "object"
+            },
+            "DropdownOption": {
+                "title": "Dropdown Option",
+                "description": "Opción para dropdown/select",
+                "properties": {
+                    "value": {
+                        "description": "Valor de la opción",
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "8015bc21-9a48-4b9c-a552-71d1f6f6fb15"
+                    },
+                    "label": {
+                        "description": "Etiqueta mostrada",
+                        "type": "string",
+                        "example": "Departamento de Informática"
+                    },
+                    "code": {
+                        "description": "Código adicional (opcional)",
+                        "type": "string",
+                        "example": "INFO"
+                    }
+                },
+                "type": "object"
+            },
+            "PluckOption": {
+                "title": "Pluck Option",
+                "description": "Opción para formato pluck (key-value)",
+                "properties": {
+                    "value": {
+                        "description": "Valor de la clave",
+                        "example": "8015bc21-9a48-4b9c-a552-71d1f6f6fb15"
+                    },
+                    "label": {
+                        "description": "Etiqueta del valor",
+                        "type": "string",
+                        "example": "Departamento de Informática"
+                    }
+                },
+                "type": "object"
+            },
+            "BulkDeleteResponse": {
+                "title": "Bulk Delete Response",
+                "description": "Respuesta de operación de eliminación masiva",
+                "properties": {
+                    "deleted_count": {
+                        "description": "Número de elementos eliminados exitosamente",
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "total_requested": {
+                        "description": "Número total de elementos solicitados para eliminación",
+                        "type": "integer",
+                        "example": 3
+                    },
+                    "success_rate": {
+                        "description": "Porcentaje de éxito de la operación",
+                        "type": "string",
+                        "example": "66.67%"
+                    }
+                },
+                "type": "object"
             }
         },
         "securitySchemes": {
@@ -1341,6 +2616,10 @@
         {
             "name": "HeadOffices",
             "description": "Operaciones para gestión de Sedes"
+        },
+        {
+            "name": "Departments",
+            "description": "Departments"
         }
     ]
 }

@@ -1,0 +1,98 @@
+<?php
+
+namespace App\Http\Requests\Department;
+
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+
+/**
+ * Request validation for creating a new department
+ */
+class StoreDepartmentRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     */
+    public function rules(): array
+    {
+        return [
+            'head_office_id' => [
+                'required',
+                'uuid',
+                'exists:head_offices,id',
+            ],
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                'min:2',
+                Rule::unique('departments', 'name')
+                    ->where('head_office_id', $this->input('head_office_id'))
+                    ->whereNull('deleted_at')
+            ],
+            'code' => [
+                'nullable',
+                'string',
+                'max:255',
+                'alpha_num',
+                'uppercase',
+                Rule::unique('departments', 'code')
+                    ->whereNull('deleted_at')
+            ],
+        ];
+    }
+
+    /**
+     * Get custom error messages for validation rules.
+     */
+    public function messages(): array
+    {
+        return [
+            'head_office_id.required' => 'La sede es requerida.',
+            'head_office_id.uuid' => 'El ID de sede debe ser un UUID válido.',
+            'head_office_id.exists' => 'La sede seleccionada no existe.',
+            'name.required' => 'El nombre es requerido.',
+            'name.string' => 'El nombre debe ser una cadena de texto.',
+            'name.max' => 'El nombre no puede exceder los 255 caracteres.',
+            'name.min' => 'El nombre debe tener al menos 2 caracteres.',
+            'name.unique' => 'Ya existe un departamento con este nombre en la sede seleccionada.',
+            'code.string' => 'El código debe ser una cadena de texto.',
+            'code.max' => 'El código no puede exceder los 255 caracteres.',
+            'code.alpha_num' => 'El código solo puede contener letras y números.',
+            'code.uppercase' => 'El código debe estar en mayúsculas.',
+            'code.unique' => 'Ya existe un departamento con este código.',
+        ];
+    }
+
+    /**
+     * Get custom attributes for validator errors.
+     */
+    public function attributes(): array
+    {
+        return [
+            'head_office_id' => 'sede',
+            'name' => 'nombre',
+            'code' => 'código',
+        ];
+    }
+
+    /**
+     * Prepare the data for validation.
+     */
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('code') && $this->input('code')) {
+            $this->merge([
+                'code' => strtoupper($this->input('code'))
+            ]);
+        }
+    }
+}

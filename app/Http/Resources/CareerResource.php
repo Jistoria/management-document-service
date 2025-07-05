@@ -21,11 +21,11 @@ class CareerResource extends BaseResource
             'id' => $this->id,
             'name' => $this->name,
             'code' => $this->code,
-            'department_id' => $this->department_id,
-            'created_at' => $this->created_at?->toISOString(),
-            'updated_at' => $this->updated_at?->toISOString(),
-            'created_by' => $this->created_by,
-            'updated_by' => $this->updated_by,
+            'departmentId' => $this->department_id,
+            'createdAt' => $this->created_at?->toISOString(),
+            'updatedAt' => $this->updated_at?->toISOString(),
+            'createdBy' => $this->created_by,
+            'updatedBy' => $this->updated_by,
             'version' => $this->version,
 
             // Conditional relationships
@@ -38,7 +38,7 @@ class CareerResource extends BaseResource
                 }
             ),
 
-            'head_office' => $this->when(
+            'headOffice' => $this->when(
                 $this->shouldInclude('head_office', $request),
                 function () {
                     return $this->whenLoaded('department.headOffice', function () {

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\HeadOfficeController;
 use Illuminate\Support\Facades\Route;
 
@@ -19,6 +20,24 @@ Route::prefix('head-offices')->group(function () {
     Route::get('/{head_office}/statistics', [HeadOfficeController::class, 'statistics']);
     Route::get('/code/{code}', [HeadOfficeController::class, 'findByCode']);
     Route::post('/bulk-delete', [HeadOfficeController::class, 'bulkDelete']);
+});
+
+// Departments Routes
+Route::prefix('departments')->group(function () {
+    // Standard CRUD routes
+    Route::get('/', [DepartmentController::class, 'index']);
+    Route::post('/', [DepartmentController::class, 'store']);
+    Route::get('/{department}', [DepartmentController::class, 'show']);
+    Route::put('/{department}', [DepartmentController::class, 'update']);
+    Route::patch('/{department}', [DepartmentController::class, 'update']);
+    Route::delete('/{department}', [DepartmentController::class, 'destroy']);
+
+    // Additional routes
+    Route::post('/{department}/restore', [DepartmentController::class, 'restore']);
+    Route::get('/{department}/hierarchy', [DepartmentController::class, 'hierarchy']);
+    Route::get('/{department}/statistics', [DepartmentController::class, 'statistics']);
+    Route::get('/code/{code}', [DepartmentController::class, 'findByCode']);
+    Route::post('/bulk-delete', [DepartmentController::class, 'bulkDelete']);
 });
 
 Route::fallback(function () {

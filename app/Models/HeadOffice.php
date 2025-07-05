@@ -101,7 +101,7 @@ class HeadOffice extends Model
     {
         return $this->load([
             'departments.careers.subsystems',
-            'departments.careers.requiredDocuments'
+            'departments.careers.subsystems.processCategories.processes.requiredDocuments',
         ]);
     }
 }

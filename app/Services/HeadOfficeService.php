@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Constants\HttpStatus;
 use App\Models\HeadOffice;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -145,7 +146,7 @@ class HeadOfficeService
 
         // Check if has active departments
         if ($headOffice->activeDepartments()->exists()) {
-            throw new \InvalidArgumentException("No se puede eliminar la sede porque tiene departamentos activos.");
+            throw new \InvalidArgumentException("No se puede eliminar la sede porque tiene departamentos activos.", HttpStatus::CONFLICT);
         }
 
         return $headOffice->delete();
@@ -255,4 +256,27 @@ class HeadOfficeService
 
         return $query->exists();
     }
+
+    /**
+     * Resolve includes for head office relationships
+     */
+    public function resolveIncludes(array $requestedIncludes, $headOffice): void
+    {
+        $resolved = [];
+
+        foreach ($requestedIncludes as $include) {
+            match ($include) {
+                'departments' => $resolved[] = 'departments',
+                'hierarchy' => $resolved = array_merge($resolved, [
+                    'departments.careers.subsystems',
+                ]),
+                default => null, // Ignora includes no válidos
+            };
+        }
+
+        if (!empty($resolved)) {
+            $headOffice->load(array_unique($resolved));
+        }
+    }
+
 }

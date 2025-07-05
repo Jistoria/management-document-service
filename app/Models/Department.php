@@ -112,4 +112,16 @@ class Department extends Model
     {
         return $query->whereNull('deleted_at');
     }
+
+    /**
+     * Get full department hierarchy with all relationships.
+     * This method loads the complete hierarchy for an existing model instance.
+     */
+    public function getFullHierarchy()
+    {
+        return $this->load([
+            'headOffice',
+            'careers.subsystems'
+        ]);
+    }
 }

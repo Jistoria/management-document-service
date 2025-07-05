@@ -297,16 +297,14 @@ class HeadOfficeController extends Controller
                 throw new \InvalidArgumentException('Sede no encontrada');
             }
 
-            // Load relationships if requested
-            $includes = $request->get('include', '');
-            if ($includes) {
-                $includeArray = explode(',', $includes);
-                $headOffice->load($includeArray);
-            }
+            $includes = explode(',', $request->get('include', ''));
+            $this->headOfficeService->resolveIncludes($includes, $headOffice);
 
             return (new HeadOfficeResource($headOffice))->detailed();
         }, 'Sede obtenida exitosamente');
     }
+
+
 
     /**
      * @OA\Put(

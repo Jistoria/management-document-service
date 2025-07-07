@@ -50,6 +50,68 @@ class CareerResource extends BaseResource
     }
 
     /**
+     * Transform for dropdown/select usage
+     */
+    public static function forDropdown($collection): array
+    {
+        return [
+            'options' => $collection->map(function ($career) {
+                return [
+                    'value' => $career->id,
+                    'label' => $career->name,
+                    'code' => $career->code,
+                    'department_id' => $career->department_id,
+                    'department_name' => $career->department?->name,
+                ];
+            }),
+            'count' => count($collection)
+        ];
+    }
+
+    /**
+     * Transform for hierarchy view
+     */
+    public function withHierarchy(): array
+    {
+        return array_merge($this->toArray(request()), [
+            'subsystems' => $this->whenLoaded('subsystems', function () {
+                return $this->subsystems->map(function ($subsystem) {
+                    return [
+                        'id' => $subsystem->id,
+                        'name' => $subsystem->name,
+                        'code' => $subsystem->code,
+                    ];
+                });
+            }),
+            'department' => $this->whenLoaded('department', function () {
+                return [
+                    'id' => $this->department->id,
+                    'name' => $this->department->name,
+                    'code' => $this->department->code,
+                    'head_office' => $this->department->headOffice ? [
+                        'id' => $this->department->headOffice->id,
+                        'name' => $this->department->headOffice->name,
+                        'code' => $this->department->headOffice->code,
+                    ] : null,
+                ];
+            }),
+        ]);
+    }
+
+    /**
+     * Additional metadata to include in the response.
+     *
+     * @param Request $request
+     * @return array<string, mixed>
+     */
+    public function with(Request $request): array
+    {
+        return [
+            'meta' => $this->getDetailedMeta(),
+        ];
+    }
+
+    /**
      * Get minimal fields for listing views
      */
     protected function getMinimalFields(): array

@@ -19,21 +19,21 @@ class HeadOfficeSeeder extends Seeder
         // Crear sedes principales
         $headOffices = [
             [
-                'id' => Str::uuid(),
+                'id' => Str::uuid7(),
                 'name' => 'Sede Central',
                 'code' => 'CENTRAL',
                 'created_by' => 'system',
                 'version' => 1,
             ],
             [
-                'id' => Str::uuid(),
+                'id' => Str::uuid7(),
                 'name' => 'Sede Norte',
                 'code' => 'NORTE',
                 'created_by' => 'system',
                 'version' => 1,
             ],
             [
-                'id' => Str::uuid(),
+                'id' => Str::uuid7(),
                 'name' => 'Sede Sur',
                 'code' => 'SUR',
                 'created_by' => 'system',
@@ -47,7 +47,7 @@ class HeadOfficeSeeder extends Seeder
             // Crear departamentos para cada sede
             $departments = [
                 [
-                    'id' => Str::uuid(),
+                    'id' => Str::uuid7(),
                     'head_office_id' => $headOffice->id,
                     'name' => 'Facultad de Ingeniería',
                     'code' => 'FI',
@@ -55,7 +55,7 @@ class HeadOfficeSeeder extends Seeder
                     'version' => 1,
                 ],
                 [
-                    'id' => Str::uuid(),
+                    'id' => Str::uuid7(),
                     'head_office_id' => $headOffice->id,
                     'name' => 'Facultad de Ciencias',
                     'code' => 'FC',
@@ -71,7 +71,7 @@ class HeadOfficeSeeder extends Seeder
                 if ($departmentData['code'] === 'FI') {
                     $careers = [
                         [
-                            'id' => Str::uuid(),
+                            'id' => Str::uuid7(),
                             'department_id' => $department->id,
                             'name' => 'Ingeniería de Sistemas',
                             'code' => 'IS',
@@ -79,7 +79,7 @@ class HeadOfficeSeeder extends Seeder
                             'version' => 1,
                         ],
                         [
-                            'id' => Str::uuid(),
+                            'id' => Str::uuid7(),
                             'department_id' => $department->id,
                             'name' => 'Ingeniería Industrial',
                             'code' => 'II',
@@ -90,7 +90,7 @@ class HeadOfficeSeeder extends Seeder
                 } else {
                     $careers = [
                         [
-                            'id' => Str::uuid(),
+                            'id' => Str::uuid7(),
                             'department_id' => $department->id,
                             'name' => 'Biología',
                             'code' => 'BIO',
@@ -98,7 +98,7 @@ class HeadOfficeSeeder extends Seeder
                             'version' => 1,
                         ],
                         [
-                            'id' => Str::uuid(),
+                            'id' => Str::uuid7(),
                             'department_id' => $department->id,
                             'name' => 'Química',
                             'code' => 'QUI',

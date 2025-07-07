@@ -4,6 +4,30 @@
 
 The `ApiIndexBuilder` has been refactored to use a single `format` parameter to determine the response type, with a key-value closure strategy map for easy extension.
 
+## Implemented CRUD Controllers
+
+### 1. Department Controller
+
+-   **Path**: `/api/departments`
+-   **Service**: `DepartmentService`
+-   **Resource**: `DepartmentResource`
+-   **Filters**: `search`, `code`, `created_by`, `head_office_id`
+
+### 2. Head Office Controller
+
+-   **Path**: `/api/head-offices`
+-   **Service**: `HeadOfficeService`
+-   **Resource**: `HeadOfficeResource`
+-   **Filters**: `search`, `code`, `created_by`
+
+### 3. Career Controller ✨ NEW
+
+-   **Path**: `/api/careers`
+-   **Service**: `CareerService`
+-   **Resource**: `CareerResource`
+-   **Filters**: `search`, `code`, `created_by`, `department_id`
+-   **Additional Route**: `/api/departments/{departmentId}/careers`
+
 ## Basic Usage
 
 ### 1. Standard Controller Integration

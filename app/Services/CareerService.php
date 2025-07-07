@@ -1,0 +1,254 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\Career;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
+
+/**
+ * Service class for Career operations
+ *
+ * Handles business logic for career management including CRUD operations,
+ * filtering, pagination, and relationship management.
+ */
+class CareerService
+{
+    /**
+     * Get all careers with optional filtering
+     */
+    public function getAll(array $filters = []): Collection
+    {
+        $query = Career::query()->with(['department', 'department.headOffice']);
+
+        // Apply filters
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                    ->orWhere('code', 'LIKE', "%{$search}%");
+            });
+        }
+
+        if (!empty($filters['code'])) {
+            $query->where('code', $filters['code']);
+        }
+
+        if (!empty($filters['department_id'])) {
+            $query->where('department_id', $filters['department_id']);
+        }
+
+        if (!empty($filters['created_by'])) {
+            $query->where('created_by', $filters['created_by']);
+        }
+
+        return $query->orderBy('name')->get();
+    }
+
+    /**
+     * Get paginated careers with optional filtering
+     */
+    public function getPaginated(int $perPage = 15, array $filters = []): LengthAwarePaginator
+    {
+        $query = Career::query()->with(['department', 'department.headOffice']);
+
+        // Apply same filters as getAll
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                    ->orWhere('code', 'LIKE', "%{$search}%");
+            });
+        }
+
+        if (!empty($filters['code'])) {
+            $query->where('code', $filters['code']);
+        }
+
+        if (!empty($filters['department_id'])) {
+            $query->where('department_id', $filters['department_id']);
+        }
+
+        if (!empty($filters['created_by'])) {
+            $query->where('created_by', $filters['created_by']);
+        }
+
+        return $query->orderBy('name')->paginate($perPage);
+    }
+
+    /**
+     * Find a career by ID
+     */
+    public function findById(string $id): ?Career
+    {
+        return Career::with(['department', 'department.headOffice', 'subsystems'])->find($id);
+    }
+
+    /**
+     * Find a career by code
+     */
+    public function findByCode(string $code): ?Career
+    {
+        return Career::with(['department', 'department.headOffice'])->where('code', $code)->first();
+    }
+
+    /**
+     * Create a new career
+     */
+    public function create(array $data): Career
+    {
+        // Validate department exists
+        if (!$this->validateDepartmentExists($data['department_id'])) {
+            throw new \InvalidArgumentException('El departamento especificado no existe');
+        }
+
+        // Check if code is unique (if provided)
+        if (!empty($data['code']) && $this->codeExists($data['code'])) {
+            throw new \InvalidArgumentException('El código ya está en uso');
+        }
+
+        $career = Career::create($data);
+        return $career->load(['department', 'department.headOffice']);
+    }
+
+    /**
+     * Update an existing career
+     */
+    public function update(string $id, array $data): Career
+    {
+        $career = Career::findOrFail($id);
+
+        // Validate department exists if being updated
+        if (isset($data['department_id']) && !$this->validateDepartmentExists($data['department_id'])) {
+            throw new \InvalidArgumentException('El departamento especificado no existe');
+        }
+
+        // Check if code is unique (if provided and different from current)
+        if (!empty($data['code']) && $data['code'] !== $career->code && $this->codeExists($data['code'])) {
+            throw new \InvalidArgumentException('El código ya está en uso');
+        }
+
+        // Increment version for optimistic locking
+        $data['version'] = ($career->version ?? 0) + 1;
+
+        $career->update($data);
+        return $career->load(['department', 'department.headOffice']);
+    }
+
+    /**
+     * Delete a career (soft delete)
+     */
+    public function delete(string $id): bool
+    {
+        $career = Career::findOrFail($id);
+
+        // Check if career has active subsystems
+        if ($career->activeSubsystems()->count() > 0) {
+            throw new \InvalidArgumentException('No se puede eliminar la carrera porque tiene subsistemas activos');
+        }
+
+        return $career->delete();
+    }
+
+    /**
+     * Restore a soft-deleted career
+     */
+    public function restore(string $id): Career
+    {
+        $career = Career::withTrashed()->findOrFail($id);
+
+        if (!$career->trashed()) {
+            throw new \InvalidArgumentException('La carrera no está eliminada');
+        }
+
+        $career->restore();
+        return $career->load(['department', 'department.headOffice']);
+    }
+
+    /**
+     * Get career statistics
+     */
+    public function getStatistics(string $id): array
+    {
+        $career = Career::withCount(['subsystems', 'activeSubsystems'])
+            ->with(['department', 'department.headOffice'])
+            ->findOrFail($id);
+
+        return [
+            'subsystems_count' => $career->subsystems_count,
+            'active_subsystems_count' => $career->active_subsystems_count,
+            'department' => $career->department ? [
+                'id' => $career->department->id,
+                'name' => $career->department->name,
+                'code' => $career->department->code,
+            ] : null,
+            'head_office' => $career->department?->headOffice ? [
+                'id' => $career->department->headOffice->id,
+                'name' => $career->department->headOffice->name,
+                'code' => $career->department->headOffice->code,
+            ] : null,
+            'created_at' => $career->created_at?->toISOString(),
+            'last_updated' => $career->updated_at?->toISOString(),
+            'version' => $career->version,
+        ];
+    }
+
+    /**
+     * Get full hierarchy including department and head office
+     */
+    public function getFullHierarchy(string $id): ?Career
+    {
+        return Career::with([
+            'department',
+            'department.headOffice',
+            'subsystems' => function ($query) {
+                $query->whereNull('deleted_at');
+            }
+        ])->find($id);
+    }
+
+    /**
+     * Bulk delete careers
+     */
+    public function bulkDelete(array $ids): int
+    {
+        $deletedCount = 0;
+
+        foreach ($ids as $id) {
+            try {
+                $this->delete($id);
+                $deletedCount++;
+            } catch (\Exception $e) {
+                // Log error but continue with other deletions
+                continue;
+            }
+        }
+
+        return $deletedCount;
+    }
+
+    /**
+     * Get careers by department
+     */
+    public function getByDepartment(string $departmentId, array $filters = []): Collection
+    {
+        $filters['department_id'] = $departmentId;
+        return $this->getAll($filters);
+    }
+
+    /**
+     * Validate if department exists
+     */
+    private function validateDepartmentExists(string $departmentId): bool
+    {
+        return \App\Models\Department::where('id', $departmentId)->exists();
+    }
+
+    /**
+     * Check if code already exists
+     */
+    private function codeExists(string $code): bool
+    {
+        return Career::where('code', $code)->exists();
+    }
+}

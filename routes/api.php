@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\HeadOfficeController;
+use App\Http\Controllers\CareerController;
 use Illuminate\Support\Facades\Route;
 
 // Head Offices Routes
@@ -39,6 +40,27 @@ Route::prefix('departments')->group(function () {
     Route::get('/code/{code}', [DepartmentController::class, 'findByCode']);
     Route::post('/bulk-delete', [DepartmentController::class, 'bulkDelete']);
 });
+
+// Careers Routes
+Route::prefix('careers')->group(function () {
+    // Standard CRUD routes
+    Route::get('/', [CareerController::class, 'index']);
+    Route::post('/', [CareerController::class, 'store']);
+    Route::get('/{career}', [CareerController::class, 'show']);
+    Route::put('/{career}', [CareerController::class, 'update']);
+    Route::patch('/{career}', [CareerController::class, 'update']);
+    Route::delete('/{career}', [CareerController::class, 'destroy']);
+
+    // Additional routes
+    Route::post('/{career}/restore', [CareerController::class, 'restore']);
+    Route::get('/{career}/hierarchy', [CareerController::class, 'hierarchy']);
+    Route::get('/{career}/statistics', [CareerController::class, 'statistics']);
+    Route::get('/code/{code}', [CareerController::class, 'findByCode']);
+    Route::post('/bulk-delete', [CareerController::class, 'bulkDelete']);
+});
+
+// Nested route for careers by department
+Route::get('/departments/{departmentId}/careers', [CareerController::class, 'getByDepartment']);
 
 Route::fallback(function () {
     return response()->json(['message' => 'API connection successful.'], 200);

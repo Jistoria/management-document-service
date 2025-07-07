@@ -28,22 +28,38 @@ class CareerResource extends BaseResource
             'updatedBy' => $this->updated_by,
             'version' => $this->version,
 
-            // Conditional relationships
+            // Conditional relationships based on what was loaded by service
             'department' => $this->when(
-                $this->shouldInclude('department', $request),
+                $this->relationLoaded('department') && ($this->wasIncludeRequested('department') || $this->wasIncludeRequested('hierarchy')),
                 function () {
-                    return $this->whenLoaded('department', function () {
-                        return new DepartmentResource($this->department);
-                    });
+                    return new DepartmentResource($this->department);
                 }
             ),
 
+
+            // 'subsystems' => $this->when(
+            //     $this->relationLoaded('subsystems') && $this->wasIncludeRequested('subsystems'),
+            //     function () {
+            //         return SubsystemResource::collection($this->subsystems);
+            //     }
+            // ),
+
             'headOffice' => $this->when(
-                $this->shouldInclude('head_office', $request),
+                $this->relationLoaded('department')
+                    && $this->department->relationLoaded('headOffice')
+                    && ($this->wasIncludeRequested('head_office') || $this->wasIncludeRequested('hierarchy')),
                 function () {
-                    return $this->whenLoaded('department.headOffice', function () {
-                        return new HeadOfficeResource($this->department->headOffice);
-                    });
+                    return new HeadOfficeResource($this->department->headOffice);
+                }
+            ),
+
+            'statistics' => $this->when(
+                $this->wasIncludeRequested('statistics'),
+                function () {
+                    return [
+                        'subsystemsCount' => $this->relationLoaded('subsystems') ? $this->subsystems->count() : $this->subsystems()->count(),
+                        'hasSubsystems' => $this->relationLoaded('subsystems') ? $this->subsystems->isNotEmpty() : $this->subsystems()->exists(),
+                    ];
                 }
             ),
         ];
@@ -121,6 +137,15 @@ class CareerResource extends BaseResource
             'name' => $this->name,
             'code' => $this->code,
         ];
+    }
+
+    /**
+     * Check if a specific include was requested by the service
+     */
+    protected function wasIncludeRequested(string $include): bool
+    {
+        $requestedIncludes = $this->resource->getAttribute('_requested_includes') ?? [];
+        return in_array($include, $requestedIncludes);
     }
 
     /**

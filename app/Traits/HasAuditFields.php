@@ -20,7 +20,7 @@ trait HasAuditFields
         // Automatically set created_by and version on creation
         static::creating(function (Model $model) {
             if (empty($model->created_by)) {
-                $model->created_by = self::getCurrentExternalUserId();
+                $model->created_by = $model->getCurrentExternalUserId();
             }
             if (empty($model->version)) {
                 $model->version = 1;
@@ -29,7 +29,7 @@ trait HasAuditFields
 
         // Automatically set updated_by and increment version on update
         static::updating(function (Model $model) {
-            $model->updated_by = self::getCurrentExternalUserId();
+            $model->updated_by = $model->getCurrentExternalUserId();
             if ($model->isDirty() && !$model->isDirty('version')) {
                 $model->version = ($model->version ?? 1) + 1;
             }

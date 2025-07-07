@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\Auditable; // 👈 Agregar trait de auditoría
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -26,7 +27,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class ExternalApi extends Model
 {
-    use HasFactory, HasUuids;
+    use HasFactory, HasUuids, Auditable;
 
     /**
      * The table associated with the model.

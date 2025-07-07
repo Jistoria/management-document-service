@@ -39,13 +39,13 @@ abstract class BaseResource extends JsonResource
         return [
             'data' => static::collection($paginator->items()),
             'pagination' => [
-                'current_page' => $paginator->currentPage(),
-                'last_page' => $paginator->lastPage(),
-                'per_page' => $paginator->perPage(),
+                'currentPage' => $paginator->currentPage(),
+                'lastPage' => $paginator->lastPage(),
+                'perPage' => $paginator->perPage(),
                 'total' => $paginator->total(),
                 'from' => $paginator->firstItem(),
                 'to' => $paginator->lastItem(),
-                'has_more_pages' => $paginator->hasMorePages(),
+                'hasMorePages' => $paginator->hasMorePages(),
             ]
         ];
     }
@@ -117,8 +117,8 @@ abstract class BaseResource extends JsonResource
     protected function getDetailedMeta(): array
     {
         return [
-            'resource_type' => $this->getResourceType(),
-            'generated_at' => now()->toISOString(),
+            'resourceType' => $this->getResourceType(),
+            'generatedAt' => now()->toISOString(),
             'context' => $this->context,
         ];
     }
@@ -135,6 +135,7 @@ abstract class BaseResource extends JsonResource
 
     /**
      * Check if should include relationships
+     * @deprecated Use service resolveIncludes() and relationLoaded() instead
      */
     protected function shouldIncludeRelations(Request $request): bool
     {
@@ -143,6 +144,7 @@ abstract class BaseResource extends JsonResource
 
     /**
      * Get requested includes from query parameter
+     * @deprecated Use service resolveIncludes() instead
      */
     protected function getRequestedIncludes(Request $request): array
     {
@@ -152,6 +154,7 @@ abstract class BaseResource extends JsonResource
 
     /**
      * Check if specific relation should be included
+     * @deprecated Use service resolveIncludes() and relationLoaded() instead
      */
     protected function shouldInclude(string $relation, Request $request): bool
     {

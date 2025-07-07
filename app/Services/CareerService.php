@@ -264,6 +264,7 @@ class CareerService
     public function resolveIncludes(array $requestedIncludes, $career): void
     {
         $resolved = [];
+        $context = []; // Store what was requested for the resource
 
         foreach ($requestedIncludes as $include) {
             $include = trim($include); // Clean whitespace
@@ -277,14 +278,21 @@ class CareerService
                     'department.headOffice',
                     'subsystems',
                 ]),
-                'statistics', 'statics' => null, // Statistics don't require loading relationships
+                'statistics' => null, // Statistics don't require loading relationships
                 default => null, // Ignora includes no válidos
             };
+
+            // Store the original request for resource context
+            $context[] = $include;
         }
 
+        // Load the resolved relationships
         if (!empty($resolved)) {
             $career->load(array_unique($resolved));
         }
+
+        // Store requested includes as an attribute for the resource to check
+        $career->setAttribute('_requested_includes', $context);
     }
 
     /**

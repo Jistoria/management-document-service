@@ -269,6 +269,7 @@ class HeadOfficeService
     public function resolveIncludes(array $requestedIncludes, $headOffice): void
     {
         $resolved = [];
+        $context = []; // Store what was requested for the resource
 
         foreach ($requestedIncludes as $include) {
             $include = trim($include); // Clean whitespace
@@ -278,14 +279,21 @@ class HeadOfficeService
                 'hierarchy' => $resolved = array_merge($resolved, [
                     'departments.careers.subsystems',
                 ]),
-                'statistics', 'statics' => null,
+                'statistics' => $resolved[] = 'departments', // Load departments for statistics calculations
                 default => null,
             };
+
+            // Store the original request for resource context
+            $context[] = $include;
         }
 
+        // Load the resolved relationships
         if (!empty($resolved)) {
             $headOffice->load(array_unique($resolved));
         }
+
+        // Store requested includes as an attribute for the resource to check
+        $headOffice->setAttribute('_requested_includes', $context);
     }
 
     /**

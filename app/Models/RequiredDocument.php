@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -29,7 +30,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class RequiredDocument extends Model
 {
-    use HasFactory, HasUuids, SoftDeletes;
+    use HasFactory, HasUuids, SoftDeletes, Auditable;
 
     /**
      * The table associated with the model.
@@ -43,6 +44,7 @@ class RequiredDocument extends Model
         'process_id',
         'document_type_id',
         'academic_role_id',
+        'metadata_schema_id', // 👈 Nuevo campo
         'order',
         'mandatory',
         'external_user_id',

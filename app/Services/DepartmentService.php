@@ -283,8 +283,11 @@ class DepartmentService
     public function resolveIncludes(array $requestedIncludes, $department): void
     {
         $resolved = [];
+        $context = []; // Store what was requested for the resource
 
         foreach ($requestedIncludes as $include) {
+            $include = trim($include); // Clean whitespace
+
             match ($include) {
                 'head_office' => $resolved[] = 'headOffice',
                 'careers' => $resolved[] = 'careers',
@@ -292,13 +295,21 @@ class DepartmentService
                     'headOffice',
                     'careers.subsystems',
                 ]),
+                'statistics' => null, // Statistics don't need additional relationships
                 default => null, // Ignora includes no válidos
             };
+
+            // Store the original request for resource context
+            $context[] = $include;
         }
 
+        // Load the resolved relationships
         if (!empty($resolved)) {
             $department->load(array_unique($resolved));
         }
+
+        // Store requested includes as an attribute for the resource to check
+        $department->setAttribute('_requested_includes', $context);
     }
 
     /**

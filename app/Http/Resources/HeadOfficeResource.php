@@ -30,13 +30,11 @@ class HeadOfficeResource extends BaseResource
             'updatedBy' => $this->updated_by,
             'version' => $this->version,
 
-            // Conditional relationships based on includes
+            // Conditional relationships based on what was loaded by service
             'departments' => $this->when(
-                $this->shouldInclude('departments', $request),
+                $this->relationLoaded('departments') && $this->wasIncludeRequested('departments'),
                 function () {
-                    return $this->whenLoaded('departments', function () {
-                        return DepartmentResource::collection($this->departments);
-                    });
+                    return DepartmentResource::collection($this->departments);
                 }
             ),
 
@@ -45,26 +43,26 @@ class HeadOfficeResource extends BaseResource
                 fn() => $this->departments->count()
             ),
 
-            // Statistics when requested
+            // Statistics when specifically requested
             'statistics' => $this->when(
-                $this->shouldInclude('statistics', $request),
+                $this->relationLoaded('departments') && $this->wasIncludeRequested('statistics'),
                 function () {
                     return [
-                        'departmentsCount' => $this->departments()->count(),
-                        'careersCount' => $this->departments()
-                            ->withCount('careers')
-                            ->get()
-                            ->sum('careers_count'),
-                        'hasDepartments' => $this->departments()->exists(),
+                        'departmentsCount' => $this->departments->count(),
+                        'careersCount' => $this->departments->sum(function ($dept) {
+                            return $dept->relationLoaded('careers') ? $dept->careers->count() : 0;
+                        }),
+                        'hasDepartments' => $this->departments->isNotEmpty(),
                     ];
                 }
             ),
 
-            // Hierarchy information when loaded
+            // Hierarchy information when specifically requested and fully loaded
             'hierarchy' => $this->when(
-                $this->shouldInclude('hierarchy', $request)
-                && $this->relationLoaded('departments')
-                && $this->departments->every(fn($d) => $d->relationLoaded('careers')),
+                $this->wasIncludeRequested('hierarchy')
+                    && $this->relationLoaded('departments')
+                    && $this->departments->every(fn($d) => $d->relationLoaded('careers'))
+                    && $this->departments->every(fn($d) => $d->careers->every(fn($c) => $c->relationLoaded('subsystems'))),
                 fn() => [
                     'departmentsCount' => $this->departments->count(),
                     'careersCount' => $this->departments->sum(function ($dept) {
@@ -146,6 +144,15 @@ class HeadOfficeResource extends BaseResource
     }
 
     /**
+     * Check if a specific include was requested by the service
+     */
+    protected function wasIncludeRequested(string $include): bool
+    {
+        $requestedIncludes = $this->resource->getAttribute('_requested_includes') ?? [];
+        return in_array($include, $requestedIncludes);
+    }
+
+    /**
      * Additional metadata to include in the response.
      *
      * @param Request $request
@@ -158,4 +165,3 @@ class HeadOfficeResource extends BaseResource
         ];
     }
 }
-

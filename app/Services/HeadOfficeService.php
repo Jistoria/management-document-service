@@ -41,7 +41,10 @@ class HeadOfficeService
             $query->where('created_by', $filters['created_by']);
         }
 
-        return $query->orderBy('name')->get();
+        // Apply sorting
+        $this->applySorting($query, $filters);
+
+        return $query->get();
     }
 
     /**
@@ -68,7 +71,10 @@ class HeadOfficeService
             $query->createdBy($filters['created_by']);
         }
 
-        return $query->orderBy('name')->paginate($perPage);
+        // Apply sorting
+        $this->applySorting($query, $filters);
+
+        return $query->paginate($perPage);
     }
 
     /**
@@ -272,13 +278,39 @@ class HeadOfficeService
                 'hierarchy' => $resolved = array_merge($resolved, [
                     'departments.careers.subsystems',
                 ]),
-                'statistics', 'statics' => null, // These are handled by the resource, not relationships
-                default => null, // Ignora includes no válidos
+                'statistics', 'statics' => null,
+                default => null,
             };
         }
 
         if (!empty($resolved)) {
             $headOffice->load(array_unique($resolved));
+        }
+    }
+
+    /**
+     * Apply sorting to the query
+     */
+    private function applySorting($query, array $filters): void
+    {
+        $sortBy = $filters['sort_by'] ?? 'name';
+        $sortDirection = $filters['sort_direction'] ?? 'asc';
+
+        // Campos permitidos para ordenamiento
+        $allowedSortFields = [
+            'name',
+            'code',
+            'created_at',
+            'updated_at',
+            'created_by',
+        ];
+
+        // Verificar que el campo sea válido
+        if (in_array($sortBy, $allowedSortFields)) {
+            $query->orderBy($sortBy, $sortDirection);
+        } else {
+            // Fallback por defecto
+            $query->orderBy('name', 'asc');
         }
     }
 }

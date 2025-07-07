@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\HeadOffice\StoreHeadOfficeRequest;
 use App\Http\Requests\HeadOffice\UpdateHeadOfficeRequest;
+use App\Http\Requests\HeadOffice\FiltersHeadOfficeRequest;
 use App\Http\Resources\HeadOfficeResource;
 use App\Services\HeadOfficeService;
 use App\Helpers\ApiIndexBuilder;
@@ -139,11 +140,11 @@ class HeadOfficeController extends Controller
      *     )
      * )
      */
-    public function index(Request $request): JsonResponse
+    public function index(FiltersHeadOfficeRequest $request): JsonResponse
     {
         return catchSync(function () use ($request) {
-            // Filtros específicos para sedes principales
-            $filters = ApiIndexBuilder::extractFilters($request);
+            // Usar filtros validados
+            $filters = $request->getValidatedFilters();
 
             return ApiIndexBuilder::build(
                 $this->headOfficeService,

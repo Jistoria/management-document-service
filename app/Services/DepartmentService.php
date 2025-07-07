@@ -45,7 +45,10 @@ class DepartmentService
             $query->where('created_by', $filters['created_by']);
         }
 
-        return $query->orderBy('name')->get();
+        // Apply sorting
+        $this->applySorting($query, $filters);
+
+        return $query->get();
     }
 
     /**
@@ -76,7 +79,10 @@ class DepartmentService
             $query->where('created_by', $filters['created_by']);
         }
 
-        return $query->orderBy('name')->paginate($perPage);
+        // Apply sorting
+        $this->applySorting($query, $filters);
+
+        return $query->paginate($perPage);
     }
 
     /**
@@ -292,6 +298,32 @@ class DepartmentService
 
         if (!empty($resolved)) {
             $department->load(array_unique($resolved));
+        }
+    }
+
+    /**
+     * Apply sorting to the query
+     */
+    private function applySorting($query, array $filters): void
+    {
+        $sortBy = $filters['sort_by'] ?? 'name';
+        $sortDirection = $filters['sort_direction'] ?? 'asc';
+
+        // Campos permitidos para ordenamiento
+        $allowedSortFields = [
+            'name',
+            'code',
+            'created_at',
+            'updated_at',
+            'created_by',
+        ];
+
+        // Verificar que el campo sea válido
+        if (in_array($sortBy, $allowedSortFields)) {
+            $query->orderBy($sortBy, $sortDirection);
+        } else {
+            // Fallback por defecto
+            $query->orderBy('name', 'asc');
         }
     }
 }

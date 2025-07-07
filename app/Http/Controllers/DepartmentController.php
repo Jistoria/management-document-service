@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Department\StoreDepartmentRequest;
 use App\Http\Requests\Department\UpdateDepartmentRequest;
+use App\Http\Requests\Department\FiltersDepartmentRequest;
 use App\Http\Resources\DepartmentResource;
 use App\Services\DepartmentService;
 use App\Helpers\ApiIndexBuilder;
@@ -146,11 +147,11 @@ class DepartmentController extends Controller
      *     )
      * )
      */
-    public function index(Request $request): JsonResponse
+    public function index(FiltersDepartmentRequest $request): JsonResponse
     {
         return catchSync(function () use ($request) {
-            // Filtros específicos para departamentos
-            $filters = ApiIndexBuilder::extractFilters($request, ['head_office_id']);
+            // Usar filtros validados
+            $filters = $request->getValidatedFilters();
 
             return ApiIndexBuilder::build(
                 $this->departmentService,
@@ -275,35 +276,8 @@ class DepartmentController extends Controller
                 throw new \InvalidArgumentException('Departamento no encontrado');
             }
 
-            // Load relationships if requested
-            $includes = $request->get('include', '');
-            if ($includes) {
-                $includeArray = explode(',', $includes);
-                $relationshipsToLoad = [];
-
-                foreach ($includeArray as $include) {
-                    $include = trim($include);
-                    if ($include === 'hierarchy') {
-                        // For hierarchy, load the complete nested relationships
-                        $relationshipsToLoad[] = 'headOffice';
-                        $relationshipsToLoad[] = 'careers.subsystems';
-                    } elseif ($include === 'head_office') {
-                        $relationshipsToLoad[] = 'headOffice';
-                    } elseif ($include === 'careers') {
-                        $relationshipsToLoad[] = 'careers';
-                    } elseif ($include === 'statistics') {
-                        // Statistics don't require loading relationships, handled in resource
-                        continue;
-                    } else {
-                        // For other includes, add directly
-                        $relationshipsToLoad[] = $include;
-                    }
-                }
-
-                if (!empty($relationshipsToLoad)) {
-                    $department->load($relationshipsToLoad);
-                }
-            }
+            $includes = explode(',', $request->get('include', ''));
+            $this->departmentService->resolveIncludes($includes, $department);
 
             return (new DepartmentResource($department))->detailed();
         }, 'Departamento obtenido exitosamente');

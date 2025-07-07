@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Career\StoreCareerRequest;
 use App\Http\Requests\Career\UpdateCareerRequest;
+use App\Http\Requests\Career\FiltersCareerRequest;
 use App\Http\Resources\CareerResource;
 use App\Services\CareerService;
 use App\Helpers\ApiIndexBuilder;
@@ -146,11 +147,11 @@ class CareerController extends Controller
      *     )
      * )
      */
-    public function index(Request $request): JsonResponse
+    public function index(FiltersCareerRequest $request): JsonResponse
     {
         return catchSync(function () use ($request) {
-            // Filtros específicos para carreras
-            $filters = ApiIndexBuilder::extractFilters($request, ['department_id']);
+            // Usar filtros validados
+            $filters = $request->getValidatedFilters();
 
             return ApiIndexBuilder::build(
                 $this->careerService,
@@ -275,35 +276,8 @@ class CareerController extends Controller
                 throw new \InvalidArgumentException('Carrera no encontrada');
             }
 
-            // Load relationships if requested
-            $includes = $request->get('include', '');
-            if ($includes) {
-                $includeArray = explode(',', $includes);
-                $relationshipsToLoad = [];
-
-                foreach ($includeArray as $include) {
-                    $include = trim($include);
-                    if ($include === 'hierarchy') {
-                        // For hierarchy, load the complete nested relationships
-                        $relationshipsToLoad[] = 'department';
-                        $relationshipsToLoad[] = 'department.headOffice';
-                        $relationshipsToLoad[] = 'subsystems';
-                    } elseif ($include === 'department') {
-                        $relationshipsToLoad[] = 'department';
-                    } elseif ($include === 'head_office') {
-                        $relationshipsToLoad[] = 'department.headOffice';
-                    } elseif ($include === 'subsystems') {
-                        $relationshipsToLoad[] = 'subsystems';
-                    } else {
-                        // For other includes, add directly
-                        $relationshipsToLoad[] = $include;
-                    }
-                }
-
-                if (!empty($relationshipsToLoad)) {
-                    $career->load($relationshipsToLoad);
-                }
-            }
+            $includes = explode(',', $request->get('include', ''));
+            $this->careerService->resolveIncludes($includes, $career);
 
             return (new CareerResource($career))->detailed();
         }, 'Carrera obtenida exitosamente');
@@ -725,11 +699,11 @@ class CareerController extends Controller
      *     )
      * )
      */
-    public function getByDepartment(Request $request, string $departmentId): JsonResponse
+    public function getByDepartment(FiltersCareerRequest $request, string $departmentId): JsonResponse
     {
         return catchSync(function () use ($request, $departmentId) {
-            // Extract additional filters
-            $filters = ApiIndexBuilder::extractFilters($request);
+            // Extract validated filters
+            $filters = $request->getValidatedFilters();
 
             // Add department filter
             $filters['department_id'] = $departmentId;

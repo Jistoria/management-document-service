@@ -42,7 +42,10 @@ class CareerService
             $query->where('created_by', $filters['created_by']);
         }
 
-        return $query->orderBy('name')->get();
+        // Apply sorting
+        $this->applySorting($query, $filters);
+
+        return $query->get();
     }
 
     /**
@@ -73,7 +76,10 @@ class CareerService
             $query->where('created_by', $filters['created_by']);
         }
 
-        return $query->orderBy('name')->paginate($perPage);
+        // Apply sorting
+        $this->applySorting($query, $filters);
+
+        return $query->paginate($perPage);
     }
 
     /**
@@ -250,5 +256,61 @@ class CareerService
     private function codeExists(string $code): bool
     {
         return Career::where('code', $code)->exists();
+    }
+
+    /**
+     * Resolve includes for career relationships
+     */
+    public function resolveIncludes(array $requestedIncludes, $career): void
+    {
+        $resolved = [];
+
+        foreach ($requestedIncludes as $include) {
+            $include = trim($include); // Clean whitespace
+
+            match ($include) {
+                'department' => $resolved[] = 'department',
+                'head_office' => $resolved[] = 'department.headOffice',
+                'subsystems' => $resolved[] = 'subsystems',
+                'hierarchy' => $resolved = array_merge($resolved, [
+                    'department',
+                    'department.headOffice',
+                    'subsystems',
+                ]),
+                'statistics', 'statics' => null, // Statistics don't require loading relationships
+                default => null, // Ignora includes no válidos
+            };
+        }
+
+        if (!empty($resolved)) {
+            $career->load(array_unique($resolved));
+        }
+    }
+
+    /**
+     * Apply sorting to the query
+     */
+    private function applySorting($query, array $filters): void
+    {
+        $sortBy = $filters['sort_by'] ?? 'name';
+        $sortDirection = $filters['sort_direction'] ?? 'asc';
+
+        // Campos permitidos para ordenamiento
+        $allowedSortFields = [
+            'name',
+            'code',
+            'created_at',
+            'updated_at',
+            'created_by',
+            'department_id',
+        ];
+
+        // Verificar que el campo sea válido
+        if (in_array($sortBy, $allowedSortFields)) {
+            $query->orderBy($sortBy, $sortDirection);
+        } else {
+            // Fallback por defecto
+            $query->orderBy('name', 'asc');
+        }
     }
 }

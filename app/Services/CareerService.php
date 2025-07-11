@@ -211,7 +211,6 @@ class CareerService
     public function getFullHierarchy(string $id): ?Career
     {
         return Career::with([
-            'department',
             'department.headOffice',
             'subsystems' => function ($query) {
                 $query->whereNull('deleted_at');

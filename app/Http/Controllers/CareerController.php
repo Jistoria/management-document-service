@@ -171,7 +171,7 @@ class CareerController extends Controller
     public function store(StoreCareerRequest $request): JsonResponse
     {
         return catchSync(function () use ($request) {
-            $career = $this->careerService->create($request->prepareForValidation());
+            $career = $this->careerService->create($request->validated());
             return new CareerResource($career);
         }, 'Carrera creada exitosamente', 201);
     }

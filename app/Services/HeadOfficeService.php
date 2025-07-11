@@ -103,6 +103,8 @@ class HeadOfficeService
      */
     public function create(array $data): HeadOffice
     {
+        // Convert camelCase to snake_case for database operations
+        $data = HeadOffice::convertToSnakeCase($data);
 
         if ($this->codeExists($data['code'])) {
             throw new \InvalidArgumentException("El código '{$data['code']}' ya existe.");
@@ -120,6 +122,9 @@ class HeadOfficeService
      */
     public function update(string $id, array $data): HeadOffice
     {
+        // Convert camelCase to snake_case for database operations
+        $data = HeadOffice::convertToSnakeCase($data);
+
         $headOffice = $this->findById($id);
 
         if (!$headOffice) {

@@ -111,6 +111,9 @@ class DepartmentService
      */
     public function create(array $data): Department
     {
+        // Convert camelCase to snake_case for database operations
+        $data = Department::convertToSnakeCase($data);
+
         if ($this->codeExists($data['code'] ?? null)) {
             throw new \InvalidArgumentException("El código '{$data['code']}' ya existe.");
         }
@@ -127,6 +130,9 @@ class DepartmentService
      */
     public function update(string $id, array $data): Department
     {
+        // Convert camelCase to snake_case for database operations
+        $data = Department::convertToSnakeCase($data);
+
         $department = $this->findById($id);
 
         if (!$department) {

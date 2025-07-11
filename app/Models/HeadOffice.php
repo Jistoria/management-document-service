@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Traits\HasAuditFields;
 use App\Traits\Auditable; // 👈 Agregar trait de auditoría
+use App\Traits\HasCamelCaseAttributes; // 👈 Agregar trait para camelCase
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -28,7 +29,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class HeadOffice extends Model
 {
-    use HasFactory, HasUuids, SoftDeletes, HasAuditFields, Auditable {
+    use HasFactory, HasUuids, SoftDeletes, HasAuditFields, Auditable, HasCamelCaseAttributes {
         Auditable::getCurrentExternalUserId insteadof HasAuditFields;
     }
 

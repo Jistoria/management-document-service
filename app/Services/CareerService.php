@@ -103,8 +103,11 @@ class CareerService
      */
     public function create(array $data): Career
     {
+        // Convert camelCase to snake_case for database operations
+        $data = Career::convertToSnakeCase($data);
+
         // Validate department exists
-        if (!$this->validateDepartmentExists($data['departmentId'])) {
+        if (!$this->validateDepartmentExists($data['department_id'])) {
             throw new \InvalidArgumentException('El departamento especificado no existe');
         }
 
@@ -122,6 +125,9 @@ class CareerService
      */
     public function update(string $id, array $data): Career
     {
+        // Convert camelCase to snake_case for database operations
+        $data = Career::convertToSnakeCase($data);
+
         $career = Career::findOrFail($id);
 
         // Validate department exists if being updated

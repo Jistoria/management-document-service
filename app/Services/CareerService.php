@@ -104,7 +104,7 @@ class CareerService
     public function create(array $data): Career
     {
         // Validate department exists
-        if (!$this->validateDepartmentExists($data['department_id'])) {
+        if (!$this->validateDepartmentExists($data['departmentId'])) {
             throw new \InvalidArgumentException('El departamento especificado no existe');
         }
 

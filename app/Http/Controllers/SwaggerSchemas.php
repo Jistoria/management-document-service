@@ -11,12 +11,12 @@ namespace App\Http\Controllers;
  *     @OA\Property(property="id", type="string", format="uuid", example="0197d795-7572-7331-903b-3aeed9fb34c2", description="ID único de la sede"),
  *     @OA\Property(property="name", type="string", example="Sede Central", description="Nombre de la sede"),
  *     @OA\Property(property="code", type="string", example="CENTRAL", description="Código único de la sede"),
- *     @OA\Property(property="created_at", type="string", format="date-time", example="2025-07-04T22:36:25.000000Z", description="Fecha de creación"),
- *     @OA\Property(property="updated_at", type="string", format="date-time", example="2025-07-04T22:36:47.000000Z", description="Fecha de última actualización"),
- *     @OA\Property(property="created_by", type="string", example="system", description="Usuario que creó la sede"),
- *     @OA\Property(property="updated_by", type="string", example="system", description="Usuario que actualizó la sede"),
+ *     @OA\Property(property="createdAt", type="string", format="date-time", example="2025-07-04T22:36:25.000000Z", description="Fecha de creación"),
+ *     @OA\Property(property="updatedAt", type="string", format="date-time", example="2025-07-04T22:36:47.000000Z", description="Fecha de última actualización"),
+ *     @OA\Property(property="createdBy", type="string", example="system", description="Usuario que creó la sede"),
+ *     @OA\Property(property="updatedBy", type="string", example="system", description="Usuario que actualizó la sede"),
  *     @OA\Property(property="version", type="integer", example=2, description="Versión del registro"),
- *     @OA\Property(property="departments_count", type="integer", example=0, description="Número de departamentos asociados")
+ *     @OA\Property(property="departmentsCount", type="integer", example=0, description="Número de departamentos asociados")
  * )
  *
  * @OA\Schema(
@@ -42,8 +42,8 @@ namespace App\Http\Controllers;
  *             @OA\Property(
  *                 property="meta",
  *                 type="object",
- *                 @OA\Property(property="resource_type", type="string", example="head_office"),
- *                 @OA\Property(property="generated_at", type="string", format="date-time"),
+ *                 @OA\Property(property="resourceType", type="string", example="head_office"),
+ *                 @OA\Property(property="generatedAt", type="string", format="date-time"),
  *                 @OA\Property(property="context", type="array", @OA\Items(type="string"))
  *             )
  *         )
@@ -84,13 +84,13 @@ namespace App\Http\Controllers;
  *     type="object",
  *     title="Pagination",
  *     description="Información de paginación",
- *     @OA\Property(property="current_page", type="integer", example=1, description="Página actual"),
- *     @OA\Property(property="last_page", type="integer", example=1, description="Última página"),
- *     @OA\Property(property="per_page", type="integer", example=15, description="Elementos por página"),
+ *     @OA\Property(property="currentPage", type="integer", example=1, description="Página actual"),
+ *     @OA\Property(property="lastPage", type="integer", example=1, description="Última página"),
+ *     @OA\Property(property="perPage", type="integer", example=15, description="Elementos por página"),
  *     @OA\Property(property="total", type="integer", example=1, description="Total de elementos"),
  *     @OA\Property(property="from", type="integer", example=1, description="Primer elemento de la página"),
  *     @OA\Property(property="to", type="integer", example=1, description="Último elemento de la página"),
- *     @OA\Property(property="has_more_pages", type="boolean", example=false, description="Si hay más páginas")
+ *     @OA\Property(property="hasMorePages", type="boolean", example=false, description="Si hay más páginas")
  * )
  *
  * @OA\Schema(
@@ -115,7 +115,7 @@ namespace App\Http\Controllers;
  *         type="object",
  *         description="Errores de validación por campo",
  *         @OA\Property(
- *             property="field_name",
+ *             property="fieldName",
  *             type="array",
  *             @OA\Items(type="string", example="El campo es requerido")
  *         )
@@ -138,15 +138,15 @@ namespace App\Http\Controllers;
  *     title="Department",
  *     description="Departamento de una sede",
  *     @OA\Property(property="id", type="string", format="uuid", example="8015bc21-9a48-4b9c-a552-71d1f6f6fb15", description="ID único del departamento"),
- *     @OA\Property(property="head_office_id", type="string", format="uuid", example="0197d888-7f98-71fc-baaa-e95ee1c28c84", description="ID de la sede a la que pertenece"),
+ *     @OA\Property(property="headOfficeId", type="string", format="uuid", example="0197d888-7f98-71fc-baaa-e95ee1c28c84", description="ID de la sede a la que pertenece"),
  *     @OA\Property(property="name", type="string", example="Departamento de Informática", description="Nombre del departamento"),
  *     @OA\Property(property="code", type="string", example="INFO", description="Código único del departamento"),
- *     @OA\Property(property="created_at", type="string", format="date-time", example="2025-07-04T22:36:25.000000Z", description="Fecha de creación"),
- *     @OA\Property(property="updated_at", type="string", format="date-time", example="2025-07-04T22:36:47.000000Z", description="Fecha de última actualización"),
- *     @OA\Property(property="created_by", type="string", example="system", description="Usuario que creó el departamento"),
- *     @OA\Property(property="updated_by", type="string", example="system", description="Usuario que actualizó el departamento"),
+ *     @OA\Property(property="createdAt", type="string", format="date-time", example="2025-07-04T22:36:25.000000Z", description="Fecha de creación"),
+ *     @OA\Property(property="updatedAt", type="string", format="date-time", example="2025-07-04T22:36:47.000000Z", description="Fecha de última actualización"),
+ *     @OA\Property(property="createdBy", type="string", example="system", description="Usuario que creó el departamento"),
+ *     @OA\Property(property="updatedBy", type="string", example="system", description="Usuario que actualizó el departamento"),
  *     @OA\Property(property="version", type="integer", example=1, description="Versión del registro"),
- *     @OA\Property(property="careers_count", type="integer", example=3, description="Número de carreras asociadas")
+ *     @OA\Property(property="careersCount", type="integer", example=3, description="Número de carreras asociadas")
  * )
  *
  * @OA\Schema(
@@ -155,7 +155,7 @@ namespace App\Http\Controllers;
  *         @OA\Schema(ref="#/components/schemas/Department"),
  *         @OA\Schema(
  *             @OA\Property(
- *                 property="head_office",
+ *                 property="headOffice",
  *                 ref="#/components/schemas/HeadOffice",
  *                 description="Sede a la que pertenece (incluida condicionalmente)"
  *             ),
@@ -168,22 +168,22 @@ namespace App\Http\Controllers;
  *             @OA\Property(
  *                 property="statistics",
  *                 type="object",
- *                 @OA\Property(property="careers_count", type="integer", example=3),
- *                 @OA\Property(property="has_careers", type="boolean", example=true),
- *                 @OA\Property(property="head_office_name", type="string", example="Sede Central"),
+ *                 @OA\Property(property="careersCount", type="integer", example=3),
+ *                 @OA\Property(property="hasCareers", type="boolean", example=true),
+ *                 @OA\Property(property="headOfficeName", type="string", example="Sede Central"),
  *                 description="Estadísticas del departamento (incluidas condicionalmente)"
  *             ),
  *             @OA\Property(
  *                 property="hierarchy",
  *                 type="object",
  *                 @OA\Property(
- *                     property="head_office",
+ *                     property="headOffice",
  *                     type="object",
  *                     @OA\Property(property="id", type="string", format="uuid"),
  *                     @OA\Property(property="name", type="string"),
  *                     @OA\Property(property="code", type="string")
  *                 ),
- *                 @OA\Property(property="careers_count", type="integer"),
+ *                 @OA\Property(property="careersCount", type="integer"),
  *                 @OA\Property(
  *                     property="careers",
  *                     type="array",
@@ -194,8 +194,8 @@ namespace App\Http\Controllers;
  *             @OA\Property(
  *                 property="meta",
  *                 type="object",
- *                 @OA\Property(property="resource_type", type="string", example="department"),
- *                 @OA\Property(property="generated_at", type="string", format="date-time"),
+ *                 @OA\Property(property="resourceType", type="string", example="department"),
+ *                 @OA\Property(property="generatedAt", type="string", format="date-time"),
  *                 @OA\Property(property="context", type="array", @OA\Items(type="string"))
  *             )
  *         )
@@ -208,13 +208,13 @@ namespace App\Http\Controllers;
  *     title="Career",
  *     description="Carrera académica",
  *     @OA\Property(property="id", type="string", format="uuid", example="310331bc-9201-472f-8d23-26ebcd3a8fdf", description="ID único de la carrera"),
- *     @OA\Property(property="department_id", type="string", format="uuid", example="8015bc21-9a48-4b9c-a552-71d1f6f6fb15", description="ID del departamento al que pertenece"),
+ *     @OA\Property(property="departmentId", type="string", format="uuid", example="8015bc21-9a48-4b9c-a552-71d1f6f6fb15", description="ID del departamento al que pertenece"),
  *     @OA\Property(property="name", type="string", example="Ingeniería de Sistemas", description="Nombre de la carrera"),
  *     @OA\Property(property="code", type="string", example="ISIST", description="Código de la carrera"),
- *     @OA\Property(property="created_at", type="string", format="date-time", description="Fecha de creación"),
- *     @OA\Property(property="updated_at", type="string", format="date-time", description="Fecha de última actualización"),
- *     @OA\Property(property="created_by", type="string", example="system", description="Usuario que creó la carrera"),
- *     @OA\Property(property="updated_by", type="string", example="system", description="Usuario que actualizó la carrera"),
+ *     @OA\Property(property="createdAt", type="string", format="date-time", description="Fecha de creación"),
+ *     @OA\Property(property="updatedAt", type="string", format="date-time", description="Fecha de última actualización"),
+ *     @OA\Property(property="createdBy", type="string", example="system", description="Usuario que creó la carrera"),
+ *     @OA\Property(property="updatedBy", type="string", example="system", description="Usuario que actualizó la carrera"),
  *     @OA\Property(property="version", type="integer", example=1, description="Versión del registro")
  * )
  *
@@ -241,10 +241,10 @@ namespace App\Http\Controllers;
  *     @OA\Property(property="id", type="string", format="uuid", example="41091aec-4181-4546-b5dd-f97b34876015", description="ID único del subsistema"),
  *     @OA\Property(property="name", type="string", example="Subsistema de Prueba", description="Nombre del subsistema"),
  *     @OA\Property(property="code", type="string", example="SPRUEBA", description="Código único del subsistema"),
- *     @OA\Property(property="created_at", type="string", format="date-time", description="Fecha de creación"),
- *     @OA\Property(property="updated_at", type="string", format="date-time", description="Fecha de última actualización"),
- *     @OA\Property(property="created_by", type="string", example="system", description="Usuario que creó el subsistema"),
- *     @OA\Property(property="updated_by", type="string", example="system", description="Usuario que actualizó el subsistema"),
+ *     @OA\Property(property="createdAt", type="string", format="date-time", description="Fecha de creación"),
+ *     @OA\Property(property="updatedAt", type="string", format="date-time", description="Fecha de última actualización"),
+ *     @OA\Property(property="createdBy", type="string", example="system", description="Usuario que creó el subsistema"),
+ *     @OA\Property(property="updatedBy", type="string", example="system", description="Usuario que actualizó el subsistema"),
  *     @OA\Property(property="version", type="integer", example=1, description="Versión del registro")
  * )
  *
@@ -272,9 +272,9 @@ namespace App\Http\Controllers;
  *     type="object",
  *     title="Bulk Delete Response",
  *     description="Respuesta de operación de eliminación masiva",
- *     @OA\Property(property="deleted_count", type="integer", example=2, description="Número de elementos eliminados exitosamente"),
- *     @OA\Property(property="total_requested", type="integer", example=3, description="Número total de elementos solicitados para eliminación"),
- *     @OA\Property(property="success_rate", type="string", example="66.67%", description="Porcentaje de éxito de la operación")
+ *     @OA\Property(property="deletedCount", type="integer", example=2, description="Número de elementos eliminados exitosamente"),
+ *     @OA\Property(property="totalRequested", type="integer", example=3, description="Número total de elementos solicitados para eliminación"),
+ *     @OA\Property(property="successRate", type="string", example="66.67%", description="Porcentaje de éxito de la operación")
  * )
  */
 class SwaggerSchemas

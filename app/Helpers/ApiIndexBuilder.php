@@ -64,8 +64,8 @@ class ApiIndexBuilder
             // Formato pluck personalizado
             'pluck' => fn($ctx) => $ctx['resource']::pluck(
                 $ctx['service']->getAll($ctx['filters']),
-                $ctx['request']->input('pluck_key', 'id'),
-                $ctx['request']->input('pluck_label', 'name')
+                $ctx['request']->input('pluckKey') ?? $ctx['request']->input('pluck_key', 'id'),
+                $ctx['request']->input('pluckLabel') ?? $ctx['request']->input('pluck_label', 'name')
             ),
 
             // Colección simple (fallback por defecto)
@@ -108,7 +108,7 @@ class ApiIndexBuilder
             'resource' => $resource,
             'request' => $request,
             'filters' => $filters,
-            'perPage' => (int) $request->input('per_page', $defaultPerPage),
+            'perPage' => (int) ($request->input('perPage') ?? $request->input('per_page', $defaultPerPage)),
             'format' => $format,
         ];
 
@@ -127,9 +127,9 @@ class ApiIndexBuilder
             return $explicitFormat;
         }
 
-        // 2. Checks de compatibilidad con parámetros legacy
+        // 2. Checks de compatibilidad con parámetros legacy y camelCase
         $formatChecks = [
-            'pluck' => fn($req) => $req->filled('pluck_key') || $req->filled('pluck'),
+            'pluck' => fn($req) => $req->filled('pluckKey') || $req->filled('pluck_key') || $req->filled('pluck'),
             'minimal' => fn($req) => $req->boolean('minimal'),
             'paginate' => fn($req) => $req->boolean('paginate', false),
         ];
@@ -152,14 +152,30 @@ class ApiIndexBuilder
         $filters = [];
 
         // Filtros comunes que la mayoría de entidades soportan
-        $commonFilters = ['search', 'code', 'created_by'];
+        $commonFilters = ['search', 'code', 'createdBy', 'created_by'];
 
         // Combinar filtros comunes con específicos de la entidad
         $allFilters = array_merge($commonFilters, $allowedFilters);
 
         foreach ($allFilters as $filter) {
             if ($request->filled($filter)) {
-                $filters[$filter] = $request->input($filter);
+                // Convertir camelCase a snake_case para compatibilidad interna
+                $internalFilter = $filter === 'createdBy' ? 'created_by' : $filter;
+                $filters[$internalFilter] = $request->input($filter);
+            }
+        }
+
+        // Filtros específicos con conversión camelCase
+        $camelCaseFilters = [
+            'headOfficeId' => 'head_office_id',
+            'departmentId' => 'department_id',
+        ];
+
+        foreach ($camelCaseFilters as $camelCase => $snakeCase) {
+            if ($request->filled($camelCase)) {
+                $filters[$snakeCase] = $request->input($camelCase);
+            } elseif ($request->filled($snakeCase)) {
+                $filters[$snakeCase] = $request->input($snakeCase);
             }
         }
 

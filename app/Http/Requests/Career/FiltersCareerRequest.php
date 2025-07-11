@@ -22,18 +22,17 @@ class FiltersCareerRequest extends DefaultFiltersRequest
     public function rules(): array
     {
         return array_merge(parent::rules(), [
-            // Reglas específicas para Career
             'code' => [
                 'nullable',
                 'string',
                 'max:20',
             ],
-            'department_id' => [
+            'departmentId' => [
                 'nullable',
                 'uuid',
                 'exists:departments,id',
             ],
-            'created_by' => [
+            'createdBy' => [
                 'nullable',
                 'string',
                 'max:255',
@@ -48,8 +47,8 @@ class FiltersCareerRequest extends DefaultFiltersRequest
     {
         return array_merge(parent::attributes(), [
             'code' => 'código',
-            'department_id' => 'departamento',
-            'created_by' => 'creado por',
+            'departmentId' => 'departamento',
+            'createdBy' => 'creado por',
         ]);
     }
 
@@ -59,8 +58,8 @@ class FiltersCareerRequest extends DefaultFiltersRequest
     public function messages(): array
     {
         return array_merge(parent::messages(), [
-            'department_id.uuid' => 'El ID del departamento debe ser un UUID válido.',
-            'department_id.exists' => 'El departamento seleccionado no existe.',
+            'departmentId.uuid' => 'El ID del departamento debe ser un UUID válido.',
+            'departmentId.exists' => 'El departamento seleccionado no existe.',
         ]);
     }
 }

@@ -22,17 +22,17 @@ class DepartmentResource extends BaseResource
     {
         return [
             'id' => $this->id,
-            'head_office_id' => $this->head_office_id,
+            'headOfficeId' => $this->head_office_id,
             'name' => $this->name,
             'code' => $this->code,
-            'created_at' => $this->created_at?->toISOString(),
-            'updated_at' => $this->updated_at?->toISOString(),
-            'created_by' => $this->created_by,
-            'updated_by' => $this->updated_by,
+            'createdAt' => $this->created_at?->toISOString(),
+            'updatedAt' => $this->updated_at?->toISOString(),
+            'createdBy' => $this->created_by,
+            'updatedBy' => $this->updated_by,
             'version' => $this->version,
 
             // Conditional relationships based on what was loaded by service
-            'head_office' => $this->when(
+            'headOffice' => $this->when(
                 $this->relationLoaded('headOffice') && $this->wasIncludeRequested('head_office'),
                 function () {
                     return new HeadOfficeResource($this->headOffice);
@@ -46,7 +46,7 @@ class DepartmentResource extends BaseResource
                 }
             ),
 
-            'careers_count' => $this->when(
+            'careersCount' => $this->when(
                 $this->relationLoaded('careers'),
                 fn() => $this->careers->count()
             ),
@@ -56,9 +56,9 @@ class DepartmentResource extends BaseResource
                 $this->wasIncludeRequested('statistics'),
                 function () {
                     return [
-                        'careers_count' => $this->relationLoaded('careers') ? $this->careers->count() : $this->careers()->count(),
-                        'has_careers' => $this->relationLoaded('careers') ? $this->careers->isNotEmpty() : $this->careers()->exists(),
-                        'head_office_name' => $this->relationLoaded('headOffice') ? $this->headOffice?->name : $this->headOffice?->name,
+                        'careersCount' => $this->relationLoaded('careers') ? $this->careers->count() : $this->careers()->count(),
+                        'hasCareers' => $this->relationLoaded('careers') ? $this->careers->isNotEmpty() : $this->careers()->exists(),
+                        'headOfficeName' => $this->relationLoaded('headOffice') ? $this->headOffice?->name : $this->headOffice?->name,
                     ];
                 }
             ),
@@ -70,12 +70,12 @@ class DepartmentResource extends BaseResource
                     && $this->relationLoaded('careers')
                     && $this->careers->every(fn($c) => $c->relationLoaded('subsystems')),
                 fn() => [
-                    'head_office' => [
+                    'headOffice' => [
                         'id' => $this->headOffice?->id,
                         'name' => $this->headOffice?->name,
                         'code' => $this->headOffice?->code,
                     ],
-                    'careers_count' => $this->careers->count(),
+                    'careersCount' => $this->careers->count(),
                     'careers' => CareerResource::collection($this->careers ?? collect())
                         ->map(function ($career) {
                             return array_merge($career->toArray(request()), [
@@ -96,8 +96,8 @@ class DepartmentResource extends BaseResource
             'id' => $this->id,
             'name' => $this->name,
             'code' => $this->code,
-            'head_office_id' => $this->head_office_id,
-            'careers_count' => $this->careers()->count(),
+            'headOfficeId' => $this->head_office_id,
+            'careersCount' => $this->careers()->count(),
         ];
     }
 

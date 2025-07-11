@@ -35,81 +35,32 @@ class DepartmentController extends Controller
      *     summary="Obtener listado de departamentos",
      *     description="Retorna el listado de departamentos con soporte para múltiples formatos: paginación, colección, minimal, dropdown, pluck",
      *     @OA\Parameter(
-     *         name="format",
-     *         in="query",
-     *         description="Formato de respuesta",
-     *         required=false,
-     *         @OA\Schema(type="string", enum={"paginate", "minimal", "dropdown", "pluck", "collection"}, example="paginate")
-     *     ),
-     *     @OA\Parameter(
-     *         name="per_page",
-     *         in="query",
-     *         description="Elementos por página (cuando format=paginate)",
-     *         required=false,
-     *         @OA\Schema(type="integer", example=15)
-     *     ),
-     *     @OA\Parameter(
-     *         name="pluck_key",
-     *         in="query",
-     *         description="Campo clave para formato pluck",
-     *         required=false,
-     *         @OA\Schema(type="string", example="id")
-     *     ),
-     *     @OA\Parameter(
-     *         name="pluck_label",
-     *         in="query",
-     *         description="Campo etiqueta para formato pluck",
-     *         required=false,
-     *         @OA\Schema(type="string", example="name")
-     *     ),
-     *     @OA\Parameter(
-     *         name="paginate",
-     *         in="query",
-     *         description="[Legacy] Activar paginación (usar format=paginate)",
-     *         required=false,
-     *         @OA\Schema(type="boolean", example=true)
-     *     ),
-     *     @OA\Parameter(
-     *         name="minimal",
-     *         in="query",
-     *         description="[Legacy] Vista minimal (usar format=minimal)",
-     *         required=false,
-     *         @OA\Schema(type="boolean", example=true)
-     *     ),
-     *     @OA\Parameter(
-     *         name="pluck",
-     *         in="query",
-     *         description="[Legacy] Campo para pluck (usar format=pluck)",
-     *         required=false,
-     *         @OA\Schema(type="string", example="id")
-     *     ),
-     *     @OA\Parameter(
      *         name="search",
      *         in="query",
      *         description="Búsqueda por nombre o código",
      *         required=false,
-     *         @OA\Schema(type="string", example="informática")
+     *         @OA\Schema(type="string")
      *     ),
      *     @OA\Parameter(
-     *         name="code",
-     *         in="query",
-     *         description="Filtrar por código específico",
-     *         required=false,
-     *         @OA\Schema(type="string", example="INFO")
-     *     ),
-     *     @OA\Parameter(
-     *         name="head_office_id",
+     *         name="headOfficeId",
      *         in="query",
      *         description="Filtrar por sede específica",
      *         required=false,
      *         @OA\Schema(type="string", format="uuid")
      *     ),
      *     @OA\Parameter(
-     *         name="created_by",
+     *         name="perPage",
      *         in="query",
-     *         description="Filtrar por creador",
+     *         description="Elementos por página",
      *         required=false,
-     *         @OA\Schema(type="string", example="system")
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Parameter(
+     *         name="format",
+     *         in="query",
+     *         description="Formato de respuesta (collection, paginate, minimal, dropdown, pluck)",
+     *         required=false,
+     *         @OA\Schema(type="string", enum={"collection", "paginate", "minimal", "dropdown", "pluck"})
      *     ),
      *     @OA\Response(
      *         response=200,
@@ -173,10 +124,10 @@ class DepartmentController extends Controller
      *         required=true,
      *         description="Datos del departamento a crear",
      *         @OA\JsonContent(
-     *             required={"name","head_office_id"},
-     *             @OA\Property(property="name", type="string", example="Departamento de Informática", description="Nombre del departamento"),
-     *             @OA\Property(property="code", type="string", example="INFO", description="Código único del departamento (alfanumérico, mayúsculas)"),
-     *             @OA\Property(property="head_office_id", type="string", format="uuid", example="0197d795-7572-7331-903b-3aeed9fb34c2", description="ID de la sede a la que pertenece")
+     *             required={"name","headOfficeId"},
+     *             @OA\Property(property="name", type="string", description="Nombre del departamento"),
+     *             @OA\Property(property="code", type="string", description="Código único del departamento (alfanumérico, mayúsculas)"),
+     *             @OA\Property(property="headOfficeId", type="string", format="uuid", description="ID de la sede a la que pertenece")
      *         )
      *     ),
      *     @OA\Response(
@@ -203,7 +154,7 @@ class DepartmentController extends Controller
      *                     @OA\Items(type="string", example="El nombre es requerido")
      *                 ),
      *                 @OA\Property(
-     *                     property="head_office_id",
+     *                     property="headOfficeId",
      *                     type="array",
      *                     @OA\Items(type="string", example="La sede es requerida")
      *                 )
@@ -242,9 +193,9 @@ class DepartmentController extends Controller
      *     @OA\Parameter(
      *         name="include",
      *         in="query",
-     *         description="Relaciones a incluir (head_office, careers, statistics, hierarchy)",
+     *         description="Relaciones a incluir (headOffice, careers, statistics, hierarchy)",
      *         required=false,
-     *         @OA\Schema(type="string", example="head_office,careers")
+     *         @OA\Schema(type="string")
      *     ),
      *     @OA\Response(
      *         response=200,
@@ -301,9 +252,9 @@ class DepartmentController extends Controller
      *         required=true,
      *         description="Datos del departamento a actualizar",
      *         @OA\JsonContent(
-     *             @OA\Property(property="name", type="string", example="Departamento de Informática Actualizado"),
-     *             @OA\Property(property="code", type="string", example="INFO_UPD"),
-     *             @OA\Property(property="head_office_id", type="string", format="uuid")
+     *             @OA\Property(property="name", type="string", description="Nombre del departamento"),
+     *             @OA\Property(property="code", type="string", description="Código único del departamento"),
+     *             @OA\Property(property="headOfficeId", type="string", format="uuid", description="ID de la sede")
      *         )
      *     ),
      *     @OA\Response(

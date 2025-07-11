@@ -29,104 +29,16 @@
                 "operationId": "getCareers",
                 "parameters": [
                     {
-                        "name": "format",
-                        "in": "query",
-                        "description": "Formato de respuesta",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "paginate",
-                                "minimal",
-                                "dropdown",
-                                "pluck",
-                                "collection"
-                            ],
-                            "example": "paginate"
-                        }
-                    },
-                    {
-                        "name": "per_page",
-                        "in": "query",
-                        "description": "Elementos por página (cuando format=paginate)",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "example": 15
-                        }
-                    },
-                    {
-                        "name": "pluck_key",
-                        "in": "query",
-                        "description": "Campo clave para formato pluck",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "example": "id"
-                        }
-                    },
-                    {
-                        "name": "pluck_label",
-                        "in": "query",
-                        "description": "Campo etiqueta para formato pluck",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "example": "name"
-                        }
-                    },
-                    {
-                        "name": "paginate",
-                        "in": "query",
-                        "description": "[Legacy] Activar paginación (usar format=paginate)",
-                        "required": false,
-                        "schema": {
-                            "type": "boolean",
-                            "example": true
-                        }
-                    },
-                    {
-                        "name": "minimal",
-                        "in": "query",
-                        "description": "[Legacy] Vista minimal (usar format=minimal)",
-                        "required": false,
-                        "schema": {
-                            "type": "boolean",
-                            "example": true
-                        }
-                    },
-                    {
-                        "name": "pluck",
-                        "in": "query",
-                        "description": "[Legacy] Campo para pluck (usar format=pluck)",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "example": "id"
-                        }
-                    },
-                    {
                         "name": "search",
                         "in": "query",
                         "description": "Búsqueda por nombre o código",
                         "required": false,
                         "schema": {
-                            "type": "string",
-                            "example": "ingeniería"
+                            "type": "string"
                         }
                     },
                     {
-                        "name": "code",
-                        "in": "query",
-                        "description": "Filtrar por código específico",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "example": "ING_SISTEMAS"
-                        }
-                    },
-                    {
-                        "name": "department_id",
+                        "name": "departmentId",
                         "in": "query",
                         "description": "Filtrar por departamento específico",
                         "required": false,
@@ -136,13 +48,28 @@
                         }
                     },
                     {
-                        "name": "created_by",
+                        "name": "perPage",
                         "in": "query",
-                        "description": "Filtrar por creador",
+                        "description": "Elementos por página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "format",
+                        "in": "query",
+                        "description": "Formato de respuesta (collection, paginate, minimal, dropdown, pluck)",
                         "required": false,
                         "schema": {
                             "type": "string",
-                            "example": "system"
+                            "enum": [
+                                "collection",
+                                "paginate",
+                                "minimal",
+                                "dropdown",
+                                "pluck"
+                            ]
                         }
                     }
                 ],
@@ -227,24 +154,21 @@
                             "schema": {
                                 "required": [
                                     "name",
-                                    "department_id"
+                                    "departmentId"
                                 ],
                                 "properties": {
                                     "name": {
                                         "description": "Nombre de la carrera",
-                                        "type": "string",
-                                        "example": "Ingeniería en Sistemas"
+                                        "type": "string"
                                     },
                                     "code": {
                                         "description": "Código único de la carrera (alfanumérico, mayúsculas)",
-                                        "type": "string",
-                                        "example": "ING_SISTEMAS"
+                                        "type": "string"
                                     },
-                                    "department_id": {
+                                    "departmentId": {
                                         "description": "ID del departamento al que pertenece",
                                         "type": "string",
-                                        "format": "uuid",
-                                        "example": "0197d795-7572-7331-903b-3aeed9fb34c2"
+                                        "format": "uuid"
                                     }
                                 },
                                 "type": "object"
@@ -299,7 +223,7 @@
                                                         "example": "El nombre es requerido"
                                                     }
                                                 },
-                                                "department_id": {
+                                                "departmentId": {
                                                     "type": "array",
                                                     "items": {
                                                         "type": "string",
@@ -350,11 +274,10 @@
                     {
                         "name": "include",
                         "in": "query",
-                        "description": "Relaciones a incluir (department, head_office, subsystems, hierarchy)",
+                        "description": "Relaciones a incluir (department, headOffice, subsystems, hierarchy)",
                         "required": false,
                         "schema": {
-                            "type": "string",
-                            "example": "department,subsystems"
+                            "type": "string"
                         }
                     }
                 ],
@@ -431,14 +354,15 @@
                             "schema": {
                                 "properties": {
                                     "name": {
-                                        "type": "string",
-                                        "example": "Ingeniería en Sistemas Actualizada"
+                                        "description": "Nombre de la carrera",
+                                        "type": "string"
                                     },
                                     "code": {
-                                        "type": "string",
-                                        "example": "ING_SISTEMAS_UPD"
+                                        "description": "Código único de la carrera",
+                                        "type": "string"
                                     },
-                                    "department_id": {
+                                    "departmentId": {
+                                        "description": "ID del departamento",
                                         "type": "string",
                                         "format": "uuid"
                                     }
@@ -1080,104 +1004,16 @@
                 "operationId": "getDepartments",
                 "parameters": [
                     {
-                        "name": "format",
-                        "in": "query",
-                        "description": "Formato de respuesta",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "paginate",
-                                "minimal",
-                                "dropdown",
-                                "pluck",
-                                "collection"
-                            ],
-                            "example": "paginate"
-                        }
-                    },
-                    {
-                        "name": "per_page",
-                        "in": "query",
-                        "description": "Elementos por página (cuando format=paginate)",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "example": 15
-                        }
-                    },
-                    {
-                        "name": "pluck_key",
-                        "in": "query",
-                        "description": "Campo clave para formato pluck",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "example": "id"
-                        }
-                    },
-                    {
-                        "name": "pluck_label",
-                        "in": "query",
-                        "description": "Campo etiqueta para formato pluck",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "example": "name"
-                        }
-                    },
-                    {
-                        "name": "paginate",
-                        "in": "query",
-                        "description": "[Legacy] Activar paginación (usar format=paginate)",
-                        "required": false,
-                        "schema": {
-                            "type": "boolean",
-                            "example": true
-                        }
-                    },
-                    {
-                        "name": "minimal",
-                        "in": "query",
-                        "description": "[Legacy] Vista minimal (usar format=minimal)",
-                        "required": false,
-                        "schema": {
-                            "type": "boolean",
-                            "example": true
-                        }
-                    },
-                    {
-                        "name": "pluck",
-                        "in": "query",
-                        "description": "[Legacy] Campo para pluck (usar format=pluck)",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "example": "id"
-                        }
-                    },
-                    {
                         "name": "search",
                         "in": "query",
                         "description": "Búsqueda por nombre o código",
                         "required": false,
                         "schema": {
-                            "type": "string",
-                            "example": "informática"
+                            "type": "string"
                         }
                     },
                     {
-                        "name": "code",
-                        "in": "query",
-                        "description": "Filtrar por código específico",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "example": "INFO"
-                        }
-                    },
-                    {
-                        "name": "head_office_id",
+                        "name": "headOfficeId",
                         "in": "query",
                         "description": "Filtrar por sede específica",
                         "required": false,
@@ -1187,13 +1023,28 @@
                         }
                     },
                     {
-                        "name": "created_by",
+                        "name": "perPage",
                         "in": "query",
-                        "description": "Filtrar por creador",
+                        "description": "Elementos por página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "format",
+                        "in": "query",
+                        "description": "Formato de respuesta (collection, paginate, minimal, dropdown, pluck)",
                         "required": false,
                         "schema": {
                             "type": "string",
-                            "example": "system"
+                            "enum": [
+                                "collection",
+                                "paginate",
+                                "minimal",
+                                "dropdown",
+                                "pluck"
+                            ]
                         }
                     }
                 ],
@@ -1278,24 +1129,21 @@
                             "schema": {
                                 "required": [
                                     "name",
-                                    "head_office_id"
+                                    "headOfficeId"
                                 ],
                                 "properties": {
                                     "name": {
                                         "description": "Nombre del departamento",
-                                        "type": "string",
-                                        "example": "Departamento de Informática"
+                                        "type": "string"
                                     },
                                     "code": {
                                         "description": "Código único del departamento (alfanumérico, mayúsculas)",
-                                        "type": "string",
-                                        "example": "INFO"
+                                        "type": "string"
                                     },
-                                    "head_office_id": {
+                                    "headOfficeId": {
                                         "description": "ID de la sede a la que pertenece",
                                         "type": "string",
-                                        "format": "uuid",
-                                        "example": "0197d795-7572-7331-903b-3aeed9fb34c2"
+                                        "format": "uuid"
                                     }
                                 },
                                 "type": "object"
@@ -1350,7 +1198,7 @@
                                                         "example": "El nombre es requerido"
                                                     }
                                                 },
-                                                "head_office_id": {
+                                                "headOfficeId": {
                                                     "type": "array",
                                                     "items": {
                                                         "type": "string",
@@ -1401,11 +1249,10 @@
                     {
                         "name": "include",
                         "in": "query",
-                        "description": "Relaciones a incluir (head_office, careers, statistics, hierarchy)",
+                        "description": "Relaciones a incluir (headOffice, careers, statistics, hierarchy)",
                         "required": false,
                         "schema": {
-                            "type": "string",
-                            "example": "head_office,careers"
+                            "type": "string"
                         }
                     }
                 ],
@@ -1482,14 +1329,15 @@
                             "schema": {
                                 "properties": {
                                     "name": {
-                                        "type": "string",
-                                        "example": "Departamento de Informática Actualizado"
+                                        "description": "Nombre del departamento",
+                                        "type": "string"
                                     },
                                     "code": {
-                                        "type": "string",
-                                        "example": "INFO_UPD"
+                                        "description": "Código único del departamento",
+                                        "type": "string"
                                     },
-                                    "head_office_id": {
+                                    "headOfficeId": {
+                                        "description": "ID de la sede",
                                         "type": "string",
                                         "format": "uuid"
                                     }
@@ -2037,110 +1885,37 @@
                 "operationId": "getHeadOffices",
                 "parameters": [
                     {
-                        "name": "format",
-                        "in": "query",
-                        "description": "Formato de respuesta",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "paginate",
-                                "minimal",
-                                "dropdown",
-                                "pluck",
-                                "collection"
-                            ],
-                            "example": "paginate"
-                        }
-                    },
-                    {
-                        "name": "per_page",
-                        "in": "query",
-                        "description": "Elementos por página (cuando format=paginate)",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "example": 15
-                        }
-                    },
-                    {
-                        "name": "pluck_key",
-                        "in": "query",
-                        "description": "Campo clave para formato pluck",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "example": "id"
-                        }
-                    },
-                    {
-                        "name": "pluck_label",
-                        "in": "query",
-                        "description": "Campo etiqueta para formato pluck",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "example": "name"
-                        }
-                    },
-                    {
-                        "name": "paginate",
-                        "in": "query",
-                        "description": "[Legacy] Activar paginación (usar format=paginate)",
-                        "required": false,
-                        "schema": {
-                            "type": "boolean",
-                            "example": true
-                        }
-                    },
-                    {
-                        "name": "minimal",
-                        "in": "query",
-                        "description": "[Legacy] Vista minimal (usar format=minimal)",
-                        "required": false,
-                        "schema": {
-                            "type": "boolean",
-                            "example": true
-                        }
-                    },
-                    {
-                        "name": "pluck",
-                        "in": "query",
-                        "description": "[Legacy] Campo para pluck (usar format=pluck)",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "example": "id"
-                        }
-                    },
-                    {
                         "name": "search",
                         "in": "query",
                         "description": "Búsqueda por nombre o código",
                         "required": false,
                         "schema": {
-                            "type": "string",
-                            "example": "central"
+                            "type": "string"
                         }
                     },
                     {
-                        "name": "code",
+                        "name": "perPage",
                         "in": "query",
-                        "description": "Filtrar por código específico",
+                        "description": "Elementos por página",
                         "required": false,
                         "schema": {
-                            "type": "string",
-                            "example": "CENTRAL"
+                            "type": "integer"
                         }
                     },
                     {
-                        "name": "created_by",
+                        "name": "format",
                         "in": "query",
-                        "description": "Filtrar por creador",
+                        "description": "Formato de respuesta (collection, paginate, minimal, dropdown, pluck)",
                         "required": false,
                         "schema": {
                             "type": "string",
-                            "example": "system"
+                            "enum": [
+                                "collection",
+                                "paginate",
+                                "minimal",
+                                "dropdown",
+                                "pluck"
+                            ]
                         }
                     }
                 ],
@@ -2230,13 +2005,11 @@
                                 "properties": {
                                     "name": {
                                         "description": "Nombre de la sede",
-                                        "type": "string",
-                                        "example": "Sede Central"
+                                        "type": "string"
                                     },
                                     "code": {
                                         "description": "Código único de la sede (alfanumérico, mayúsculas)",
-                                        "type": "string",
-                                        "example": "CENTRAL"
+                                        "type": "string"
                                     }
                                 },
                                 "type": "object"
@@ -2346,8 +2119,7 @@
                         "description": "Relaciones a incluir (departments, statistics, hierarchy)",
                         "required": false,
                         "schema": {
-                            "type": "string",
-                            "example": "departments,statistics"
+                            "type": "string"
                         }
                     }
                 ],
@@ -2436,13 +2208,11 @@
                                 "properties": {
                                     "name": {
                                         "description": "Nombre de la sede",
-                                        "type": "string",
-                                        "example": "Sede Central Actualizada"
+                                        "type": "string"
                                     },
                                     "code": {
                                         "description": "Código único de la sede",
-                                        "type": "string",
-                                        "example": "CENTRAL_UPD"
+                                        "type": "string"
                                     }
                                 },
                                 "type": "object"
@@ -3111,24 +2881,24 @@
                         "type": "string",
                         "example": "CENTRAL"
                     },
-                    "created_at": {
+                    "createdAt": {
                         "description": "Fecha de creación",
                         "type": "string",
                         "format": "date-time",
                         "example": "2025-07-04T22:36:25.000000Z"
                     },
-                    "updated_at": {
+                    "updatedAt": {
                         "description": "Fecha de última actualización",
                         "type": "string",
                         "format": "date-time",
                         "example": "2025-07-04T22:36:47.000000Z"
                     },
-                    "created_by": {
+                    "createdBy": {
                         "description": "Usuario que creó la sede",
                         "type": "string",
                         "example": "system"
                     },
-                    "updated_by": {
+                    "updatedBy": {
                         "description": "Usuario que actualizó la sede",
                         "type": "string",
                         "example": "system"
@@ -3138,7 +2908,7 @@
                         "type": "integer",
                         "example": 2
                     },
-                    "departments_count": {
+                    "departmentsCount": {
                         "description": "Número de departamentos asociados",
                         "type": "integer",
                         "example": 0
@@ -3167,11 +2937,11 @@
                             },
                             "meta": {
                                 "properties": {
-                                    "resource_type": {
+                                    "resourceType": {
                                         "type": "string",
                                         "example": "head_office"
                                     },
-                                    "generated_at": {
+                                    "generatedAt": {
                                         "type": "string",
                                         "format": "date-time"
                                     },
@@ -3241,17 +3011,17 @@
                 "title": "Pagination",
                 "description": "Información de paginación",
                 "properties": {
-                    "current_page": {
+                    "currentPage": {
                         "description": "Página actual",
                         "type": "integer",
                         "example": 1
                     },
-                    "last_page": {
+                    "lastPage": {
                         "description": "Última página",
                         "type": "integer",
                         "example": 1
                     },
-                    "per_page": {
+                    "perPage": {
                         "description": "Elementos por página",
                         "type": "integer",
                         "example": 15
@@ -3271,7 +3041,7 @@
                         "type": "integer",
                         "example": 1
                     },
-                    "has_more_pages": {
+                    "hasMorePages": {
                         "description": "Si hay más páginas",
                         "type": "boolean",
                         "example": false
@@ -3316,7 +3086,7 @@
                     "errors": {
                         "description": "Errores de validación por campo",
                         "properties": {
-                            "field_name": {
+                            "fieldName": {
                                 "type": "array",
                                 "items": {
                                     "type": "string",
@@ -3360,7 +3130,7 @@
                         "format": "uuid",
                         "example": "8015bc21-9a48-4b9c-a552-71d1f6f6fb15"
                     },
-                    "head_office_id": {
+                    "headOfficeId": {
                         "description": "ID de la sede a la que pertenece",
                         "type": "string",
                         "format": "uuid",
@@ -3376,24 +3146,24 @@
                         "type": "string",
                         "example": "INFO"
                     },
-                    "created_at": {
+                    "createdAt": {
                         "description": "Fecha de creación",
                         "type": "string",
                         "format": "date-time",
                         "example": "2025-07-04T22:36:25.000000Z"
                     },
-                    "updated_at": {
+                    "updatedAt": {
                         "description": "Fecha de última actualización",
                         "type": "string",
                         "format": "date-time",
                         "example": "2025-07-04T22:36:47.000000Z"
                     },
-                    "created_by": {
+                    "createdBy": {
                         "description": "Usuario que creó el departamento",
                         "type": "string",
                         "example": "system"
                     },
-                    "updated_by": {
+                    "updatedBy": {
                         "description": "Usuario que actualizó el departamento",
                         "type": "string",
                         "example": "system"
@@ -3403,7 +3173,7 @@
                         "type": "integer",
                         "example": 1
                     },
-                    "careers_count": {
+                    "careersCount": {
                         "description": "Número de carreras asociadas",
                         "type": "integer",
                         "example": 3
@@ -3418,7 +3188,7 @@
                     },
                     {
                         "properties": {
-                            "head_office": {
+                            "headOffice": {
                                 "$ref": "#/components/schemas/HeadOffice"
                             },
                             "careers": {
@@ -3431,15 +3201,15 @@
                             "statistics": {
                                 "description": "Estadísticas del departamento (incluidas condicionalmente)",
                                 "properties": {
-                                    "careers_count": {
+                                    "careersCount": {
                                         "type": "integer",
                                         "example": 3
                                     },
-                                    "has_careers": {
+                                    "hasCareers": {
                                         "type": "boolean",
                                         "example": true
                                     },
-                                    "head_office_name": {
+                                    "headOfficeName": {
                                         "type": "string",
                                         "example": "Sede Central"
                                     }
@@ -3449,7 +3219,7 @@
                             "hierarchy": {
                                 "description": "Jerarquía completa (incluida condicionalmente)",
                                 "properties": {
-                                    "head_office": {
+                                    "headOffice": {
                                         "properties": {
                                             "id": {
                                                 "type": "string",
@@ -3464,7 +3234,7 @@
                                         },
                                         "type": "object"
                                     },
-                                    "careers_count": {
+                                    "careersCount": {
                                         "type": "integer"
                                     },
                                     "careers": {
@@ -3478,11 +3248,11 @@
                             },
                             "meta": {
                                 "properties": {
-                                    "resource_type": {
+                                    "resourceType": {
                                         "type": "string",
                                         "example": "department"
                                     },
-                                    "generated_at": {
+                                    "generatedAt": {
                                         "type": "string",
                                         "format": "date-time"
                                     },
@@ -3510,7 +3280,7 @@
                         "format": "uuid",
                         "example": "310331bc-9201-472f-8d23-26ebcd3a8fdf"
                     },
-                    "department_id": {
+                    "departmentId": {
                         "description": "ID del departamento al que pertenece",
                         "type": "string",
                         "format": "uuid",
@@ -3526,22 +3296,22 @@
                         "type": "string",
                         "example": "ISIST"
                     },
-                    "created_at": {
+                    "createdAt": {
                         "description": "Fecha de creación",
                         "type": "string",
                         "format": "date-time"
                     },
-                    "updated_at": {
+                    "updatedAt": {
                         "description": "Fecha de última actualización",
                         "type": "string",
                         "format": "date-time"
                     },
-                    "created_by": {
+                    "createdBy": {
                         "description": "Usuario que creó la carrera",
                         "type": "string",
                         "example": "system"
                     },
-                    "updated_by": {
+                    "updatedBy": {
                         "description": "Usuario que actualizó la carrera",
                         "type": "string",
                         "example": "system"
@@ -3593,22 +3363,22 @@
                         "type": "string",
                         "example": "SPRUEBA"
                     },
-                    "created_at": {
+                    "createdAt": {
                         "description": "Fecha de creación",
                         "type": "string",
                         "format": "date-time"
                     },
-                    "updated_at": {
+                    "updatedAt": {
                         "description": "Fecha de última actualización",
                         "type": "string",
                         "format": "date-time"
                     },
-                    "created_by": {
+                    "createdBy": {
                         "description": "Usuario que creó el subsistema",
                         "type": "string",
                         "example": "system"
                     },
-                    "updated_by": {
+                    "updatedBy": {
                         "description": "Usuario que actualizó el subsistema",
                         "type": "string",
                         "example": "system"
@@ -3664,17 +3434,17 @@
                 "title": "Bulk Delete Response",
                 "description": "Respuesta de operación de eliminación masiva",
                 "properties": {
-                    "deleted_count": {
+                    "deletedCount": {
                         "description": "Número de elementos eliminados exitosamente",
                         "type": "integer",
                         "example": 2
                     },
-                    "total_requested": {
+                    "totalRequested": {
                         "description": "Número total de elementos solicitados para eliminación",
                         "type": "integer",
                         "example": 3
                     },
-                    "success_rate": {
+                    "successRate": {
                         "description": "Porcentaje de éxito de la operación",
                         "type": "string",
                         "example": "66.67%"

@@ -12,7 +12,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Opcional: Middleware para convertir automáticamente todas las respuestas a camelCase
+        // Descomenta la siguiente línea para habilitar conversión global
+        // $middleware->api([\App\Http\Middleware\ConvertResponseToCamelCase::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

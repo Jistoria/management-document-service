@@ -76,8 +76,8 @@ class CareerResource extends BaseResource
                     'value' => $career->id,
                     'label' => $career->name,
                     'code' => $career->code,
-                    'department_id' => $career->department_id,
-                    'department_name' => $career->department?->name,
+                    'departmentId' => $career->department_id,
+                    'departmentName' => $career->department?->name,
                 ];
             }),
             'count' => count($collection)
@@ -104,7 +104,7 @@ class CareerResource extends BaseResource
                     'id' => $this->department->id,
                     'name' => $this->department->name,
                     'code' => $this->department->code,
-                    'head_office' => $this->department->headOffice ? [
+                    'headOffice' => $this->department->headOffice ? [
                         'id' => $this->department->headOffice->id,
                         'name' => $this->department->headOffice->name,
                         'code' => $this->department->headOffice->code,

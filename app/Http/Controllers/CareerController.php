@@ -35,81 +35,32 @@ class CareerController extends Controller
      *     summary="Obtener listado de carreras",
      *     description="Retorna el listado de carreras con soporte para múltiples formatos: paginación, colección, minimal, dropdown, pluck",
      *     @OA\Parameter(
-     *         name="format",
-     *         in="query",
-     *         description="Formato de respuesta",
-     *         required=false,
-     *         @OA\Schema(type="string", enum={"paginate", "minimal", "dropdown", "pluck", "collection"}, example="paginate")
-     *     ),
-     *     @OA\Parameter(
-     *         name="per_page",
-     *         in="query",
-     *         description="Elementos por página (cuando format=paginate)",
-     *         required=false,
-     *         @OA\Schema(type="integer", example=15)
-     *     ),
-     *     @OA\Parameter(
-     *         name="pluck_key",
-     *         in="query",
-     *         description="Campo clave para formato pluck",
-     *         required=false,
-     *         @OA\Schema(type="string", example="id")
-     *     ),
-     *     @OA\Parameter(
-     *         name="pluck_label",
-     *         in="query",
-     *         description="Campo etiqueta para formato pluck",
-     *         required=false,
-     *         @OA\Schema(type="string", example="name")
-     *     ),
-     *     @OA\Parameter(
-     *         name="paginate",
-     *         in="query",
-     *         description="[Legacy] Activar paginación (usar format=paginate)",
-     *         required=false,
-     *         @OA\Schema(type="boolean", example=true)
-     *     ),
-     *     @OA\Parameter(
-     *         name="minimal",
-     *         in="query",
-     *         description="[Legacy] Vista minimal (usar format=minimal)",
-     *         required=false,
-     *         @OA\Schema(type="boolean", example=true)
-     *     ),
-     *     @OA\Parameter(
-     *         name="pluck",
-     *         in="query",
-     *         description="[Legacy] Campo para pluck (usar format=pluck)",
-     *         required=false,
-     *         @OA\Schema(type="string", example="id")
-     *     ),
-     *     @OA\Parameter(
      *         name="search",
      *         in="query",
      *         description="Búsqueda por nombre o código",
      *         required=false,
-     *         @OA\Schema(type="string", example="ingeniería")
+     *         @OA\Schema(type="string")
      *     ),
      *     @OA\Parameter(
-     *         name="code",
-     *         in="query",
-     *         description="Filtrar por código específico",
-     *         required=false,
-     *         @OA\Schema(type="string", example="ING_SISTEMAS")
-     *     ),
-     *     @OA\Parameter(
-     *         name="department_id",
+     *         name="departmentId",
      *         in="query",
      *         description="Filtrar por departamento específico",
      *         required=false,
      *         @OA\Schema(type="string", format="uuid")
      *     ),
      *     @OA\Parameter(
-     *         name="created_by",
+     *         name="perPage",
      *         in="query",
-     *         description="Filtrar por creador",
+     *         description="Elementos por página",
      *         required=false,
-     *         @OA\Schema(type="string", example="system")
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Parameter(
+     *         name="format",
+     *         in="query",
+     *         description="Formato de respuesta (collection, paginate, minimal, dropdown, pluck)",
+     *         required=false,
+     *         @OA\Schema(type="string", enum={"collection", "paginate", "minimal", "dropdown", "pluck"})
      *     ),
      *     @OA\Response(
      *         response=200,
@@ -173,10 +124,10 @@ class CareerController extends Controller
      *         required=true,
      *         description="Datos de la carrera a crear",
      *         @OA\JsonContent(
-     *             required={"name","department_id"},
-     *             @OA\Property(property="name", type="string", example="Ingeniería en Sistemas", description="Nombre de la carrera"),
-     *             @OA\Property(property="code", type="string", example="ING_SISTEMAS", description="Código único de la carrera (alfanumérico, mayúsculas)"),
-     *             @OA\Property(property="department_id", type="string", format="uuid", example="0197d795-7572-7331-903b-3aeed9fb34c2", description="ID del departamento al que pertenece")
+     *             required={"name","departmentId"},
+     *             @OA\Property(property="name", type="string", description="Nombre de la carrera"),
+     *             @OA\Property(property="code", type="string", description="Código único de la carrera (alfanumérico, mayúsculas)"),
+     *             @OA\Property(property="departmentId", type="string", format="uuid", description="ID del departamento al que pertenece")
      *         )
      *     ),
      *     @OA\Response(
@@ -203,7 +154,7 @@ class CareerController extends Controller
      *                     @OA\Items(type="string", example="El nombre es requerido")
      *                 ),
      *                 @OA\Property(
-     *                     property="department_id",
+     *                     property="departmentId",
      *                     type="array",
      *                     @OA\Items(type="string", example="El departamento es requerido")
      *                 )
@@ -220,7 +171,7 @@ class CareerController extends Controller
     public function store(StoreCareerRequest $request): JsonResponse
     {
         return catchSync(function () use ($request) {
-            $career = $this->careerService->create($request->validated());
+            $career = $this->careerService->create($request->prepareForValidation());
             return new CareerResource($career);
         }, 'Carrera creada exitosamente', 201);
     }
@@ -242,9 +193,9 @@ class CareerController extends Controller
      *     @OA\Parameter(
      *         name="include",
      *         in="query",
-     *         description="Relaciones a incluir (department, head_office, subsystems, hierarchy)",
+     *         description="Relaciones a incluir (department, headOffice, subsystems, hierarchy)",
      *         required=false,
-     *         @OA\Schema(type="string", example="department,subsystems")
+     *         @OA\Schema(type="string")
      *     ),
      *     @OA\Response(
      *         response=200,
@@ -301,9 +252,9 @@ class CareerController extends Controller
      *         required=true,
      *         description="Datos de la carrera a actualizar",
      *         @OA\JsonContent(
-     *             @OA\Property(property="name", type="string", example="Ingeniería en Sistemas Actualizada"),
-     *             @OA\Property(property="code", type="string", example="ING_SISTEMAS_UPD"),
-     *             @OA\Property(property="department_id", type="string", format="uuid")
+     *             @OA\Property(property="name", type="string", description="Nombre de la carrera"),
+     *             @OA\Property(property="code", type="string", description="Código único de la carrera"),
+     *             @OA\Property(property="departmentId", type="string", format="uuid", description="ID del departamento")
      *         )
      *     ),
      *     @OA\Response(

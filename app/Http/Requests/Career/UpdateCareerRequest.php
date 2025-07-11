@@ -40,13 +40,13 @@ class UpdateCareerRequest extends FormRequest
                 'regex:/^[A-Z0-9_-]+$/',
                 Rule::unique('careers', 'code')->ignore($careerId),
             ],
-            'department_id' => [
+            'departmentId' => [
                 'sometimes',
                 'required',
                 'uuid',
                 'exists:departments,id',
             ],
-            'updated_by' => [
+            'updatedBy' => [
                 'nullable',
                 'string',
                 'max:255',
@@ -75,12 +75,12 @@ class UpdateCareerRequest extends FormRequest
             'code.regex' => 'El código solo puede contener letras mayúsculas, números, guiones y guiones bajos.',
             'code.unique' => 'Este código ya está en uso por otra carrera.',
 
-            'department_id.required' => 'El departamento es requerido.',
-            'department_id.uuid' => 'El ID del departamento debe ser un UUID válido.',
-            'department_id.exists' => 'El departamento seleccionado no existe.',
+            'departmentId.required' => 'El departamento es requerido.',
+            'departmentId.uuid' => 'El ID del departamento debe ser un UUID válido.',
+            'departmentId.exists' => 'El departamento seleccionado no existe.',
 
-            'updated_by.string' => 'El campo actualizado por debe ser una cadena de texto.',
-            'updated_by.max' => 'El campo actualizado por no puede tener más de 255 caracteres.',
+            'updatedBy.string' => 'El campo actualizado por debe ser una cadena de texto.',
+            'updatedBy.max' => 'El campo actualizado por no puede tener más de 255 caracteres.',
 
             'version.integer' => 'La versión debe ser un número entero.',
             'version.min' => 'La versión debe ser mayor o igual a 0.',
@@ -95,8 +95,8 @@ class UpdateCareerRequest extends FormRequest
         return [
             'name' => 'nombre',
             'code' => 'código',
-            'department_id' => 'departamento',
-            'updated_by' => 'actualizado por',
+            'departmentId' => 'departamento',
+            'updatedBy' => 'actualizado por',
             'version' => 'versión',
         ];
     }
@@ -106,6 +106,15 @@ class UpdateCareerRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
+        // Handle camelCase to snake_case conversion for compatibility
+        if ($this->has('departmentId') && !$this->has('department_id')) {
+            $this->merge(['department_id' => $this->input('departmentId')]);
+        }
+
+        if ($this->has('updatedBy') && !$this->has('updated_by')) {
+            $this->merge(['updated_by' => $this->input('updatedBy')]);
+        }
+
         // Normalize code to uppercase if provided
         if ($this->has('code') && !empty($this->input('code'))) {
             $this->merge([
@@ -121,7 +130,7 @@ class UpdateCareerRequest extends FormRequest
         }
 
         // Set default updated_by if not provided
-        if (!$this->has('updated_by') || empty($this->input('updated_by'))) {
+        if (!$this->has('updatedBy') && !$this->has('updated_by')) {
             $this->merge([
                 'updated_by' => 'system'
             ]);

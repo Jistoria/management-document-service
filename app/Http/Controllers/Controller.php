@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+
 /**
  * @OA\Info(
  *     title="Management Document Service API",
@@ -35,5 +36,5 @@ namespace App\Http\Controllers;
  */
 abstract class Controller
 {
-    //
+
 }

@@ -36,12 +36,12 @@ class StoreCareerRequest extends FormRequest
                 'regex:/^[A-Z0-9_-]+$/',
                 'unique:careers,code',
             ],
-            'department_id' => [
+            'departmentId' => [
                 'required',
                 'uuid',
                 'exists:departments,id',
             ],
-            'created_by' => [
+            'createdBy' => [
                 'nullable',
                 'string',
                 'max:255',
@@ -65,12 +65,12 @@ class StoreCareerRequest extends FormRequest
             'code.regex' => 'El código solo puede contener letras mayúsculas, números, guiones y guiones bajos.',
             'code.unique' => 'Este código ya está en uso por otra carrera.',
 
-            'department_id.required' => 'El departamento es requerido.',
-            'department_id.uuid' => 'El ID del departamento debe ser un UUID válido.',
-            'department_id.exists' => 'El departamento seleccionado no existe.',
+            'departmentId.required' => 'El departamento es requerido.',
+            'departmentId.uuid' => 'El ID del departamento debe ser un UUID válido.',
+            'departmentId.exists' => 'El departamento seleccionado no existe.',
 
-            'created_by.string' => 'El campo creado por debe ser una cadena de texto.',
-            'created_by.max' => 'El campo creado por no puede tener más de 255 caracteres.',
+            'createdBy.string' => 'El campo creado por debe ser una cadena de texto.',
+            'createdBy.max' => 'El campo creado por no puede tener más de 255 caracteres.',
         ];
     }
 
@@ -82,8 +82,8 @@ class StoreCareerRequest extends FormRequest
         return [
             'name' => 'nombre',
             'code' => 'código',
-            'department_id' => 'departamento',
-            'created_by' => 'creado por',
+            'departmentId' => 'departamento',
+            'createdBy' => 'creado por',
         ];
     }
 
@@ -92,6 +92,15 @@ class StoreCareerRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
+        // Handle camelCase to snake_case conversion for compatibility
+        if ($this->has('departmentId') && !$this->has('department_id')) {
+            $this->merge(['department_id' => $this->input('departmentId')]);
+        }
+
+        if ($this->has('createdBy') && !$this->has('created_by')) {
+            $this->merge(['created_by' => $this->input('createdBy')]);
+        }
+
         // Normalize code to uppercase if provided
         if ($this->has('code') && !empty($this->input('code'))) {
             $this->merge([
@@ -107,7 +116,7 @@ class StoreCareerRequest extends FormRequest
         }
 
         // Set default created_by if not provided
-        if (!$this->has('created_by') || empty($this->input('created_by'))) {
+        if (!$this->has('createdBy') && !$this->has('created_by')) {
             $this->merge([
                 'created_by' => 'system'
             ]);

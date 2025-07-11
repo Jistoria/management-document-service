@@ -24,16 +24,16 @@ class FiltersDepartmentRequest extends DefaultFiltersRequest
         return array_merge(parent::rules(), [
             // Reglas específicas para Department
             'code' => [
-                'nullable',
-                'string',
-                'max:20',
+            'nullable',
+            'string',
+            'max:20',
             ],
-            'head_office_id' => [
+            'headOfficeId' => [
                 'nullable',
                 'uuid',
                 'exists:head_offices,id',
             ],
-            'created_by' => [
+            'createdBy' => [
                 'nullable',
                 'string',
                 'max:255',
@@ -48,8 +48,8 @@ class FiltersDepartmentRequest extends DefaultFiltersRequest
     {
         return array_merge(parent::attributes(), [
             'code' => 'código',
-            'head_office_id' => 'sede principal',
-            'created_by' => 'creado por',
+            'headOfficeId' => 'sede principal',
+            'createdBy' => 'creado por',
         ]);
     }
 
@@ -59,8 +59,8 @@ class FiltersDepartmentRequest extends DefaultFiltersRequest
     public function messages(): array
     {
         return array_merge(parent::messages(), [
-            'head_office_id.uuid' => 'El ID de la sede debe ser un UUID válido.',
-            'head_office_id.exists' => 'La sede seleccionada no existe.',
+            'headOfficeId.uuid' => 'El ID de la sede debe ser un UUID válido.',
+            'headOfficeId.exists' => 'La sede seleccionada no existe.',
         ]);
     }
 }

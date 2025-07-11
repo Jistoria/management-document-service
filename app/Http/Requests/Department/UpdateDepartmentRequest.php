@@ -26,7 +26,7 @@ class UpdateDepartmentRequest extends FormRequest
         $departmentId = $this->route('department');
 
         return [
-            'head_office_id' => [
+            'headOfficeId' => [
                 'sometimes',
                 'uuid',
                 'exists:head_offices,id',
@@ -37,7 +37,7 @@ class UpdateDepartmentRequest extends FormRequest
                 'max:255',
                 'min:2',
                 Rule::unique('departments', 'name')
-                    ->where('head_office_id', $this->input('head_office_id'))
+                    ->where('head_office_id', $this->getHeadOfficeId())
                     ->ignore($departmentId)
                     ->whereNull('deleted_at')
             ],
@@ -60,8 +60,8 @@ class UpdateDepartmentRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'head_office_id.uuid' => 'El ID de sede debe ser un UUID válido.',
-            'head_office_id.exists' => 'La sede seleccionada no existe.',
+            'headOfficeId.uuid' => 'El ID de sede debe ser un UUID válido.',
+            'headOfficeId.exists' => 'La sede seleccionada no existe.',
             'name.string' => 'El nombre debe ser una cadena de texto.',
             'name.max' => 'El nombre no puede exceder los 255 caracteres.',
             'name.min' => 'El nombre debe tener al menos 2 caracteres.',
@@ -80,7 +80,7 @@ class UpdateDepartmentRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'head_office_id' => 'sede',
+            'headOfficeId' => 'sede',
             'name' => 'nombre',
             'code' => 'código',
         ];
@@ -91,10 +91,24 @@ class UpdateDepartmentRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
+        // Handle camelCase to snake_case conversion for compatibility
+        if ($this->has('headOfficeId') && !$this->has('head_office_id')) {
+            $this->merge(['head_office_id' => $this->input('headOfficeId')]);
+        }
+
+        // Handle code uppercase conversion
         if ($this->has('code') && $this->input('code')) {
             $this->merge([
                 'code' => strtoupper($this->input('code'))
             ]);
         }
+    }
+
+    /**
+     * Get head office ID supporting both camelCase and snake_case
+     */
+    protected function getHeadOfficeId(): ?string
+    {
+        return $this->input('headOfficeId') ?? $this->input('head_office_id');
     }
 }

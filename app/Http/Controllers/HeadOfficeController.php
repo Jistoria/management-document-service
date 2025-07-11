@@ -35,74 +35,25 @@ class HeadOfficeController extends Controller
      *     summary="Obtener listado de sedes",
      *     description="Retorna el listado de sedes con soporte para múltiples formatos: paginación, colección, minimal, dropdown, pluck",
      *     @OA\Parameter(
-     *         name="format",
-     *         in="query",
-     *         description="Formato de respuesta",
-     *         required=false,
-     *         @OA\Schema(type="string", enum={"paginate", "minimal", "dropdown", "pluck", "collection"}, example="paginate")
-     *     ),
-     *     @OA\Parameter(
-     *         name="per_page",
-     *         in="query",
-     *         description="Elementos por página (cuando format=paginate)",
-     *         required=false,
-     *         @OA\Schema(type="integer", example=15)
-     *     ),
-     *     @OA\Parameter(
-     *         name="pluck_key",
-     *         in="query",
-     *         description="Campo clave para formato pluck",
-     *         required=false,
-     *         @OA\Schema(type="string", example="id")
-     *     ),
-     *     @OA\Parameter(
-     *         name="pluck_label",
-     *         in="query",
-     *         description="Campo etiqueta para formato pluck",
-     *         required=false,
-     *         @OA\Schema(type="string", example="name")
-     *     ),
-     *     @OA\Parameter(
-     *         name="paginate",
-     *         in="query",
-     *         description="[Legacy] Activar paginación (usar format=paginate)",
-     *         required=false,
-     *         @OA\Schema(type="boolean", example=true)
-     *     ),
-     *     @OA\Parameter(
-     *         name="minimal",
-     *         in="query",
-     *         description="[Legacy] Vista minimal (usar format=minimal)",
-     *         required=false,
-     *         @OA\Schema(type="boolean", example=true)
-     *     ),
-     *     @OA\Parameter(
-     *         name="pluck",
-     *         in="query",
-     *         description="[Legacy] Campo para pluck (usar format=pluck)",
-     *         required=false,
-     *         @OA\Schema(type="string", example="id")
-     *     ),
-     *     @OA\Parameter(
      *         name="search",
      *         in="query",
      *         description="Búsqueda por nombre o código",
      *         required=false,
-     *         @OA\Schema(type="string", example="central")
+     *         @OA\Schema(type="string")
      *     ),
      *     @OA\Parameter(
-     *         name="code",
+     *         name="perPage",
      *         in="query",
-     *         description="Filtrar por código específico",
+     *         description="Elementos por página",
      *         required=false,
-     *         @OA\Schema(type="string", example="CENTRAL")
+     *         @OA\Schema(type="integer")
      *     ),
      *     @OA\Parameter(
-     *         name="created_by",
+     *         name="format",
      *         in="query",
-     *         description="Filtrar por creador",
+     *         description="Formato de respuesta (collection, paginate, minimal, dropdown, pluck)",
      *         required=false,
-     *         @OA\Schema(type="string", example="system")
+     *         @OA\Schema(type="string", enum={"collection", "paginate", "minimal", "dropdown", "pluck"})
      *     ),
      *     @OA\Response(
      *         response=200,
@@ -167,8 +118,8 @@ class HeadOfficeController extends Controller
      *         description="Datos de la sede a crear",
      *         @OA\JsonContent(
      *             required={"name","code"},
-     *             @OA\Property(property="name", type="string", example="Sede Central", description="Nombre de la sede"),
-     *             @OA\Property(property="code", type="string", example="CENTRAL", description="Código único de la sede (alfanumérico, mayúsculas)")
+     *             @OA\Property(property="name", type="string", description="Nombre de la sede"),
+     *             @OA\Property(property="code", type="string", description="Código único de la sede (alfanumérico, mayúsculas)")
      *         )
      *     ),
      *     @OA\Response(
@@ -241,7 +192,7 @@ class HeadOfficeController extends Controller
      *         in="query",
      *         description="Relaciones a incluir (departments, statistics, hierarchy)",
      *         required=false,
-     *         @OA\Schema(type="string", example="departments,statistics")
+     *         @OA\Schema(type="string")
      *     ),
      *     @OA\Response(
      *         response=200,
@@ -303,8 +254,8 @@ class HeadOfficeController extends Controller
      *         required=true,
      *         description="Datos a actualizar de la sede",
      *         @OA\JsonContent(
-     *             @OA\Property(property="name", type="string", example="Sede Central Actualizada", description="Nombre de la sede"),
-     *             @OA\Property(property="code", type="string", example="CENTRAL_UPD", description="Código único de la sede")
+     *             @OA\Property(property="name", type="string", description="Nombre de la sede"),
+     *             @OA\Property(property="code", type="string", description="Código único de la sede")
      *         )
      *     ),
      *     @OA\Response(

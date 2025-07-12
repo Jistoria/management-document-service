@@ -7,15 +7,44 @@ services:
       POSTGRES_DB: management_db
       POSTGRES_USER: user123
       POSTGRES_PASSWORD: pass123
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
     ports:
       - "5450:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      # Scripts de inicialización
+      - ./recreate_database_complete.sql:/docker-entrypoint-initdb.d/recreate_database_complete.sql:ro
+      - ./docker/db_sync_check.sql:/docker-entrypoint-initdb.d/db_sync_check.sql:ro
+      - ./docker/init-db.sh:/docker-entrypoint-initdb.d/01-init-db.sh:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U user123"]
-      interval: 10s
-      timeout: 5s
+      test: ["CMD-SHELL", "pg_isready -U user123 -d management_db"]
+      interval: 15s
+      timeout: 10s
       retries: 5
+      start_period: 30s
+
+  # Servicio de verificación de base de datos (opcional para debugging)
+  db-sync-checker:
+    image: postgres:16
+    container_name: db-sync-checker
+    profiles: ["debug"]  # Solo se ejecuta con docker-compose --profile debug up
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGHOST: postgres
+      PGDATABASE: management_db
+      PGUSER: user123
+      PGPASSWORD: pass123
+    volumes:
+      - ./docker/db_sync_check.sql:/app/db_sync_check.sql:ro
+    command: >
+      bash -c "
+        echo '🔍 Ejecutando verificación de sincronización de DB...';
+        psql -f /app/db_sync_check.sql;
+        echo '✅ Verificación completada';
+      "
+    restart: "no"
 
 volumes:
   postgres_data:

@@ -9,9 +9,9 @@
 -- =====================================================================================
 -- NOTA: TABLAS YA IMPLEMENTADAS EN LA BASE DE DATOS
 -- =====================================================================================
--- 
+--
 -- Las siguientes tablas YA EXISTEN en la base de datos con esquemas más completos:
--- 
+--
 -- ✅ metadata_schemas - CON COLUMNAS ADICIONALES:
 --    - external_system_id, api_endpoint, cache_ttl
 --    - created_by, updated_by, deleted_at
@@ -36,39 +36,39 @@
 -- =====================================================================================
 
 -- Verificar estructura de metadata_schemas
-SELECT 
-    column_name, 
-    data_type, 
-    is_nullable, 
+SELECT
+    column_name,
+    data_type,
+    is_nullable,
     column_default
-FROM information_schema.columns 
-WHERE table_name = 'metadata_schemas' 
+FROM information_schema.columns
+WHERE table_name = 'metadata_schemas'
 ORDER BY ordinal_position;
 
 -- Verificar estructura de metadata_fields
-SELECT 
-    column_name, 
-    data_type, 
-    is_nullable, 
+SELECT
+    column_name,
+    data_type,
+    is_nullable,
     column_default
-FROM information_schema.columns 
-WHERE table_name = 'metadata_fields' 
+FROM information_schema.columns
+WHERE table_name = 'metadata_fields'
 ORDER BY ordinal_position;
 
 -- Verificar constraints en metadata_fields
-SELECT 
-    constraint_name, 
+SELECT
+    constraint_name,
     constraint_type
-FROM information_schema.table_constraints 
+FROM information_schema.table_constraints
 WHERE table_name = 'metadata_fields';
 
 -- Verificar estructura de required_documents
-SELECT 
-    column_name, 
-    data_type, 
+SELECT
+    column_name,
+    data_type,
     is_nullable
-FROM information_schema.columns 
-WHERE table_name = 'required_documents' 
+FROM information_schema.columns
+WHERE table_name = 'required_documents'
     AND column_name IN ('metadata_schema_id', 'schema_id', 'security_level')
 ORDER BY ordinal_position;
 
@@ -77,18 +77,18 @@ ORDER BY ordinal_position;
 -- =====================================================================================
 
 -- Verificar que existen esquemas de metadatos
-SELECT 
+SELECT
     id,
     name,
     description,
     is_canonical,
     version,
     created_at
-FROM metadata_schemas 
+FROM metadata_schemas
 ORDER BY created_at;
 
 -- Verificar campos de metadatos existentes
-SELECT 
+SELECT
     mf.name as field_name,
     mf.data_type,
     mf.is_required,
@@ -100,11 +100,11 @@ JOIN metadata_schemas ms ON mf.schema_id = ms.id
 ORDER BY ms.name, mf.field_order;
 
 -- Verificar eventos del sistema de metadatos
-SELECT 
+SELECT
     event_type,
     COUNT(*) as event_count,
     MAX(event_time) as last_event
-FROM metadata_schema_events 
+FROM metadata_schema_events
 GROUP BY event_type
 ORDER BY last_event DESC;
 
@@ -114,11 +114,11 @@ ORDER BY last_event DESC;
 
 -- Esquema básico de documento académico (si no existe)
 INSERT INTO metadata_schemas (
-    id, 
-    name, 
-    description, 
-    is_canonical, 
-    version, 
+    id,
+    name,
+    description,
+    is_canonical,
+    version,
     created_by
 ) VALUES (
     gen_random_uuid(),
@@ -138,7 +138,7 @@ INSERT INTO metadata_fields (
     is_required,
     field_order,
     is_reference
-) SELECT 
+) SELECT
     gen_random_uuid(),
     ms.id,
     field_data.name,
@@ -147,7 +147,7 @@ INSERT INTO metadata_fields (
     field_data.field_order,
     field_data.is_reference
 FROM metadata_schemas ms,
-(VALUES 
+(VALUES
     ('titulo', 'string', true, 1, false),
     ('fecha_creacion', 'date', true, 2, false),
     ('autor', 'string', true, 3, false),

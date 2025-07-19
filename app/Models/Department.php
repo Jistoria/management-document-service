@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -75,6 +76,20 @@ class Department extends Model
     public function headOffice(): BelongsTo
     {
         return $this->belongsTo(HeadOffice::class);
+    }
+
+    /**
+     * Get the subsystems associated with this department.
+     */
+    public function subsystems(): MorphToMany
+    {
+        return $this->morphToMany(
+            Subsystem::class,
+            'entity',
+            'subsystem_entity_links',
+            'entity_id',
+            'subsystem_id'
+        )->withTimestamps();
     }
 
     /**

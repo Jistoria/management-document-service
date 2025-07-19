@@ -96,14 +96,40 @@ CREATE TABLE public.subsystems (
     CONSTRAINT subsystems_code_unique UNIQUE (code)
 );
 
--- Tabla: Relación many-to-many entre carreras y subsistemas
-CREATE TABLE public.careers_subsystems (
-    career_id uuid NOT NULL,
-    subsystem_id uuid NOT NULL,
-    CONSTRAINT careers_subsystems_pkey PRIMARY KEY (career_id, subsystem_id),
-    CONSTRAINT careers_subsystems_career_id_foreign FOREIGN KEY (career_id) REFERENCES careers(id) ON DELETE CASCADE,
-    CONSTRAINT careers_subsystems_subsystem_id_foreign FOREIGN KEY (subsystem_id) REFERENCES subsystems(id) ON DELETE CASCADE
+-- Tabla: Grupos de subsistemas
+CREATE TABLE public.subsystem_groups (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    name varchar(255) NOT NULL,
+    code varchar(100) UNIQUE NOT NULL,
+    description text,
+    is_public boolean DEFAULT true NOT NULL, -- indica si es visible a todos o solo interna
+    created_at timestamp DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Tabla: Relación many-to-many(polimórfica) entre subsistemas y grupos
+CREATE TABLE public.subsystem_group_links (
+    subsystem_id uuid NOT NULL,
+    group_id uuid NOT NULL,
+    created_at timestamp DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (subsystem_id, group_id),
+    FOREIGN KEY (subsystem_id) REFERENCES subsystems(id) ON DELETE CASCADE,
+    FOREIGN KEY (group_id) REFERENCES subsystem_groups(id) ON DELETE CASCADE
+);
+
+
+
+-- Tabla: Relación many-to-many(polimorfica) entre subsistemas a otras entidades
+CREATE TABLE public.subsystem_entity_links (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    subsystem_id uuid NOT NULL REFERENCES subsystems(id) ON DELETE CASCADE,
+    entity_type VARCHAR(50) NOT NULL,  -- 'head_office', 'department', 'career', etc.
+    entity_id uuid NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (subsystem_id, entity_type, entity_id)
+);
+
 
 -- =====================================================================================
 -- TABLAS DE GESTIÓN DE PROCESOS

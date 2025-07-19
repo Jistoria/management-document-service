@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -72,6 +74,21 @@ class HeadOffice extends Model
     public function departments(): HasMany
     {
         return $this->hasMany(Department::class);
+    }
+
+
+    /**
+     * Get the subsystems associated with this head office.
+     */
+    public function subsystems(): MorphToMany
+    {
+        return $this->morphToMany(
+            Subsystem::class,
+            'entity',
+            'subsystem_entity_links',
+            'entity_id',
+            'subsystem_id'
+        )->withTimestamps();
     }
 
     /**

@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -78,11 +79,25 @@ class Career extends Model
     }
 
     /**
-     * Get the subsystems associated with this career.
+     * Get the subsystems associated with this career via careers_subsystems table.
      */
     public function subsystems(): BelongsToMany
     {
         return $this->belongsToMany(Subsystem::class, 'careers_subsystems');
+    }
+
+    /**
+     * Get the subsystems associated with this career via entity links.
+     */
+    public function subsystemsViaEntityLinks(): MorphToMany
+    {
+        return $this->morphToMany(
+            Subsystem::class,
+            'entity',
+            'subsystem_entity_links',
+            'entity_id',
+            'subsystem_id'
+        )->withTimestamps();
     }
 
     /**

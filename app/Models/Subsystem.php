@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -73,6 +74,57 @@ class Subsystem extends Model
     public function careers(): BelongsToMany
     {
         return $this->belongsToMany(Career::class, 'careers_subsystems');
+    }
+
+    /**
+     * Get the head offices associated with this subsystem.
+     */
+    public function headOffices(): MorphToMany
+    {
+        return $this->morphedByMany(
+            HeadOffice::class,
+            'entity',
+            'subsystem_entity_links',
+            'subsystem_id',
+            'entity_id'
+        )->withTimestamps();
+    }
+
+    /**
+     * Get the departments associated with this subsystem.
+     */
+    public function departments(): MorphToMany
+    {
+        return $this->morphedByMany(
+            Department::class,
+            'entity',
+            'subsystem_entity_links',
+            'subsystem_id',
+            'entity_id'
+        )->withTimestamps();
+    }
+
+    /**
+     * Get the careers associated with this subsystem via entity links.
+     */
+    public function careersViaEntityLinks(): MorphToMany
+    {
+        return $this->morphedByMany(
+            Career::class,
+            'entity',
+            'subsystem_entity_links',
+            'subsystem_id',
+            'entity_id'
+        )->withTimestamps();
+    }
+
+    /**
+     * Get the groups associated with this subsystem.
+     */
+    public function groups(): BelongsToMany
+    {
+        return $this->belongsToMany(SubsystemGroup::class, 'subsystem_group_links', 'subsystem_id', 'group_id')
+            ->withTimestamps();
     }
 
     /**

@@ -33,7 +33,8 @@ WHERE table_schema = 'public'
 -- Listado detallado de tablas esperadas
 WITH expected_tables AS (
     SELECT unnest(ARRAY[
-        'head_offices', 'departments', 'careers', 'subsystems', 'careers_subsystems',
+        'head_offices', 'departments', 'careers', 'subsystems', 'subsystem_entity_links',
+        'subsystem_group_links', 'subsystem_groups',
         'process_categories', 'processes', 'document_types', 'academic_roles',
         'required_documents', 'storage_unit_types', 'storage_units',
         'metadata_schemas', 'metadata_fields', 'metadata_schema_events',

@@ -55,7 +55,8 @@ verify_database_sync() {
     echo -e "${YELLOW}🔄 Verificando sincronización de la base de datos...${NC}"
 
     # Verificar que todas las tablas esperadas existen
-    EXPECTED_TABLES=("head_offices" "departments" "careers" "subsystems" "careers_subsystems"
+    EXPECTED_TABLES=("head_offices" "departments" "careers" "subsystems" "subsystem_entity_links"
+                     "subsystem_group_links" "subsystem_groups"
                      "process_categories" "processes" "document_types" "academic_roles"
                      "required_documents" "storage_unit_types" "storage_units"
                      "metadata_schemas" "metadata_fields" "metadata_schema_events"

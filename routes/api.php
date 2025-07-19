@@ -4,6 +4,8 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\HeadOfficeController;
 use App\Http\Controllers\CareerController;
 use App\Http\Controllers\SubsystemController;
+use App\Http\Controllers\SubsystemEntityLinkController;
+use App\Http\Controllers\SubsystemGroupController;
 use Illuminate\Support\Facades\Route;
 
 // Head Offices Routes
@@ -76,6 +78,23 @@ Route::prefix('subsystems')->group(function () {
     Route::get('/{subsystem}/statistics', [SubsystemController::class, 'statistics']);
     Route::get('/code/{code}', [SubsystemController::class, 'findByCode']);
     Route::post('/bulk-delete', [SubsystemController::class, 'bulkDelete']);
+});
+
+// Subsystem Groups Routes
+Route::prefix('subsystem-groups')->group(function () {
+    Route::get('/', [SubsystemGroupController::class, 'index']);
+    Route::post('/', [SubsystemGroupController::class, 'store']);
+    Route::get('/{subsystemGroup}', [SubsystemGroupController::class, 'show']);
+    Route::put('/{subsystemGroup}', [SubsystemGroupController::class, 'update']);
+    Route::patch('/{subsystemGroup}', [SubsystemGroupController::class, 'update']);
+    Route::delete('/{subsystemGroup}', [SubsystemGroupController::class, 'destroy']);
+});
+
+// Subsystem Entity Links Routes
+Route::prefix('subsystem-entity-links')->group(function () {
+    Route::get('/', [SubsystemEntityLinkController::class, 'index']);       // GET with query params
+    Route::post('/', [SubsystemEntityLinkController::class, 'store']);      // POST attach
+    Route::delete('/', [SubsystemEntityLinkController::class, 'destroy']);  // DELETE detach
 });
 
 // Nested route for careers by department

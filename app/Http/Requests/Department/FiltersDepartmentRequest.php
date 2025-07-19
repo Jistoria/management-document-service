@@ -22,7 +22,6 @@ class FiltersDepartmentRequest extends DefaultFiltersRequest
     public function rules(): array
     {
         return array_merge(parent::rules(), [
-            // Reglas específicas para Department
             'code' => [
             'nullable',
             'string',

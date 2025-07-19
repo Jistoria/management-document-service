@@ -3,6 +3,7 @@
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\HeadOfficeController;
 use App\Http\Controllers\CareerController;
+use App\Http\Controllers\SubsystemController;
 use Illuminate\Support\Facades\Route;
 
 // Head Offices Routes
@@ -57,6 +58,24 @@ Route::prefix('careers')->group(function () {
     Route::get('/{career}/statistics', [CareerController::class, 'statistics']);
     Route::get('/code/{code}', [CareerController::class, 'findByCode']);
     Route::post('/bulk-delete', [CareerController::class, 'bulkDelete']);
+});
+
+// Subsystems Routes
+Route::prefix('subsystems')->group(function () {
+    // Standard CRUD routes
+    Route::get('/', [SubsystemController::class, 'index']);
+    Route::post('/', [SubsystemController::class, 'store']);
+    Route::get('/{subsystem}', [SubsystemController::class, 'show']);
+    Route::put('/{subsystem}', [SubsystemController::class, 'update']);
+    Route::patch('/{subsystem}', [SubsystemController::class, 'update']);
+    Route::delete('/{subsystem}', [SubsystemController::class, 'destroy']);
+
+    // Additional routes
+    Route::post('/{subsystem}/restore', [SubsystemController::class, 'restore']);
+    Route::get('/{subsystem}/hierarchy', [SubsystemController::class, 'hierarchy']);
+    Route::get('/{subsystem}/statistics', [SubsystemController::class, 'statistics']);
+    Route::get('/code/{code}', [SubsystemController::class, 'findByCode']);
+    Route::post('/bulk-delete', [SubsystemController::class, 'bulkDelete']);
 });
 
 // Nested route for careers by department

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Constants\HttpStatus;
 use App\Models\Subsystem;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -67,7 +68,9 @@ class SubsystemService
     public function update(string $id, array $data): Subsystem
     {
         $data = Subsystem::convertToSnakeCase($data);
-        $subsystem = Subsystem::findOrFail($id);
+        $subsystem = Subsystem::find($id);
+        if (empty($subsystem)) throw new \Exception('Subsistema no encontrado', code: HttpStatus::NOT_FOUND);
+        
         $subsystem->update($data);
         return $subsystem->fresh(['careers', 'processCategories']);
     }

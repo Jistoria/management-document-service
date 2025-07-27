@@ -69,14 +69,6 @@ class Subsystem extends Model
     ];
 
     /**
-     * Get the careers associated with this subsystem.
-     */
-    public function careers(): BelongsToMany
-    {
-        return $this->belongsToMany(Career::class, 'careers_subsystems');
-    }
-
-    /**
      * Get the head offices associated with this subsystem.
      */
     public function headOffices(): MorphToMany
@@ -107,7 +99,7 @@ class Subsystem extends Model
     /**
      * Get the careers associated with this subsystem via entity links.
      */
-    public function careersViaEntityLinks(): MorphToMany
+    public function careers(): MorphToMany
     {
         return $this->morphedByMany(
             Career::class,

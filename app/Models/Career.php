@@ -79,14 +79,6 @@ class Career extends Model
     }
 
     /**
-     * Get the subsystems associated with this career via careers_subsystems table.
-     */
-    public function subsystems(): BelongsToMany
-    {
-        return $this->belongsToMany(Subsystem::class, 'careers_subsystems');
-    }
-
-    /**
      * Get the subsystems associated with this career via entity links.
      */
     public function subsystemsViaEntityLinks(): MorphToMany

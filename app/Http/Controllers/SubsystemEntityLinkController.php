@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Constants\HttpStatus;
+use App\Http\Requests\Subsystem\DeleteEntityLinkRequest;
+use App\Http\Requests\Subsystem\StoreEntityLinkRequest;
 use App\Services\SubsystemEntityLinkService;
 use App\Helpers\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
+use function App\Helpers\catchSync;
 
 /**
  * @OA\Tag(
@@ -156,31 +160,19 @@ class SubsystemEntityLinkController extends Controller
      *     )
      * )
      */
-    public function store(Request $request): JsonResponse
+    public function store(StoreEntityLinkRequest $request): JsonResponse
     {
-        try {
-            $validated = $request->validate([
-                'subsystem_id' => 'required|uuid|exists:subsystems,id',
-                'entity_type' => 'required|string|in:head_office,department,career',
-                'entity_id' => 'required|uuid|exists:' . $this->getTableName($request->entity_type) . ',id',
-            ]);
-
-            $attached = $this->linkService->attachSubsystemToEntity(
-                $validated['subsystem_id'],
-                $validated['entity_type'],
-                $validated['entity_id']
-            );
-
-            if (!$attached) {
-                return ApiResponse::error('Relationship already exists', 409);
-            }
-
-            return ApiResponse::success(null, 'Subsystem attached successfully', 201);
-        } catch (ValidationException $e) {
-            return ApiResponse::error('Validation failed', 422, $e->errors());
-        } catch (\Exception $e) {
-            return ApiResponse::error('Failed to attach subsystem: ' . $e->getMessage());
-        }
+        return catchSync(
+            function () use ($request) {
+                $validated = $request->validated();
+                $attached = $this->linkService->attachSubsystemToEntity(
+                    $validated['subsystem_id'],
+                    $validated['entity_type'],
+                    $validated['entity_id']
+                );
+            },
+            status: HttpStatus::CREATED
+    );
     }
 
     /**
@@ -233,41 +225,19 @@ class SubsystemEntityLinkController extends Controller
      *     )
      * )
      */
-    public function destroy(Request $request): JsonResponse
+    public function destroy(DeleteEntityLinkRequest $request): JsonResponse
     {
-        try {
-            $validated = $request->validate([
-                'subsystem_id' => 'required|uuid|exists:subsystems,id',
-                'entity_type' => 'required|string|in:head_office,department,career',
-                'entity_id' => 'required|uuid|exists:' . $this->getTableName($request->entity_type) . ',id',
-            ]);
-
-            $detached = $this->linkService->detachSubsystemFromEntity(
+        return catchSync( function () use ($request) {
+            $validated = $request->validated();
+            $attached = $this->linkService->detachSubsystemFromEntity(
                 $validated['subsystem_id'],
                 $validated['entity_type'],
                 $validated['entity_id']
             );
-
-            if (!$detached) {
-                return ApiResponse::error('Relationship not found', 404);
-            }
-
-            return ApiResponse::success(null, 'Subsystem detached successfully');
-        } catch (ValidationException $e) {
-            return ApiResponse::error('Validation failed', 422, $e->errors());
-        } catch (\Exception $e) {
-            return ApiResponse::error('Failed to detach subsystem: ' . $e->getMessage());
-        }
+        },
+        status: HttpStatus::NO_CONTENT
+        );
     }
 
-    private function getTableName(string $entityType): string
-    {
-        $tableMap = [
-            'head_office' => 'head_offices',
-            'department' => 'departments',
-            'career' => 'careers',
-        ];
 
-        return $tableMap[$entityType] ?? '';
-    }
 }

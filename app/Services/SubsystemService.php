@@ -10,7 +10,7 @@ class SubsystemService
 {
     public function getAll(array $filters = []): Collection
     {
-        $query = Subsystem::query()->with(['careers', 'processCategories']);
+        $query = Subsystem::query()->with(['processCategories']);
         if (!empty($filters['search'])) {
             $search = $filters['search'];
             $query->where(function ($q) use ($search) {

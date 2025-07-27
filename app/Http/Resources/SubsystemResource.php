@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Career;
 use Illuminate\Http\Request;
 
 class SubsystemResource extends BaseResource
@@ -17,7 +18,8 @@ class SubsystemResource extends BaseResource
             'version' => $this->version,
             'createdAt' => $this->created_at?->toISOString(),
             'updatedAt' => $this->updated_at?->toISOString(),
-            'careers' => CareerResource::collection($this->whenLoaded('careers')),
+            'countCareers' => $this->careers->count(),
+            'countHeadOffices' => $this->headOffices->count(),
             'processCategories' => ProcessCategoryResource::collection($this->whenLoaded('processCategories')),
         ];
     }

@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests\Subsystem;
 
+use App\Helpers\SubsystemEntityMap;
 use App\Http\Requests\BaseFormRequest;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Validation\Rule;
 
 
 class DeleteEntityLinkRequest extends BaseFormRequest
@@ -24,7 +26,7 @@ class DeleteEntityLinkRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'entity_type' => ['required', 'exists:subsystem_entity_links,entity_type'],
+            'entity_type' => ['required', Rule::in(SubsystemEntityMap::keys())],
             'entity_id' => ['required', 'exists:subsystem_entity_links,entity_id'],
             'subsystem_id' => ['required', 'exists:subsystems,id'],
         ];

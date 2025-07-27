@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Constants\HttpStatus;
+use App\Helpers\SubsystemEntityMap;
 use App\Http\Requests\Subsystem\DeleteEntityLinkRequest;
 use App\Http\Requests\Subsystem\StoreEntityLinkRequest;
 use App\Services\SubsystemEntityLinkService;
@@ -91,10 +92,10 @@ class SubsystemEntityLinkController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        try {
+        return catchSync(function () use ($request) {
             $validated = $request->validate([
                 'entity_type' => 'required|string|in:head_office,department,career',
-                'entity_id' => 'required|uuid|exists:' . $this->getTableName($request->entity_type) . ',id',
+                'entity_id' => 'required|uuid'
             ]);
 
             $subsystems = $this->linkService->getLinksForEntity(
@@ -102,12 +103,8 @@ class SubsystemEntityLinkController extends Controller
                 $validated['entity_id']
             );
 
-            return ApiResponse::success($subsystems, 'Subsystems retrieved successfully');
-        } catch (ValidationException $e) {
-            return ApiResponse::error('Validation failed', 422, $e->errors());
-        } catch (\Exception $e) {
-            return ApiResponse::error('Failed to retrieve subsystems: ' . $e->getMessage());
-        }
+            return $subsystems;
+        },status: HttpStatus::OK);
     }
 
     /**

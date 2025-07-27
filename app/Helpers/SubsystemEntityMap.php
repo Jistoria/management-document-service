@@ -36,4 +36,9 @@ class SubsystemEntityMap
     {
         return array_keys(self::MAP);
     }
+
+    public  static function keysString() : string
+    {
+        return implode(',', array_keys(self::MAP));
+    }
 }

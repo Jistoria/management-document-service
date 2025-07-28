@@ -6,6 +6,7 @@ use App\Models\HeadOffice;
 use App\Models\Department;
 use App\Models\Career;
 use App\Models\Subsystem;
+use App\Models\SubsystemGroup;
 use App\Models\ProcessCategory;
 use App\Models\Process;
 use App\Models\DocumentType;
@@ -40,6 +41,12 @@ class ProductionSeeder extends Seeder
 
             // Create standard subsystems
             $this->createStandardSubsystems();
+
+            // Create subsystem groups and establish relationships
+            $this->createSubsystemGroups();
+
+            // Create subsystem-entity relationships
+            $this->createSubsystemEntityRelationships();
 
             // Create standard document types
             $this->createStandardDocumentTypes();
@@ -212,6 +219,201 @@ class ProductionSeeder extends Seeder
         }
 
         $this->command->info("   ✓ Subsystems: " . Subsystem::count());
+    }
+
+    /**
+     * Create subsystem groups and establish relationships
+     */
+    private function createSubsystemGroups(): void
+    {
+        $this->command->info('🏷️ Creando grupos de subsistemas...');
+
+        $subsystemGroups = [
+            [
+                'name' => 'Gestión Académica',
+                'code' => 'ACADEMICO',
+                'description' => 'Subsistemas relacionados con la gestión académica institucional',
+                'is_public' => true,
+                'created_by' => 'system',
+                'updated_by' => 'system',
+            ],
+            [
+                'name' => 'Investigación y Desarrollo',
+                'code' => 'INVESTIGACION',
+                'description' => 'Subsistemas dedicados a la investigación y desarrollo científico',
+                'is_public' => true,
+                'created_by' => 'system',
+                'updated_by' => 'system',
+            ],
+            [
+                'name' => 'Servicios Estudiantiles',
+                'code' => 'SERVICIOS',
+                'description' => 'Subsistemas que brindan servicios a los estudiantes',
+                'is_public' => true,
+                'created_by' => 'system',
+                'updated_by' => 'system',
+            ],
+        ];
+
+        foreach ($subsystemGroups as $groupData) {
+            $group = SubsystemGroup::firstOrCreate([
+                'code' => $groupData['code']
+            ], $groupData);
+
+            // Asociar subsistemas con grupos
+            $this->associateSubsystemsWithGroup($group);
+        }
+
+        $this->command->info("   ✓ Subsystem Groups: " . SubsystemGroup::count());
+    }
+
+    /**
+     * Associate subsystems with their respective groups
+     */
+    private function associateSubsystemsWithGroup(SubsystemGroup $group): void
+    {
+        $subsystemsByGroup = [
+            'ACADEMICO' => ['SGA', 'GRADUACION'],
+            'INVESTIGACION' => ['INVESTIGACION'],
+            'SERVICIOS' => ['BIBLIOTECA', 'LABORATORIOS', 'PRACTICAS'],
+        ];
+
+        $subsystemCodes = $subsystemsByGroup[$group->code] ?? [];
+
+        foreach ($subsystemCodes as $code) {
+            $subsystem = Subsystem::where('code', $code)->first();
+            if ($subsystem) {
+                $group->subsystems()->syncWithoutDetaching([$subsystem->id]);
+            }
+        }
+    }
+
+    /**
+     * Create subsystem-entity relationships using morphedByMany
+     */
+    private function createSubsystemEntityRelationships(): void
+    {
+        $this->command->info('🔗 Creando relaciones subsistema-entidades...');
+
+        // Obtener subsistemas
+        $sga = Subsystem::where('code', 'SGA')->first();
+        $biblioteca = Subsystem::where('code', 'BIBLIOTECA')->first();
+        $laboratorios = Subsystem::where('code', 'LABORATORIOS')->first();
+        $investigacion = Subsystem::where('code', 'INVESTIGACION')->first();
+        $practicas = Subsystem::where('code', 'PRACTICAS')->first();
+        $graduacion = Subsystem::where('code', 'GRADUACION')->first();
+
+        // Obtener entidades
+        $sedePrincipal = HeadOffice::where('code', 'PRINCIPAL')->first();
+        
+        $deptIngenieria = Department::where('code', 'INGYTEC')->first();
+        $deptCiencias = Department::where('code', 'CIENCIAS')->first();
+        $deptSalud = Department::where('code', 'SALUD')->first();
+        $deptEconomicas = Department::where('code', 'ECONOMICAS')->first();
+
+        // Crear relaciones con sede principal para todos los subsistemas
+        if ($sedePrincipal) {
+            $subsystems = [$sga, $biblioteca, $laboratorios, $investigacion, $practicas, $graduacion];
+            foreach ($subsystems as $subsystem) {
+                if ($subsystem) {
+                    $subsystem->headOffices()->syncWithoutDetaching([$sedePrincipal->id]);
+                }
+            }
+        }
+
+        // Relaciones específicas por departamento
+        if ($sga) {
+            // SGA se relaciona con todos los departamentos
+            $departments = [$deptIngenieria, $deptCiencias, $deptSalud, $deptEconomicas];
+            foreach ($departments as $dept) {
+                if ($dept) {
+                    $sga->departments()->syncWithoutDetaching([$dept->id]);
+                    
+                    // También relacionar con todas las carreras del departamento
+                    $careers = Career::where('department_id', $dept->id)->get();
+                    foreach ($careers as $career) {
+                        $sga->careers()->syncWithoutDetaching([$career->id]);
+                    }
+                }
+            }
+        }
+
+        if ($biblioteca) {
+            // Biblioteca se relaciona con todos los departamentos y carreras
+            $departments = [$deptIngenieria, $deptCiencias, $deptSalud, $deptEconomicas];
+            foreach ($departments as $dept) {
+                if ($dept) {
+                    $biblioteca->departments()->syncWithoutDetaching([$dept->id]);
+                    
+                    $careers = Career::where('department_id', $dept->id)->get();
+                    foreach ($careers as $career) {
+                        $biblioteca->careers()->syncWithoutDetaching([$career->id]);
+                    }
+                }
+            }
+        }
+
+        if ($laboratorios) {
+            // Laboratorios principalmente para Ingeniería y Ciencias
+            $techDepartments = [$deptIngenieria, $deptCiencias];
+            foreach ($techDepartments as $dept) {
+                if ($dept) {
+                    $laboratorios->departments()->syncWithoutDetaching([$dept->id]);
+                    
+                    $careers = Career::where('department_id', $dept->id)->get();
+                    foreach ($careers as $career) {
+                        $laboratorios->careers()->syncWithoutDetaching([$career->id]);
+                    }
+                }
+            }
+        }
+
+        if ($investigacion) {
+            // Investigación se relaciona con todos los departamentos
+            $departments = [$deptIngenieria, $deptCiencias, $deptSalud, $deptEconomicas];
+            foreach ($departments as $dept) {
+                if ($dept) {
+                    $investigacion->departments()->syncWithoutDetaching([$dept->id]);
+                    
+                    $careers = Career::where('department_id', $dept->id)->get();
+                    foreach ($careers as $career) {
+                        $investigacion->careers()->syncWithoutDetaching([$career->id]);
+                    }
+                }
+            }
+        }
+
+        if ($practicas) {
+            // Prácticas profesionales se relaciona con todos los departamentos
+            $departments = [$deptIngenieria, $deptCiencias, $deptSalud, $deptEconomicas];
+            foreach ($departments as $dept) {
+                if ($dept) {
+                    $practicas->departments()->syncWithoutDetaching([$dept->id]);
+                    
+                    $careers = Career::where('department_id', $dept->id)->get();
+                    foreach ($careers as $career) {
+                        $practicas->careers()->syncWithoutDetaching([$career->id]);
+                    }
+                }
+            }
+        }
+
+        if ($graduacion) {
+            // Graduación se relaciona con todos los departamentos
+            $departments = [$deptIngenieria, $deptCiencias, $deptSalud, $deptEconomicas];
+            foreach ($departments as $dept) {
+                if ($dept) {
+                    $graduacion->departments()->syncWithoutDetaching([$dept->id]);
+                    
+                    $careers = Career::where('department_id', $dept->id)->get();
+                    foreach ($careers as $career) {
+                        $graduacion->careers()->syncWithoutDetaching([$career->id]);
+                    }
+                }
+            }
+        }
+
+        $this->command->info("   ✓ Relaciones subsistema-entidades creadas exitosamente");
     }
 
     /**

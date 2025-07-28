@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\SubsystemGroup;
 use App\Helpers\ApiResponse;
+use App\Services\SubsystemGroupService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
+use function App\Helpers\catchSync;
 
 /**
  * @OA\Tag(
@@ -16,6 +18,11 @@ use Illuminate\Validation\ValidationException;
  */
 class SubsystemGroupController extends Controller
 {
+    public function __construct(
+        protected SubsystemGroupService $subsystemGroupService,
+    )
+    {}
+
     /**
      * @OA\Get(
      *     path="/subsystem-groups",
@@ -224,5 +231,14 @@ class SubsystemGroupController extends Controller
         } catch (\Exception $e) {
             return ApiResponse::error('Failed to delete group: ' . $e->getMessage());
         }
+    }
+
+    public function syncSubsystems(Request $request, SubsystemGroup $subsystemGroup): JsonResponse
+    {
+        return catchSync(
+            function () use ($request, $subsystemGroup) {
+                $this->subsystemGroupService->syncSubsystems($subsystemGroup, $request->get('subsystemsId', []));
+            }
+    );
     }
 }

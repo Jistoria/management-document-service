@@ -88,6 +88,9 @@ Route::prefix('subsystem-groups')->group(function () {
     Route::put('/{subsystemGroup}', [SubsystemGroupController::class, 'update']);
     Route::patch('/{subsystemGroup}', [SubsystemGroupController::class, 'update']);
     Route::delete('/{subsystemGroup}', [SubsystemGroupController::class, 'destroy']);
+
+    //Grouped Subsystems
+    Route::post('/{subsystemGroup}/subsystems', [SubsystemGroupController::class, 'subsystems']);
 });
 
 // Subsystem Entity Links Routes

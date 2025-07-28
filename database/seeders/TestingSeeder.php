@@ -6,6 +6,7 @@ use App\Models\HeadOffice;
 use App\Models\Department;
 use App\Models\Career;
 use App\Models\Subsystem;
+use App\Models\SubsystemGroup;
 use App\Models\ProcessCategory;
 use App\Models\Process;
 use App\Models\DocumentType;
@@ -42,6 +43,9 @@ class TestingSeeder extends Seeder
             // Crear datos de soporte
             $this->createSupportData();
 
+            // Crear grupos de subsistemas y relaciones
+            $this->createSubsystemGroupsAndRelationships();
+
             $this->command->info('✅ Seeder de testing completado exitosamente');
         } finally {
             // Re-enable foreign key checks (PostgreSQL compatible)
@@ -57,9 +61,12 @@ class TestingSeeder extends Seeder
         $this->command->info('🧹 Limpiando datos existentes...');
 
         // Clear in reverse dependency order
+        DB::table('subsystem_entity_links')->delete();
+        DB::table('subsystem_group_links')->delete();
         Career::query()->forceDelete();
         Department::query()->forceDelete();
         HeadOffice::query()->forceDelete();
+        SubsystemGroup::query()->forceDelete();
         Subsystem::query()->forceDelete();
         ProcessCategory::query()->forceDelete();
         Process::query()->forceDelete();
@@ -229,5 +236,88 @@ class TestingSeeder extends Seeder
         $this->command->info("   ✓ Document Types: " . DocumentType::count());
         $this->command->info("   ✓ Academic Roles: " . AcademicRole::count());
         $this->command->info("   ✓ Metadata Schemas: " . MetadataSchema::count());
+    }
+
+    /**
+     * Create subsystem groups and establish relationships for testing
+     */
+    private function createSubsystemGroupsAndRelationships(): void
+    {
+        $this->command->info('🔗 Creando grupos de subsistemas y relaciones...');
+
+        // Create subsystem groups
+        $groups = [
+            [
+                'name' => 'Sistemas Académicos',
+                'code' => 'ACAD_TEST',
+                'description' => 'Grupo de subsistemas académicos para testing',
+                'is_public' => true,
+                'created_by' => 'system',
+                'updated_by' => 'system',
+            ],
+            [
+                'name' => 'Sistemas de Apoyo',
+                'code' => 'APOYO_TEST',
+                'description' => 'Grupo de subsistemas de apoyo para testing',
+                'is_public' => true,
+                'created_by' => 'system',
+                'updated_by' => 'system',
+            ]
+        ];
+
+        foreach ($groups as $groupData) {
+            SubsystemGroup::create($groupData);
+        }
+
+        // Associate subsystems with groups
+        $acadGroup = SubsystemGroup::where('code', 'ACAD_TEST')->first();
+        $supportGroup = SubsystemGroup::where('code', 'APOYO_TEST')->first();
+
+        $sga = Subsystem::where('code', 'SGA')->first();
+        $pract = Subsystem::where('code', 'PRACT')->first();
+        $biblio = Subsystem::where('code', 'BIBLIO')->first();
+        $lab = Subsystem::where('code', 'LAB')->first();
+
+        if ($acadGroup && $sga) $acadGroup->subsystems()->attach($sga->id);
+        if ($acadGroup && $pract) $acadGroup->subsystems()->attach($pract->id);
+        if ($supportGroup && $biblio) $supportGroup->subsystems()->attach($biblio->id);
+        if ($supportGroup && $lab) $supportGroup->subsystems()->attach($lab->id);
+
+        // Create entity relationships randomly for testing
+        $this->createRandomEntityRelationships();
+
+        $this->command->info("   ✓ Subsystem Groups: " . SubsystemGroup::count());
+        $this->command->info("   ✓ Relaciones establecidas para testing");
+    }
+
+    /**
+     * Create random entity relationships for testing
+     */
+    private function createRandomEntityRelationships(): void
+    {
+        $subsystems = Subsystem::all();
+        $headOffices = HeadOffice::all();
+        $departments = Department::all();
+        $careers = Career::all();
+
+        foreach ($subsystems as $subsystem) {
+            // Associate with random head offices (1-2 per subsystem)
+            $randomHeadOffices = $headOffices->random(min(2, $headOffices->count()));
+            foreach ($randomHeadOffices as $headOffice) {
+                $subsystem->headOffices()->syncWithoutDetaching([$headOffice->id]);
+            }
+
+            // Associate with random departments (2-4 per subsystem)
+            $randomDepartments = $departments->random(min(3, $departments->count()));
+            foreach ($randomDepartments as $department) {
+                $subsystem->departments()->syncWithoutDetaching([$department->id]);
+            }
+
+            // Associate with random careers (3-6 per subsystem)
+            $randomCareers = $careers->random(min(5, $careers->count()));
+            foreach ($randomCareers as $career) {
+                $subsystem->careers()->syncWithoutDetaching([$career->id]);
+            }
+        }
     }
 }

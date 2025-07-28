@@ -104,7 +104,10 @@ CREATE TABLE public.subsystem_groups (
     description text,
     is_public boolean DEFAULT true NOT NULL, -- indica si es visible a todos o solo interna
     created_at timestamp DEFAULT CURRENT_TIMESTAMP,
-    updated_at timestamp DEFAULT CURRENT_TIMESTAMP
+    updated_at timestamp DEFAULT CURRENT_TIMESTAMP,
+    created_by character varying(255),
+    updated_by character varying(255),
+    version integer DEFAULT 1 NOT NULL
 );
 
 -- Tabla: Relación many-to-many(polimórfica) entre subsistemas y grupos
@@ -112,6 +115,7 @@ CREATE TABLE public.subsystem_group_links (
     subsystem_id uuid NOT NULL,
     group_id uuid NOT NULL,
     created_at timestamp DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (subsystem_id, group_id),
     FOREIGN KEY (subsystem_id) REFERENCES subsystems(id) ON DELETE CASCADE,
     FOREIGN KEY (group_id) REFERENCES subsystem_groups(id) ON DELETE CASCADE

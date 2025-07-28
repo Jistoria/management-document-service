@@ -70,7 +70,7 @@ class SubsystemService
         $data = Subsystem::convertToSnakeCase($data);
         $subsystem = Subsystem::find($id);
         if (empty($subsystem)) throw new \Exception('Subsistema no encontrado', code: HttpStatus::NOT_FOUND);
-        
+
         $subsystem->update($data);
         return $subsystem->fresh(['careers', 'processCategories']);
     }

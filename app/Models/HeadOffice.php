@@ -120,7 +120,7 @@ class HeadOffice extends Model
      */
     public function scopeHasSubsystems($query, $value = true)
     {
-        return $value ? $query->doesntHave('subsystems') : $query->has('subsystems');
+        return $value ? $query->has('subsystems') : $query->doesntHave('subsystems');
     }
 
     /**

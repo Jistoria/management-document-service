@@ -24,40 +24,11 @@ class HeadOfficeService
     {
         $query = HeadOffice::query()->with(['departments']);
 
-        if (isset($filters['exclude_subsystem_id'])) {
-            $query->withoutSubsystemId($filters['exclude_subsystem_id']);
-        }
-
-        if (isset($filters['subsystem_id'])) {
-            $query->withSubsystemId($filters['subsystem_id']);
-        }
-
-        if (isset($filters['has_subsystems'])) {
-            $query->hasSubsystems($filters['has_subsystems']);
-        }
-
-        if (!empty($filters['search'])) {
-            $search = $filters['search'];
-            $query->where(column: function ($q) use ($search) {
-                $q->where('name', 'ILIKE', "%{$search}%")
-                    ->orWhere('code', 'ILIKE', "%{$search}%");
-            });
-        }
-
-        if (!empty($filters['code'])) {
-            $query->byCode($filters['code']);
-        }
-
-        if (!empty($filters['created_by'])) {
-            $query->where('created_by', $filters['created_by']);
-        }
-
-        // Apply sorting
+        $this->applyFilters($query, $filters);
         $this->applySorting($query, $filters);
 
         return $query->get();
     }
-
     /**
      * Get paginated head offices
      */
@@ -65,27 +36,7 @@ class HeadOfficeService
     {
         $query = HeadOffice::query()->with(['departments']);
 
-        if (isset($filters['has_subsystems'])) {
-            $query->hasSubsystems($filters['has_subsystems']);
-        }
-
-        if (!empty($filters['search'])) {
-            $search = $filters['search'];
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'ILIKE', "%{$search}%")
-                    ->orWhere('code', 'ILIKE', "%{$search}%");
-            });
-        }
-
-        if (!empty($filters['code'])) {
-            $query->byCode($filters['code']);
-        }
-
-        if (!empty($filters['created_by'])) {
-            $query->createdBy($filters['created_by']);
-        }
-
-        // Apply sorting
+        $this->applyFilters($query, $filters);
         $this->applySorting($query, $filters);
 
         return $query->paginate($perPage);
@@ -337,5 +288,35 @@ class HeadOfficeService
             // Fallback por defecto
             $query->orderBy('name', 'asc');
         }
+    }
+
+    /**
+     * Apply filters to the query
+     */
+    private function applyFilters($query, array $filters)
+    {
+        return $query
+            ->when($filters['exclude_subsystem_id'] ?? null, function ($q, $id) {
+                $q->withoutSubsystemId($id);
+            })
+            ->when($filters['subsystem_id'] ?? null, function ($q, $id) {
+                $q->withSubsystemId($id);
+            })
+            ->when(isset($filters['has_subsystems']), function ($q) use ($filters) {
+                $q->hasSubsystems($filters['has_subsystems']);
+            })
+            ->when(!empty($filters['search']), function ($q) use ($filters) {
+                $search = $filters['search'];
+                $q->where(function ($sub) use ($search) {
+                    $sub->where('name', 'ILIKE', "%{$search}%")
+                        ->orWhere('code', 'ILIKE', "%{$search}%");
+                });
+            })
+            ->when(!empty($filters['code']), function ($q) use ($filters) {
+                $q->byCode($filters['code']);
+            })
+            ->when(!empty($filters['created_by']), function ($q) use ($filters) {
+                $q->where('created_by', $filters['created_by']);
+            });
     }
 }

@@ -1930,6 +1930,24 @@
                                 1
                             ]
                         }
+                    },
+                    {
+                        "name": "exclude_subsystem_id",
+                        "in": "query",
+                        "description": "Filtra por ID de subsistema excluido",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "subsystem_id",
+                        "in": "query",
+                        "description": "Filtra por ID de subsistema",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {

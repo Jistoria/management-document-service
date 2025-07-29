@@ -24,6 +24,14 @@ class HeadOfficeService
     {
         $query = HeadOffice::query()->with(['departments']);
 
+        if (isset($filters['exclude_subsystem_id'])) {
+            $query->withoutSubsystemId($filters['exclude_subsystem_id']);
+        }
+
+        if (isset($filters['subsystem_id'])) {
+            $query->withSubsystemId($filters['subsystem_id']);
+        }
+
         if (isset($filters['has_subsystems'])) {
             $query->hasSubsystems($filters['has_subsystems']);
         }

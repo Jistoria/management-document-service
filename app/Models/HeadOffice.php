@@ -115,9 +115,32 @@ class HeadOffice extends Model
         return $query->whereNull('deleted_at');
     }
 
+    /**
+     * Scope to get head offices with or without subsystems.
+     */
     public function scopeHasSubsystems($query, $value = true)
     {
         return $value ? $query->doesntHave('subsystems') : $query->has('subsystems');
+    }
+
+    /**
+     * Scope to get head offices with id subsystem.
+     */
+    public function scopeWithSubsystemId($query, string $subsystemId)
+    {
+        return $query->whereHas('subsystems', function ($q) use ($subsystemId) {
+            $q->where('subsystems.id', $subsystemId);
+        });
+    }
+
+    /**
+     * Scope to get head offices without a specific subsystem.
+     */
+    public function scopeWithoutSubsystemId($query, string $subsystemId)
+    {
+        return $query->whereDoesntHave('subsystems', function ($q) use ($subsystemId) {
+            $q->where('subsystems.id', $subsystemId);
+        });
     }
 
     /**

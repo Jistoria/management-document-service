@@ -36,6 +36,14 @@ class FiltersHeadOfficeRequest extends DefaultFiltersRequest
             'has_subsystems' => [
                 'boolean',
             ],
+            'exclude_subsystem_id' => [
+                'nullable',
+                'uuid',
+            ],
+            'subsystem_id' => [
+                'nullable',
+                'uuid',
+            ],
         ]);
     }
 }

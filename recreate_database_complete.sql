@@ -606,11 +606,12 @@ ORDER BY created_at DESC;
 -- Índices únicos (Primary Keys y Unique Constraints)
 CREATE UNIQUE INDEX migrations_pkey ON public.migrations USING btree (id);
 CREATE UNIQUE INDEX head_offices_pkey ON public.head_offices USING btree (id);
-CREATE UNIQUE INDEX head_offices_code_unique ON public.head_offices USING btree (code);
+CREATE UNIQUE INDEX head_offices_code ON public.head_offices USING btree (code) WHERE (deleted_at IS NULL);
 CREATE UNIQUE INDEX departments_pkey ON public.departments USING btree (id);
 CREATE UNIQUE INDEX careers_pkey ON public.careers USING btree (id);
+CREATE UNIQUE INDEX careers_code ON public.careers USING btree (code) WHERE (deleted_at IS NULL);
 CREATE UNIQUE INDEX subsystems_pkey ON public.subsystems USING btree (id);
-CREATE UNIQUE INDEX subsystems_code_unique ON public.subsystems USING btree (code);
+CREATE UNIQUE INDEX subsystems_code ON public.subsystems USING btree (code) WHERE (deleted_at IS NULL);
 CREATE UNIQUE INDEX careers_subsystems_pkey ON public.careers_subsystems USING btree (career_id, subsystem_id);
 CREATE UNIQUE INDEX process_categories_pkey ON public.process_categories USING btree (id);
 CREATE UNIQUE INDEX processes_pkey ON public.processes USING btree (id);

@@ -81,7 +81,7 @@ class Career extends Model
     /**
      * Get the subsystems associated with this career via entity links.
      */
-    public function subsystemsViaEntityLinks(): MorphToMany
+    public function subsystems(): MorphToMany
     {
         return $this->morphToMany(
             Subsystem::class,

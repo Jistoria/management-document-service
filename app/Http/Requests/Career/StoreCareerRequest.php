@@ -34,7 +34,7 @@ class StoreCareerRequest extends FormRequest
                 'string',
                 'max:20',
                 'regex:/^[A-Z0-9_-]+$/',
-                'unique:careers,code',
+                Rule::unique('careers', 'code')->whereNull('deleted_at'),
             ],
             'departmentId' => [
                 'required',

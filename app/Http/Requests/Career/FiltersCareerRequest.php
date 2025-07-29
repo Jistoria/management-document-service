@@ -37,6 +37,22 @@ class FiltersCareerRequest extends DefaultFiltersRequest
                 'string',
                 'max:255',
             ],
+            'updatedBy' => [
+                'nullable',
+                'string',
+                'max:255',
+            ],
+            'has_subsystems' => [
+                'boolean',
+            ],
+            'exclude_subsystem_id' => [
+                'nullable',
+                'uuid',
+            ],
+            'subsystem_id' => [
+                'nullable',
+                'uuid',
+            ],
         ]);
     }
 

@@ -71,6 +71,39 @@
                                 "pluck"
                             ]
                         }
+                    },
+                    {
+                        "name": "has_subsystems",
+                        "in": "query",
+                        "description": "Filtra por si tiene subsistemas (1 o 0)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "enum": [
+                                0,
+                                1
+                            ]
+                        }
+                    },
+                    {
+                        "name": "exclude_subsystem_id",
+                        "in": "query",
+                        "description": "ID del subsistema a excluir",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "subsystem_id",
+                        "in": "query",
+                        "description": "ID del subsistema",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
                     }
                 ],
                 "responses": {

@@ -117,6 +117,34 @@ class Career extends Model
     }
 
     /**
+     * Scope to get careers with or without subsystems.
+     */
+    public function scopeHasSubsystems($query, $value = true)
+    {
+        return $value ? $query->has('subsystems') : $query->doesntHave('subsystems');
+    }
+
+    /**
+     * Scope to get careers with id subsystem.
+     */
+    public function scopeWithSubsystemId($query, string $subsystemId)
+    {
+        return $query->whereHas('subsystems', function ($q) use ($subsystemId) {
+            $q->where('subsystems.id', $subsystemId);
+        });
+    }
+
+    /**
+     * Scope to get careers without a specific subsystem.
+     */
+    public function scopeWithoutSubsystemId($query, string $subsystemId)
+    {
+        return $query->whereDoesntHave('subsystems', function ($q) use ($subsystemId) {
+            $q->where('subsystems.id', $subsystemId);
+        });
+    }
+
+    /**
      * Scope to get active careers.
      */
     public function scopeActive($query)

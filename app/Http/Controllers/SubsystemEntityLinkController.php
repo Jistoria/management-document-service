@@ -8,6 +8,7 @@ use App\Http\Requests\Subsystem\DeleteEntityLinkRequest;
 use App\Http\Requests\Subsystem\StoreEntityLinkRequest;
 use App\Services\SubsystemEntityLinkService;
 use App\Helpers\ApiResponse;
+use App\Http\Resources\SubsystemResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
@@ -103,8 +104,8 @@ class SubsystemEntityLinkController extends Controller
                 $validated['entity_id']
             );
 
-            return $subsystems;
-        },status: HttpStatus::OK);
+            return SubsystemResource::collection($subsystems);
+        }, status: HttpStatus::OK);
     }
 
     /**
@@ -169,7 +170,7 @@ class SubsystemEntityLinkController extends Controller
                 );
             },
             status: HttpStatus::CREATED
-    );
+        );
     }
 
     /**
@@ -224,17 +225,16 @@ class SubsystemEntityLinkController extends Controller
      */
     public function destroy(DeleteEntityLinkRequest $request): JsonResponse
     {
-        return catchSync( function () use ($request) {
-            $validated = $request->validated();
-            $attached = $this->linkService->detachSubsystemFromEntity(
-                $validated['subsystem_id'],
-                $validated['entity_type'],
-                $validated['entity_id']
-            );
-        },
-        status: HttpStatus::NO_CONTENT
+        return catchSync(
+            function () use ($request) {
+                $validated = $request->validated();
+                $attached = $this->linkService->detachSubsystemFromEntity(
+                    $validated['subsystem_id'],
+                    $validated['entity_type'],
+                    $validated['entity_id']
+                );
+            },
+            status: HttpStatus::NO_CONTENT
         );
     }
-
-
 }

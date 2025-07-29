@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Constants\HttpStatus;
 use App\Models\HeadOffice;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -24,8 +25,7 @@ class HeadOfficeService
     {
         $query = HeadOffice::query()->with(['departments']);
 
-        $this->applyFilters($query, $filters);
-        $this->applySorting($query, $filters);
+        $this->applyFilters($filters, $query);
 
         return $query->get();
     }
@@ -36,8 +36,7 @@ class HeadOfficeService
     {
         $query = HeadOffice::query()->with(['departments']);
 
-        $this->applyFilters($query, $filters);
-        $this->applySorting($query, $filters);
+        $this->applyFilters($filters, $query);
 
         return $query->paginate($perPage);
     }
@@ -293,9 +292,9 @@ class HeadOfficeService
     /**
      * Apply filters to the query
      */
-    private function applyFilters($query, array $filters)
+    private function applyFilters(array $filters, Builder $query): void
     {
-        return $query
+        $query
             ->when($filters['exclude_subsystem_id'] ?? null, function ($q, $id) {
                 $q->withoutSubsystemId($id);
             })
@@ -318,5 +317,7 @@ class HeadOfficeService
             ->when(!empty($filters['created_by']), function ($q) use ($filters) {
                 $q->where('created_by', $filters['created_by']);
             });
+
+        $this->applySorting($query, $filters);
     }
 }

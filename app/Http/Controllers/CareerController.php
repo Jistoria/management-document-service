@@ -62,6 +62,27 @@ class CareerController extends Controller
      *         required=false,
      *         @OA\Schema(type="string", enum={"collection", "paginate", "minimal", "dropdown", "pluck"})
      *     ),
+     *     @OA\Parameter(
+     *        name="has_subsystems",
+     *        in="query",
+     *        description="Filtra por si tiene subsistemas (1 o 0)",
+     *         required=false,
+     *         @OA\Schema(type="integer", enum={0,1})
+     *     ),
+     *     @OA\Parameter(
+     *         name="exclude_subsystem_id",
+     *         in="query",
+     *         description="ID del subsistema a excluir",
+     *         required=false,
+     *         @OA\Schema(type="string", format="uuid")
+     *     ),
+     *    @OA\Parameter(
+     *         name="subsystem_id",
+     *         in="query",
+     *         description="ID del subsistema",
+     *         required=false,
+     *         @OA\Schema(type="string", format="uuid")
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Listado obtenido exitosamente",

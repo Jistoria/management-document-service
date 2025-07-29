@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Career;
 use App\Models\HeadOffice;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -288,30 +289,43 @@ class CareerService
 
     /**
      * @param array $filters
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param Builder $query
      * @return void
      */
-    protected function applyFilters(array $filters, \Illuminate\Database\Eloquent\Builder $query): void
+    protected function applyFilters(array $filters, Builder $query): void
     {
-        if (!empty($filters['search'])) {
+        $query->when(!empty($filters['search']), function ($q) use ($filters) {
             $search = $filters['search'];
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'LIKE', "%{$search}%")
+            $q->where(function ($q2) use ($search) {
+                $q2->where('name', 'LIKE', "%{$search}%")
                     ->orWhere('code', 'LIKE', "%{$search}%");
             });
-        }
+        });
 
-        if (!empty($filters['code'])) {
-            $query->where('code', $filters['code']);
-        }
+        $query->when(isset($filters['has_subsystems']), function ($q) use ($filters) {
+            $q->hasSubsystems($filters['has_subsystems']);
+        });
 
-        if (!empty($filters['department_id'])) {
-            $query->where('department_id', $filters['department_id']);
-        }
+        $query->when(!empty($filters['exclude_subsystem_id']), function ($q) use ($filters) {
+            $q->withoutSubsystemId($filters['exclude_subsystem_id']);
+        });
 
-        if (!empty($filters['created_by'])) {
-            $query->where('created_by', $filters['created_by']);
-        }
+        $query->when(!empty($filters['subsystem_id']), function ($q) use ($filters) {
+            $q->withSubsystemId($filters['subsystem_id']);
+        });
+
+
+        $query->when(!empty($filters['code']), function ($q) use ($filters) {
+            $q->where('code', $filters['code']);
+        });
+
+        $query->when(!empty($filters['department_id']), function ($q) use ($filters) {
+            $q->where('department_id', $filters['department_id']);
+        });
+
+        $query->when(!empty($filters['created_by']), function ($q) use ($filters) {
+            $q->where('created_by', $filters['created_by']);
+        });
 
         // Apply sorting
         $this->applySorting($query, $filters);

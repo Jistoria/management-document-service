@@ -7,6 +7,7 @@ use App\Models\SubsystemGroup;
 use App\Models\HeadOffice;
 use App\Models\Department;
 use App\Models\Career;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -20,7 +21,7 @@ class SubsystemEntityLinkService
         'career' => Career::class,
     ];
 
-    public function getLinksForEntity(string $entityType, string $entityId): array
+    public function getLinksForEntity(string $entityType, string $entityId): Collection
     {
         $this->validateEntityType($entityType);
 
@@ -30,8 +31,7 @@ class SubsystemEntityLinkService
 
         return $entity->subsystems()
             ->select('subsystems.id', 'subsystems.name', 'subsystems.code')
-            ->get()
-            ->toArray();
+            ->get();
     }
 
 

@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Traits\HasAuditFields;
 use App\Traits\Auditable; // 👈 Agregar trait de auditoría
 use App\Traits\HasCamelCaseAttributes; // 👈 Agregar trait para camelCase
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -16,19 +17,21 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 /**
  * Model for Departments
  *
- * Represents departments within a head office.
+ * Represents departments within the head office.
  * Departments contain careers and are part of the organizational hierarchy.
  *
  * @property string $id
  * @property string $head_office_id
  * @property string $name
  * @property string|null $code
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
- * @property \Carbon\Carbon|null $deleted_at
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ * @property Carbon|null $deleted_at
  * @property string|null $created_by
  * @property string|null $updated_by
  * @property int $version
+ * @property mixed $headOffice
+ * @method static create(array $data)
  */
 class Department extends Model
 {

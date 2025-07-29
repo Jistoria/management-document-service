@@ -26,7 +26,6 @@ class SubsystemEntityLinkService
 
         $entity = $this->findEntity($entityType, $entityId);
 
-        // Asegura que esté cargada la relación
         $entity->load('subsystems');
 
         return $entity->subsystems()

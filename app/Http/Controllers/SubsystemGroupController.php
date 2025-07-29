@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Constants\HttpStatus;
 use App\Models\SubsystemGroup;
 use App\Helpers\ApiResponse;
 use App\Services\SubsystemGroupService;
@@ -233,12 +234,54 @@ class SubsystemGroupController extends Controller
         }
     }
 
-    public function syncSubsystems(Request $request, SubsystemGroup $subsystemGroup): JsonResponse
+    /**
+     * @OA\Put(
+     *     path="/subsystem-groups/{id}/subsystems",
+     *     summary="Sync subsystems to a subsystem group",
+     *     tags={"Subsystem Groups"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the subsystem group",
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             type="object",
+     *             required={"subsystemIds"},
+     *             @OA\Property(
+     *                 property="subsystemIds",
+     *                 type="array",
+     *                 description="Array of subsystem IDs",
+     *                 @OA\Items(type="string")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Relations Synchronized",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Subsystems synced successfully"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     )
+     * )
+     */
+    public function syncSubsystems(Request $request, string $id): JsonResponse
     {
         return catchSync(
-            function () use ($request, $subsystemGroup) {
-                $this->subsystemGroupService->syncSubsystems($subsystemGroup, $request->get('subsystemsId', []));
-            }
-    );
+            function () use ($request, $id) {
+                $this->subsystemGroupService->syncSubsystems(
+                    $id,
+                    $request->get('subsystemIds', []) // Asegúrate que el nombre coincide con la doc
+                );
+            },
+            'Subsystems synced successfully',
+            HttpStatus::OK
+        );
     }
 }

@@ -13,6 +13,11 @@ class SubsystemGroupService
     )
     {}
 
+    public function getAll(array $filters)
+    {
+        return $this->subsystemGroup->all();
+    }
+
     public function syncSubsystems(string $id, array $subsystemIds): void
     {
         if(empty($subsystemIds)) throw new \Exception("No se han seleccionado subsystemas", HttpStatus::BAD_REQUEST);

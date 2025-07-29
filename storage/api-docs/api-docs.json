@@ -4070,6 +4070,73 @@
                     }
                 }
             }
+        },
+        "/subsystem-groups/{id}/subsystems": {
+            "put": {
+                "tags": [
+                    "Subsystem Groups"
+                ],
+                "summary": "Sync subsystems to a subsystem group",
+                "operationId": "f216c811799001671620595401bdc271",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the subsystem group",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "subsystemIds"
+                                ],
+                                "properties": {
+                                    "subsystemIds": {
+                                        "description": "Array of subsystem IDs",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Relations Synchronized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Subsystems synced successfully"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "components": {

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Constants\HttpStatus;
 use App\Models\Subsystem;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -12,46 +13,20 @@ class SubsystemService
     public function getAll(array $filters = []): Collection
     {
         $query = Subsystem::query()->with(['processCategories']);
-        if (!empty($filters['search'])) {
-            $search = $filters['search'];
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'LIKE', "%{$search}%")
-                    ->orWhere('code', 'LIKE', "%{$search}%");
-            });
-        }
-        if (!empty($filters['code'])) {
-            $query->where('code', $filters['code']);
-        }
-        if (!empty($filters['created_by'])) {
-            $query->where('created_by', $filters['created_by']);
-        }
-        $this->applySorting($query, $filters);
+        $this->extracted($filters, $query);
         return $query->get();
     }
 
     public function getPaginated(int $perPage = 15, array $filters = []): LengthAwarePaginator
     {
         $query = Subsystem::query()->with(['careers', 'processCategories']);
-        if (!empty($filters['search'])) {
-            $search = $filters['search'];
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'LIKE', "%{$search}%")
-                    ->orWhere('code', 'LIKE', "%{$search}%");
-            });
-        }
-        if (!empty($filters['code'])) {
-            $query->where('code', $filters['code']);
-        }
-        if (!empty($filters['created_by'])) {
-            $query->where('created_by', $filters['created_by']);
-        }
-        $this->applySorting($query, $filters);
+        $this->extracted($filters, $query);
         return $query->paginate($perPage);
     }
 
     public function findById(string $id): ?Subsystem
     {
-        return Subsystem::with(['careers', 'processCategories.processes'])->find($id);
+        return Subsystem::with(['careers', 'processCategories.processes'])->findOrFail($id);
     }
 
     public function findByCode(string $code): ?Subsystem
@@ -68,8 +43,7 @@ class SubsystemService
     public function update(string $id, array $data): Subsystem
     {
         $data = Subsystem::convertToSnakeCase($data);
-        $subsystem = Subsystem::find($id);
-        if (empty($subsystem)) throw new \Exception('Subsistema no encontrado', code: HttpStatus::NOT_FOUND);
+        $subsystem = Subsystem::findOrFail($id);
 
         $subsystem->update($data);
         return $subsystem->fresh(['careers', 'processCategories']);
@@ -132,5 +106,28 @@ class SubsystemService
         } else {
             $query->orderBy('name', 'asc');
         }
+    }
+
+    /**
+     * @param array $filters
+     * @param Builder $query
+     * @return void
+     */
+    public function extracted(array $filters, Builder $query): void
+    {
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                    ->orWhere('code', 'LIKE', "%{$search}%");
+            });
+        }
+        if (!empty($filters['code'])) {
+            $query->where('code', $filters['code']);
+        }
+        if (!empty($filters['created_by'])) {
+            $query->where('created_by', $filters['created_by']);
+        }
+        $this->applySorting($query, $filters);
     }
 }

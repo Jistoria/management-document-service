@@ -22,12 +22,11 @@ class HeadOfficeService
      */
     public function getAll(array $filters = []): Collection
     {
-        $query = HeadOffice::active()->with(['departments']);
+        $query = HeadOffice::query()->with(['departments']);
 
-        // Apply filters
         if (!empty($filters['search'])) {
             $search = $filters['search'];
-            $query->where(function ($q) use ($search) {
+            $query->where(column: function ($q) use ($search) {
                 $q->where('name', 'ILIKE', "%{$search}%")
                     ->orWhere('code', 'ILIKE', "%{$search}%");
             });
@@ -52,7 +51,7 @@ class HeadOfficeService
      */
     public function getPaginated(int $perPage = 15, array $filters = []): LengthAwarePaginator
     {
-        $query = HeadOffice::active()->with(['departments']);
+        $query = HeadOffice::query()->with(['departments']);
 
         // Apply filters
         if (!empty($filters['search'])) {
@@ -82,9 +81,8 @@ class HeadOfficeService
      */
     public function findById(string $id): ?HeadOffice
     {
-        return HeadOffice::active()
-            ->with(['departments.careers'])
-            ->find($id);
+        return HeadOffice::with(['departments.careers'])
+            ->findOrFail($id);
     }
 
     /**
@@ -92,8 +90,7 @@ class HeadOfficeService
      */
     public function findByCode(string $code): ?HeadOffice
     {
-        return HeadOffice::active()
-            ->byCode($code)
+        return HeadOffice::byCode($code)
             ->with(['departments'])
             ->first();
     }

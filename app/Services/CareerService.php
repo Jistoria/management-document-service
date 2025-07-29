@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Career;
+use App\Models\HeadOffice;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -14,6 +15,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
  */
 class CareerService
 {
+
     /**
      * Get all careers with optional filtering
      */
@@ -22,28 +24,7 @@ class CareerService
         $query = Career::query()->with(['department', 'department.headOffice']);
 
         // Apply filters
-        if (!empty($filters['search'])) {
-            $search = $filters['search'];
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'LIKE', "%{$search}%")
-                    ->orWhere('code', 'LIKE', "%{$search}%");
-            });
-        }
-
-        if (!empty($filters['code'])) {
-            $query->where('code', $filters['code']);
-        }
-
-        if (!empty($filters['department_id'])) {
-            $query->where('department_id', $filters['department_id']);
-        }
-
-        if (!empty($filters['created_by'])) {
-            $query->where('created_by', $filters['created_by']);
-        }
-
-        // Apply sorting
-        $this->applySorting($query, $filters);
+        $this->applyFilters($filters, $query);
 
         return $query->get();
     }
@@ -55,29 +36,7 @@ class CareerService
     {
         $query = Career::query()->with(['department', 'department.headOffice']);
 
-        // Apply same filters as getAll
-        if (!empty($filters['search'])) {
-            $search = $filters['search'];
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'LIKE', "%{$search}%")
-                    ->orWhere('code', 'LIKE', "%{$search}%");
-            });
-        }
-
-        if (!empty($filters['code'])) {
-            $query->where('code', $filters['code']);
-        }
-
-        if (!empty($filters['department_id'])) {
-            $query->where('department_id', $filters['department_id']);
-        }
-
-        if (!empty($filters['created_by'])) {
-            $query->where('created_by', $filters['created_by']);
-        }
-
-        // Apply sorting
-        $this->applySorting($query, $filters);
+        $this->applyFilters($filters, $query);
 
         return $query->paginate($perPage);
     }
@@ -325,5 +284,36 @@ class CareerService
             // Fallback por defecto
             $query->orderBy('name', 'asc');
         }
+    }
+
+    /**
+     * @param array $filters
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return void
+     */
+    protected function applyFilters(array $filters, \Illuminate\Database\Eloquent\Builder $query): void
+    {
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                    ->orWhere('code', 'LIKE', "%{$search}%");
+            });
+        }
+
+        if (!empty($filters['code'])) {
+            $query->where('code', $filters['code']);
+        }
+
+        if (!empty($filters['department_id'])) {
+            $query->where('department_id', $filters['department_id']);
+        }
+
+        if (!empty($filters['created_by'])) {
+            $query->where('created_by', $filters['created_by']);
+        }
+
+        // Apply sorting
+        $this->applySorting($query, $filters);
     }
 }

@@ -22,31 +22,9 @@ class DepartmentService
      */
     public function getAll(array $filters = []): Collection
     {
-        $query = Department::active()->with(['headOffice', 'careers']);
+        $query = Department::query()->with(['headOffice', 'careers']);
 
-        // Apply filters
-        if (!empty($filters['search'])) {
-            $search = $filters['search'];
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'ILIKE', "%{$search}%")
-                    ->orWhere('code', 'ILIKE', "%{$search}%");
-            });
-        }
-
-        if (!empty($filters['code'])) {
-            $query->byCode($filters['code']);
-        }
-
-        if (!empty($filters['head_office_id'])) {
-            $query->byHeadOffice($filters['head_office_id']);
-        }
-
-        if (!empty($filters['created_by'])) {
-            $query->where('created_by', $filters['created_by']);
-        }
-
-        // Apply sorting
-        $this->applySorting($query, $filters);
+        $this->applyFilters($filters, $query);
 
         return $query->get();
     }
@@ -56,31 +34,9 @@ class DepartmentService
      */
     public function getPaginated(int $perPage = 15, array $filters = []): LengthAwarePaginator
     {
-        $query = Department::active()->with(['headOffice', 'careers']);
+        $query = Department::query()->with(['headOffice', 'careers']);
 
-        // Apply filters
-        if (!empty($filters['search'])) {
-            $search = $filters['search'];
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'ILIKE', "%{$search}%")
-                    ->orWhere('code', 'ILIKE', "%{$search}%");
-            });
-        }
-
-        if (!empty($filters['code'])) {
-            $query->byCode($filters['code']);
-        }
-
-        if (!empty($filters['head_office_id'])) {
-            $query->byHeadOffice($filters['head_office_id']);
-        }
-
-        if (!empty($filters['created_by'])) {
-            $query->where('created_by', $filters['created_by']);
-        }
-
-        // Apply sorting
-        $this->applySorting($query, $filters);
+        $this->applyFilters($filters, $query);
 
         return $query->paginate($perPage);
     }
@@ -90,9 +46,8 @@ class DepartmentService
      */
     public function findById(string $id): ?Department
     {
-        return Department::active()
-            ->with(['headOffice', 'careers.subsystems'])
-            ->find($id);
+        return Department::with(['headOffice', 'careers.subsystems'])
+            ->findOrFail($id);
     }
 
     /**
@@ -100,14 +55,13 @@ class DepartmentService
      */
     public function findByCode(string $code): ?Department
     {
-        return Department::active()
-            ->byCode($code)
+        return Department::byCode($code)
             ->with(['headOffice', 'careers'])
             ->first();
     }
 
     /**
-     * Create new department
+     * Create a new department
      */
     public function create(array $data): Department
     {
@@ -196,15 +150,8 @@ class DepartmentService
      */
     public function getFullHierarchy(string $id): ?Department
     {
-        $department = Department::active()
-            ->with(['headOffice', 'careers.subsystems'])
-            ->find($id);
-
-        if (!$department) {
-            return null;
-        }
-
-        return $department;
+        return Department::with(['headOffice', 'careers.subsystems'])
+            ->findOrFail($id);
     }
 
     /**
@@ -213,10 +160,6 @@ class DepartmentService
     public function getStatistics(string $id): array
     {
         $department = $this->findById($id);
-
-        if (!$department) {
-            throw new ModelNotFoundException("Departamento no encontrado.");
-        }
 
         return [
             'careers_count' => $department->activeCareers()->count(),
@@ -342,5 +285,36 @@ class DepartmentService
             // Fallback por defecto
             $query->orderBy('name', 'asc');
         }
+    }
+
+    /**
+     * @param array $filters
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return void
+     */
+    public function applyFilters(array $filters, \Illuminate\Database\Eloquent\Builder $query): void
+    {
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'ILIKE', "%{$search}%")
+                    ->orWhere('code', 'ILIKE', "%{$search}%");
+            });
+        }
+
+        if (!empty($filters['code'])) {
+            $query->byCode($filters['code']);
+        }
+
+        if (!empty($filters['head_office_id'])) {
+            $query->byHeadOffice($filters['head_office_id']);
+        }
+
+        if (!empty($filters['created_by'])) {
+            $query->where('created_by', $filters['created_by']);
+        }
+
+        // Apply sorting
+        $this->applySorting($query, $filters);
     }
 }

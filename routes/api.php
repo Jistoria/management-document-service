@@ -90,7 +90,7 @@ Route::prefix('subsystem-groups')->group(function () {
     Route::delete('/{subsystemGroup}', [SubsystemGroupController::class, 'destroy']);
 
     //Grouped Subsystems
-    Route::post('/{subsystemGroup}/subsystems', [SubsystemGroupController::class, 'subsystems']);
+    Route::put('/{subsystemGroup}/subsystems', [SubsystemGroupController::class, 'syncSubsystems']);
 });
 
 // Subsystem Entity Links Routes

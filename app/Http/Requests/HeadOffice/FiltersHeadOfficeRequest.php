@@ -33,6 +33,9 @@ class FiltersHeadOfficeRequest extends DefaultFiltersRequest
                 'string',
                 'max:255',
             ],
+            'has_subsystems' => [
+                'boolean',
+            ],
         ]);
     }
 }

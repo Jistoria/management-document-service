@@ -24,6 +24,10 @@ class HeadOfficeService
     {
         $query = HeadOffice::query()->with(['departments']);
 
+        if (isset($filters['has_subsystems'])) {
+            $query->hasSubsystems($filters['has_subsystems']);
+        }
+
         if (!empty($filters['search'])) {
             $search = $filters['search'];
             $query->where(column: function ($q) use ($search) {
@@ -53,7 +57,10 @@ class HeadOfficeService
     {
         $query = HeadOffice::query()->with(['departments']);
 
-        // Apply filters
+        if (isset($filters['has_subsystems'])) {
+            $query->hasSubsystems($filters['has_subsystems']);
+        }
+
         if (!empty($filters['search'])) {
             $search = $filters['search'];
             $query->where(function ($q) use ($search) {

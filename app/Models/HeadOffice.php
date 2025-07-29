@@ -115,6 +115,11 @@ class HeadOffice extends Model
         return $query->whereNull('deleted_at');
     }
 
+    public function scopeHasSubsystems($query, $value = true)
+    {
+        return $value ? $query->doesntHave('subsystems') : $query->has('subsystems');
+    }
+
     /**
      * Get full organizational hierarchy starting from this head office.
      */

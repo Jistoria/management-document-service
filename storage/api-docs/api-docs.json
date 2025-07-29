@@ -1917,6 +1917,19 @@
                                 "pluck"
                             ]
                         }
+                    },
+                    {
+                        "name": "has_subsystems",
+                        "in": "query",
+                        "description": "Filtra por si tiene subsistemas (1 o 0)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "enum": [
+                                0,
+                                1
+                            ]
+                        }
                     }
                 ],
                 "responses": {

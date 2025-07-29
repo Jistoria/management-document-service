@@ -55,6 +55,13 @@ class HeadOfficeController extends Controller
      *         required=false,
      *         @OA\Schema(type="string", enum={"collection", "paginate", "minimal", "dropdown", "pluck"})
      *     ),
+     *     @OA\Parameter(
+     *         name="has_subsystems",
+     *         in="query",
+     *         description="Filtra por si tiene subsistemas (1 o 0)",
+     *         required=false,
+     *         @OA\Schema(type="integer", enum={0,1})
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Listado obtenido exitosamente",

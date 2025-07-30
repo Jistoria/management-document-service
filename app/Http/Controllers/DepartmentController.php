@@ -62,6 +62,27 @@ class DepartmentController extends Controller
      *         required=false,
      *         @OA\Schema(type="string", enum={"collection", "paginate", "minimal", "dropdown", "pluck"})
      *     ),
+     *     @OA\Parameter(
+     *        name="has_subsystems",
+     *        in="query",
+     *        description="Filtra por si tiene subsistemas (1 o 0)",
+     *        required=false,
+     *        @OA\Schema(type="integer", enum={0,1})
+     *      ),
+     *      @OA\Parameter(
+     *          name="exclude_subsystem_id",
+     *          in="query",
+     *          description="Filtra por ID de subsistema excluido",
+     *          required=false,
+     *          @OA\Schema(type="string")
+     *      ),
+     *      @OA\Parameter(
+     *         name="subsystem_id",
+     *         in="query",
+     *         description="Filtra por ID de subsistema",
+     *         required=false,
+     *         @OA\Schema(type="string")
+     *      ),
      *     @OA\Response(
      *         response=200,
      *         description="Listado obtenido exitosamente",

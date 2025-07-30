@@ -215,7 +215,7 @@ class SubsystemEntityLinkController extends Controller
      *         )
      *     ),
      *     @OA\Response(
-     *         response=200,
+     *         response=204,
      *         description="Entities synced successfully",
      *         @OA\JsonContent(
      *             type="object",

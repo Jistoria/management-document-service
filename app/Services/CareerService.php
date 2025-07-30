@@ -314,7 +314,6 @@ class CareerService
             $q->withSubsystemId($filters['subsystem_id']);
         });
 
-
         $query->when(!empty($filters['code']), function ($q) use ($filters) {
             $q->where('code', $filters['code']);
         });

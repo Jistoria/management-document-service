@@ -37,6 +37,17 @@ class FiltersDepartmentRequest extends DefaultFiltersRequest
                 'string',
                 'max:255',
             ],
+            'has_subsystems' => [
+                'boolean',
+            ],
+            'exclude_subsystem_id' => [
+                'nullable',
+                'uuid',
+            ],
+            'subsystem_id' => [
+                'nullable',
+                'uuid',
+            ],
         ]);
     }
 

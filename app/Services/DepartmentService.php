@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Constants\HttpStatus;
 use App\Models\Department;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -289,31 +290,42 @@ class DepartmentService
 
     /**
      * @param array $filters
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param Builder $query
      * @return void
      */
-    public function applyFilters(array $filters, \Illuminate\Database\Eloquent\Builder $query): void
+    public function applyFilters(array $filters, Builder $query): void
     {
-        if (!empty($filters['search'])) {
+        $query->when(!empty($filters['search']), function ($q) use ($filters) {
             $search = $filters['search'];
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'ILIKE', "%{$search}%")
-                    ->orWhere('code', 'ILIKE', "%{$search}%");
+            $q->where(function ($q2) use ($search) {
+                $q2->where('name', 'LIKE', "%{$search}%")
+                    ->orWhere('code', 'LIKE', "%{$search}%");
             });
-        }
+        });
 
-        if (!empty($filters['code'])) {
-            $query->byCode($filters['code']);
-        }
+        $query->when(isset($filters['has_subsystems']), function ($q) use ($filters) {
+            $q->hasSubsystems($filters['has_subsystems']);
+        });
 
-        if (!empty($filters['head_office_id'])) {
-            $query->byHeadOffice($filters['head_office_id']);
-        }
+        $query->when(!empty($filters['exclude_subsystem_id']), function ($q) use ($filters) {
+            $q->withoutSubsystemId($filters['exclude_subsystem_id']);
+        });
 
-        if (!empty($filters['created_by'])) {
-            $query->where('created_by', $filters['created_by']);
-        }
+        $query->when(!empty($filters['subsystem_id']), function ($q) use ($filters) {
+            $q->withSubsystemId($filters['subsystem_id']);
+        });
 
+        $query->when(!empty($filters['code']), function ($q) use ($filters) {
+            $q->where('code', $filters['code']);
+        });
+
+        $query->when(!empty($filters['headOfficeId']), function ($q) use ($filters) {
+            $q->byheadOffice($filters['headOfficeId']);
+        });
+
+        $query->when(!empty($filters['created_by']), function ($q) use ($filters) {
+            $q->where('created_by', $filters['created_by']);
+        });
         // Apply sorting
         $this->applySorting($query, $filters);
     }

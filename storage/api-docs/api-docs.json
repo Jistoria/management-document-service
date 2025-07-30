@@ -3886,6 +3886,117 @@
                 }
             }
         },
+        "/subsystem-entity-links/{subsystemId}": {
+            "put": {
+                "tags": [
+                    "Subsystem Entity Links"
+                ],
+                "summary": "Sync entities to a subsystem",
+                "description": "Sincroniza uno o varios tipos de entidades con un subsistema",
+                "operationId": "211927f082a9d1fbc35a0c3827260436",
+                "parameters": [
+                    {
+                        "name": "subsystemId",
+                        "in": "path",
+                        "description": "UUID of the subsystem",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "entities"
+                                ],
+                                "properties": {
+                                    "entities": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "entity_type",
+                                                "entity_ids"
+                                            ],
+                                            "properties": {
+                                                "entity_type": {
+                                                    "description": "Type of the entity to attach",
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "head_office",
+                                                        "department",
+                                                        "career"
+                                                    ]
+                                                },
+                                                "entity_ids": {
+                                                    "description": "List of entity UUIDs to sync",
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "format": "uuid"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Entities synced successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Entities synced successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "validation_error"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/subsystem-groups": {
             "get": {
                 "tags": [

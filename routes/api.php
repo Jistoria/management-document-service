@@ -96,7 +96,8 @@ Route::prefix('subsystem-groups')->group(function () {
 // Subsystem Entity Links Routes
 Route::prefix('subsystem-entity-links')->group(function () {
     Route::get('/', [SubsystemEntityLinkController::class, 'index']);       // GET with query params
-    Route::post('/', [SubsystemEntityLinkController::class, 'store']);      // POST attach
+    Route::post('/', [SubsystemEntityLinkController::class, 'store']);      // POST attachment
+    Route::put('/{subsystemId}', [SubsystemEntityLinkController::class, 'update']);
     Route::delete('/', [SubsystemEntityLinkController::class, 'destroy']);  // DELETE detach
 });
 

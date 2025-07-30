@@ -69,6 +69,16 @@ class Subsystem extends Model
     ];
 
     /**
+     * Relation general morphToMany
+     */
+    public function entities() : BelongsToMany
+    {
+        return $this->morphToMany(Entity::class, 'entity', 'subsystem_entity_links')
+            ->withPivot('entity_type');
+    }
+
+
+    /**
      * Get the head offices associated with this subsystem.
      */
     public function headOffices(): MorphToMany

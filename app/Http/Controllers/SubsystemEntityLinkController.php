@@ -6,6 +6,7 @@ use App\Constants\HttpStatus;
 use App\Helpers\SubsystemEntityMap;
 use App\Http\Requests\Subsystem\DeleteEntityLinkRequest;
 use App\Http\Requests\Subsystem\StoreEntityLinkRequest;
+use App\Http\Requests\Subsystem\UpdateSubsystemEntityLinkRequest;
 use App\Services\SubsystemEntityLinkService;
 use App\Helpers\ApiResponse;
 use App\Http\Resources\SubsystemResource;
@@ -172,6 +173,83 @@ class SubsystemEntityLinkController extends Controller
             status: HttpStatus::CREATED
         );
     }
+
+    /**
+     * @OA\Put(
+     *     path="/subsystem-entity-links/{subsystemId}",
+     *     summary="Sync entities to a subsystem",
+     *     description="Sincroniza uno o varios tipos de entidades con un subsistema",
+     *     tags={"Subsystem Entity Links"},
+     *     @OA\Parameter(
+     *         name="subsystemId",
+     *         in="path",
+     *         required=true,
+     *         description="UUID of the subsystem",
+     *         @OA\Schema(type="string", format="uuid")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             type="object",
+     *             required={"entities"},
+     *             @OA\Property(
+     *                 property="entities",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     required={"entity_type", "entity_ids"},
+     *                     @OA\Property(
+     *                         property="entity_type",
+     *                         type="string",
+     *                         enum={"head_office", "department", "career"},
+     *                         description="Type of the entity to attach"
+     *                     ),
+     *                     @OA\Property(
+     *                         property="entity_ids",
+     *                         type="array",
+     *                         @OA\Items(type="string", format="uuid"),
+     *                         description="List of entity UUIDs to sync"
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Entities synced successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Entities synced successfully")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="validation_error"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     )
+     * )
+     */
+    public function update(UpdateSubsystemEntityLinkRequest $request, $subsystemId) : JsonResponse
+    {
+        return catchSync(
+            function () use ($request, $subsystemId) {
+                $validated = $request->validated();
+
+                $sync = $this->linkService->syncSubsystemToEntity(
+                    $subsystemId,
+                    $validated['entities']
+                );
+            },
+            status: HttpStatus::NO_CONTENT
+        );
+    }
+
 
     /**
      * @OA\Delete(

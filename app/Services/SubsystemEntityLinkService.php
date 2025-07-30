@@ -57,7 +57,7 @@ class SubsystemEntityLinkService
                 return false; // Already exists
             }
 
-            // Create the relationship
+            // Create a relationship
             DB::table('subsystem_entity_links')->insert([
                 'id' => Str::uuid(),
                 'subsystem_id' => $subsystemId,
@@ -74,6 +74,38 @@ class SubsystemEntityLinkService
             throw $e;
         }
     }
+
+    public function syncSubsystemToEntity(string $subsystemId, array $entities): bool
+    {
+        $subsystem = Subsystem::findOrFail($subsystemId);
+
+        return DB::transaction(function () use ($subsystem, $entities) {
+            foreach ($entities as $entity) {
+                $type = $entity['entity_type'];
+                $ids = $entity['entity_ids'];
+
+                switch ($type) {
+                    case 'head_office':
+                        $subsystem->headOffices()->syncWithoutDetaching($ids);
+                        break;
+
+                    case 'department':
+                        $subsystem->departments()->syncWithoutDetaching($ids);
+                        break;
+
+                    case 'career':
+                        $subsystem->careers()->syncWithoutDetaching($ids);
+                        break;
+
+                    default:
+                        throw new \InvalidArgumentException("Tipo de entidad no soportado: $type");
+                }
+            }
+
+            return true;
+        });
+    }
+
 
     public function detachSubsystemFromEntity(string $subsystemId, string $entityType, string $entityId): bool
     {

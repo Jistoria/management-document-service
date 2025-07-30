@@ -24,8 +24,9 @@ class CareerService
     {
         $query = Career::query()->with(['department', 'department.headOffice']);
 
-        // Apply filters
         $this->applyFilters($filters, $query);
+
+        $this->applySorting($query, $filters);
 
         return $query->get();
     }
@@ -38,6 +39,8 @@ class CareerService
         $query = Career::query()->with(['department', 'department.headOffice']);
 
         $this->applyFilters($filters, $query);
+
+        $this->applySorting($query, $filters);
 
         return $query->paginate($perPage);
     }
@@ -325,8 +328,5 @@ class CareerService
         $query->when(!empty($filters['created_by']), function ($q) use ($filters) {
             $q->where('created_by', $filters['created_by']);
         });
-
-        // Apply sorting
-        $this->applySorting($query, $filters);
     }
 }

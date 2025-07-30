@@ -120,7 +120,7 @@ class HeadOfficeController extends Controller
 
             return ApiIndexBuilder::build(
                 $this->headOfficeService,
-                \App\Http\Resources\HeadOfficeResource::class,
+                HeadOfficeResource::class,
                 $request,
                 $filters
             );

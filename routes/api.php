@@ -3,6 +3,7 @@
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\HeadOfficeController;
 use App\Http\Controllers\CareerController;
+use App\Http\Controllers\ProcessCategoryController;
 use App\Http\Controllers\SubsystemController;
 use App\Http\Controllers\SubsystemEntityLinkController;
 use App\Http\Controllers\SubsystemGroupController;
@@ -100,6 +101,17 @@ Route::prefix('subsystem-entity-links')->group(function () {
     Route::put('/{subsystemId}', [SubsystemEntityLinkController::class, 'update']);
     Route::delete('/', [SubsystemEntityLinkController::class, 'destroy']);  // DELETE detach
 });
+
+// ProcessCategories Routes
+Route::prefix('process-categories')->group(function () {
+    Route::get('/', [ProcessCategoryController::class, 'index']);
+    Route::get('/{categoryId}', [ProcessCategoryController::class, 'show']);
+    Route::post('/', [ProcessCategoryController::class, 'store']);
+    Route::put('/{categoryId}', [ProcessCategoryController::class, 'update']);
+    Route::delete('/{categoryId}', [ProcessCategoryController::class, 'destroy']);
+});
+
+
 
 // Nested route for careers by department
 Route::get('/departments/{departmentId}/careers', [CareerController::class, 'getByDepartment']);

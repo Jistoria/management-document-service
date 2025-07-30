@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Career;
 use App\Models\HeadOffice;
+use App\Traits\ValidatesUuid;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -16,6 +17,8 @@ use Illuminate\Pagination\LengthAwarePaginator;
  */
 class CareerService
 {
+
+    use ValidatesUuid;
 
     /**
      * Get all careers with optional filtering
@@ -50,6 +53,8 @@ class CareerService
      */
     public function findById(string $id): ?Career
     {
+        $this->validateUuid($id);
+
         return Career::with(['department', 'department.headOffice', 'subsystems'])->find($id);
     }
 
@@ -206,7 +211,10 @@ class CareerService
      */
     public function getByDepartment(string $departmentId, array $filters = []): Collection
     {
+        $this->validateUuid($departmentId);
+
         $filters['department_id'] = $departmentId;
+
         return $this->getAll($filters);
     }
 
@@ -215,6 +223,8 @@ class CareerService
      */
     private function validateDepartmentExists(string $departmentId): bool
     {
+        $this->validateUuid($departmentId);
+
         return \App\Models\Department::where('id', $departmentId)->exists();
     }
 

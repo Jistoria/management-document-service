@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Constants\HttpStatus;
 use App\Models\HeadOffice;
+use App\Traits\ValidatesUuid;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -18,6 +19,9 @@ use Illuminate\Support\Facades\Log;
  */
 class HeadOfficeService
 {
+
+    use ValidatesUuid;
+
     /**
      * Get all active head offices
      */
@@ -46,6 +50,7 @@ class HeadOfficeService
      */
     public function findById(string $id): ?HeadOffice
     {
+        $this->validateUuid($id);
         return HeadOffice::with(['departments.careers'])
             ->findOrFail($id);
     }
@@ -84,6 +89,9 @@ class HeadOfficeService
      */
     public function update(string $id, array $data): HeadOffice
     {
+
+        $this->validateUuid($id);
+
         // Convert camelCase to snake_case for database operations
         $data = HeadOffice::convertToSnakeCase($data);
 
@@ -111,6 +119,9 @@ class HeadOfficeService
      */
     public function delete(string $id): bool
     {
+
+        $this->validateUuid($id);
+
         $headOffice = $this->findById($id);
 
         if (!$headOffice) {
@@ -130,6 +141,9 @@ class HeadOfficeService
      */
     public function restore(string $id): HeadOffice
     {
+
+        $this->validateUuid($id);
+
         $headOffice = HeadOffice::withTrashed()->find($id);
 
         if (!$headOffice) {
@@ -150,6 +164,9 @@ class HeadOfficeService
      */
     public function getFullHierarchy(string $id): ?HeadOffice
     {
+
+        $this->validateUuid($id);
+
         $headOffice = $this->findById($id);
 
         if (!$headOffice) {
@@ -189,6 +206,8 @@ class HeadOfficeService
     {
         $count = 0;
 
+        $this->validateUuidArray($ids, 'head_offices');
+
         foreach ($ids as $id) {
             try {
                 $this->delete($id);
@@ -210,6 +229,7 @@ class HeadOfficeService
         $query = HeadOffice::where('code', $code);
 
         if ($excludeId) {
+            $this->validateUuid($excludeId);
             $query->where('id', '!=', $excludeId);
         }
 
@@ -224,6 +244,7 @@ class HeadOfficeService
         $query = HeadOffice::where('name', $name);
 
         if ($excludeId) {
+            $this->validateUuid($excludeId);
             $query->where('id', '!=', $excludeId);
         }
 

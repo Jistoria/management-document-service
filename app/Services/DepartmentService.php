@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Constants\HttpStatus;
 use App\Models\Department;
+use App\Traits\ValidatesUuid;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -18,6 +19,9 @@ use Illuminate\Support\Facades\Log;
  */
 class DepartmentService
 {
+
+    use ValidatesUuid;
+
     /**
      * Get all active departments
      */
@@ -47,6 +51,9 @@ class DepartmentService
      */
     public function findById(string $id): ?Department
     {
+
+        $this->validateUuid($id);
+
         return Department::with(['headOffice', 'careers.subsystems'])
             ->findOrFail($id);
     }
@@ -85,7 +92,8 @@ class DepartmentService
      */
     public function update(string $id, array $data): Department
     {
-        // Convert camelCase to snake_case for database operations
+        $this->validateUuid($id);
+
         $data = Department::convertToSnakeCase($data);
 
         $department = $this->findById($id);
@@ -112,6 +120,9 @@ class DepartmentService
      */
     public function delete(string $id): bool
     {
+
+        $this->validateUuid($id);
+
         $department = $this->findById($id);
 
         if (!$department) {
@@ -131,6 +142,9 @@ class DepartmentService
      */
     public function restore(string $id): Department
     {
+
+        $this->validateUuid($id);
+
         $department = Department::withTrashed()->find($id);
 
         if (!$department) {
@@ -151,6 +165,9 @@ class DepartmentService
      */
     public function getFullHierarchy(string $id): ?Department
     {
+
+        $this->validateUuid($id);
+
         return Department::with(['headOffice', 'careers.subsystems'])
             ->findOrFail($id);
     }
@@ -181,6 +198,9 @@ class DepartmentService
     {
         $count = 0;
 
+        $this->validateUuidArray($ids, 'departments');
+
+
         foreach ($ids as $id) {
             try {
                 $this->delete($id);
@@ -199,6 +219,7 @@ class DepartmentService
      */
     private function codeExists(?string $code, ?string $excludeId = null): bool
     {
+
         if (!$code) {
             return false;
         }
@@ -206,6 +227,7 @@ class DepartmentService
         $query = Department::where('code', $code);
 
         if ($excludeId) {
+            $this->validateUuid($excludeId);
             $query->where('id', '!=', $excludeId);
         }
 
@@ -221,6 +243,7 @@ class DepartmentService
             ->where('head_office_id', $headOfficeId);
 
         if ($excludeId) {
+            $this->validateUuid($excludeId);
             $query->where('id', '!=', $excludeId);
         }
 

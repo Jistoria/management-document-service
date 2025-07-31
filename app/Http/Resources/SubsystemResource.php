@@ -20,7 +20,7 @@ class SubsystemResource extends BaseResource
             'updatedAt' => $this->updated_at?->toISOString(),
             'countCareers' => $this->careers->count(),
             'countHeadOffices' => $this->headOffices->count(),
-            'processCategories' => ProcessCategoryResource::collection($this->whenLoaded('processCategories')),
+            'countDepartments' => $this->departments->count()
         ];
     }
 

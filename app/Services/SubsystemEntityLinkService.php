@@ -86,6 +86,37 @@ class SubsystemEntityLinkService
 
                 switch ($type) {
                     case 'head_office':
+                        $subsystem->headOffices()->sync($ids);
+                        break;
+
+                    case 'department':
+                        $subsystem->departments()->sync($ids);
+                        break;
+
+                    case 'career':
+                        $subsystem->careers()->sync($ids);
+                        break;
+
+                    default:
+                        throw new \InvalidArgumentException("Tipo de entidad no soportado: $type");
+                }
+            }
+
+            return true;
+        });
+    }
+
+    public function syncWithoutDetachingSubsystemToEntity(string $subsystemId, array $entities): bool
+    {
+        $subsystem = Subsystem::findOrFail($subsystemId);
+
+        return DB::transaction(function () use ($subsystem, $entities) {
+            foreach ($entities as $entity) {
+                $type = $entity['entity_type'];
+                $ids = $entity['entity_ids'];
+
+                switch ($type) {
+                    case 'head_office':
                         $subsystem->headOffices()->syncWithoutDetaching($ids);
                         break;
 

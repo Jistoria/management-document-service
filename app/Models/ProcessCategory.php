@@ -3,6 +3,9 @@
 namespace App\Models;
 
 use App\Traits\Auditable;
+use App\Traits\HasAuditFields;
+use App\Traits\HasCamelCaseAttributes;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -20,13 +23,15 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $subsystem_id
  * @property string $name
  * @property string|null $code
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
- * @property \Carbon\Carbon|null $deleted_at
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ * @property Carbon|null $deleted_at
  */
 class ProcessCategory extends Model
 {
-    use HasFactory, HasUuids, SoftDeletes, Auditable;
+    use HasFactory, HasUuids, SoftDeletes, HasAuditFields, Auditable, HasCamelCaseAttributes {
+        Auditable::getCurrentExternalUserId insteadof HasAuditFields;
+    }
 
     /**
      * The table associated with the model.

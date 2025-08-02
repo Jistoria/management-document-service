@@ -12,7 +12,15 @@ class ProcessCategoryResource extends BaseResource
             'id' => $this->id,
             'name' => $this->name,
             'code' => $this->code,
+            'subsystemId' => $this->subsystem_id,
+            'createdAt' => $this->created_at?->toISOString(),
+            'updatedAt' => $this->updated_at?->toISOString(),
             'processes' => ProcessResource::collection($this->whenLoaded('processes')),
+            'subsystem' => SubsystemResource::make($this->whenLoaded('subsystem')),
+            'processesCount' => $this->when(
+                $this->relationLoaded('processes'), 
+                fn() => $this->processes->count()
+            ),
         ];
     }
 
@@ -30,6 +38,9 @@ class ProcessCategoryResource extends BaseResource
         return 'processCategory';
     }
 
+    /**
+     * Format collection for dropdown usage
+     */
     public static function forDropdown($collection): array
     {
         return [
@@ -41,6 +52,18 @@ class ProcessCategoryResource extends BaseResource
                 ];
             }),
             'count' => count($collection)
+        ];
+    }
+
+    /**
+     * Format for simple reference
+     */
+    public static function asReference($category): array
+    {
+        return [
+            'id' => $category->id,
+            'name' => $category->name,
+            'code' => $category->code,
         ];
     }
 }

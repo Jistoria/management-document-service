@@ -11,6 +11,7 @@ class FiltersProcessCategoryRequest extends DefaultFiltersRequest
         return array_merge(parent::rules(), [
             'code' => ['nullable', 'string', 'max:255'],
             'createdBy' => ['nullable', 'string', 'max:255'],
+            'subsystem_id' => ['nullable', 'string', 'max:255'],
         ]);
     }
 
@@ -19,6 +20,7 @@ class FiltersProcessCategoryRequest extends DefaultFiltersRequest
         return array_merge(parent::attributes(), [
             'code' => 'código',
             'createdBy' => 'creado por',
+            'subsystem_id' => 'subsistema',
         ]);
     }
 }

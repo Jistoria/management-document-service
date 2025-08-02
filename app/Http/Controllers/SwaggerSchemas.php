@@ -276,6 +276,286 @@ namespace App\Http\Controllers;
  *     @OA\Property(property="totalRequested", type="integer", example=3, description="Número total de elementos solicitados para eliminación"),
  *     @OA\Property(property="successRate", type="string", example="66.67%", description="Porcentaje de éxito de la operación")
  * )
+ *
+ * @OA\Schema(
+ *     schema="ProcessCategory",
+ *     type="object",
+ *     title="Process Category",
+ *     description="Entidad de categoría de proceso",
+ *     @OA\Property(
+ *         property="id",
+ *         type="string",
+ *         format="uuid",
+ *         description="Identificador único de la categoría de proceso",
+ *         example="550e8400-e29b-41d4-a716-446655440000"
+ *     ),
+ *     @OA\Property(
+ *         property="name",
+ *         type="string",
+ *         description="Nombre de la categoría de proceso",
+ *         example="Procesos de Admisiones",
+ *         maxLength=255
+ *     ),
+ *     @OA\Property(
+ *         property="code",
+ *         type="string",
+ *         description="Código único de la categoría de proceso",
+ *         example="ADMISIONES",
+ *         maxLength=255,
+ *         nullable=true
+ *     ),
+ *     @OA\Property(
+ *         property="subsystemId",
+ *         type="string",
+ *         format="uuid",
+ *         description="ID del subsistema al que pertenece la categoría",
+ *         example="550e8400-e29b-41d4-a716-446655440001"
+ *     ),
+ *     @OA\Property(
+ *         property="createdAt",
+ *         type="string",
+ *         format="date-time",
+ *         description="Fecha y hora de creación",
+ *         example="2025-08-02T10:00:00Z"
+ *     ),
+ *     @OA\Property(
+ *         property="updatedAt",
+ *         type="string",
+ *         format="date-time",
+ *         description="Fecha y hora de última actualización",
+ *         example="2025-08-02T12:30:00Z"
+ *     ),
+ *     @OA\Property(
+ *         property="processes",
+ *         type="array",
+ *         description="Lista de procesos asociados a esta categoría",
+ *         @OA\Items(ref="#/components/schemas/Process"),
+ *         nullable=true
+ *     ),
+ *     @OA\Property(
+ *         property="subsystem",
+ *         ref="#/components/schemas/Subsystem",
+ *         description="Subsistema al que pertenece la categoría",
+ *         nullable=true
+ *     ),
+ *     @OA\Property(
+ *         property="processesCount",
+ *         type="integer",
+ *         description="Número de procesos asociados",
+ *         example=3
+ *     )
+ * )
+ *
+ * @OA\Schema(
+ *     schema="Process",
+ *     type="object",
+ *     title="Process",
+ *     description="Entidad de proceso",
+ *     @OA\Property(
+ *         property="id",
+ *         type="string",
+ *         format="uuid",
+ *         description="Identificador único del proceso",
+ *         example="550e8400-e29b-41d4-a716-446655440002"
+ *     ),
+ *     @OA\Property(
+ *         property="name",
+ *         type="string",
+ *         description="Nombre del proceso",
+ *         example="Inscripción de Nuevos Estudiantes"
+ *     ),
+ *     @OA\Property(
+ *         property="code",
+ *         type="string",
+ *         description="Código del proceso",
+ *         example="INSCRIPCION",
+ *         nullable=true
+ *     ),
+ *     @OA\Property(
+ *         property="order",
+ *         type="integer",
+ *         description="Orden del proceso dentro de la categoría",
+ *         example=1
+ *     )
+ * )
+ *
+ * @OA\Schema(
+ *     schema="StoreProcessCategoryRequest",
+ *     type="object",
+ *     title="Store Process Category Request",
+ *     description="Datos requeridos para crear una nueva categoría de proceso",
+ *     required={"name", "code", "subsystem_id"},
+ *     @OA\Property(
+ *         property="name",
+ *         type="string",
+ *         description="Nombre de la categoría de proceso",
+ *         example="Procesos de Admisiones",
+ *         maxLength=255
+ *     ),
+ *     @OA\Property(
+ *         property="code",
+ *         type="string",
+ *         description="Código único de la categoría (solo letras mayúsculas, números, guiones y guiones bajos)",
+ *         example="ADMISIONES",
+ *         maxLength=255,
+ *         pattern="^[A-Z0-9_-]+$"
+ *     ),
+ *     @OA\Property(
+ *         property="subsystem_id",
+ *         type="string",
+ *         format="uuid",
+ *         description="ID del subsistema al que pertenecerá la categoría",
+ *         example="550e8400-e29b-41d4-a716-446655440001"
+ *     )
+ * )
+ *
+ * @OA\Schema(
+ *     schema="UpdateProcessCategoryRequest",
+ *     type="object",
+ *     title="Update Process Category Request",
+ *     description="Datos para actualizar una categoría de proceso existente",
+ *     required={"name", "code"},
+ *     @OA\Property(
+ *         property="name",
+ *         type="string",
+ *         description="Nombre actualizado de la categoría de proceso",
+ *         example="Procesos de Admisiones Actualizados",
+ *         maxLength=255
+ *     ),
+ *     @OA\Property(
+ *         property="code",
+ *         type="string",
+ *         description="Código único actualizado de la categoría",
+ *         example="ADMISIONES_V2",
+ *         maxLength=255,
+ *         pattern="^[A-Z0-9_-]+$"
+ *     )
+ * )
+ *
+ * @OA\Schema(
+ *     schema="ProcessCategoryDropdownResponse",
+ *     type="object",
+ *     title="Process Category Dropdown Response",
+ *     description="Respuesta formateada para dropdowns de categorías de proceso",
+ *     @OA\Property(
+ *         property="options",
+ *         type="array",
+ *         description="Lista de opciones para el dropdown",
+ *         @OA\Items(
+ *             type="object",
+ *             @OA\Property(
+ *                 property="value",
+ *                 type="string",
+ *                 format="uuid",
+ *                 description="ID de la categoría",
+ *                 example="550e8400-e29b-41d4-a716-446655440000"
+ *             ),
+ *             @OA\Property(
+ *                 property="label",
+ *                 type="string",
+ *                 description="Nombre de la categoría para mostrar",
+ *                 example="Procesos de Admisiones"
+ *             ),
+ *             @OA\Property(
+ *                 property="code",
+ *                 type="string",
+ *                 description="Código de la categoría",
+ *                 example="ADMISIONES"
+ *             )
+ *         )
+ *     ),
+ *     @OA\Property(
+ *         property="count",
+ *         type="integer",
+ *         description="Número total de opciones disponibles",
+ *         example=15
+ *     )
+ * )
+ *
+ * @OA\Schema(
+ *     schema="ValidationErrorResponse",
+ *     type="object",
+ *     title="Validation Error Response",
+ *     description="Respuesta estándar para errores de validación",
+ *     @OA\Property(
+ *         property="success",
+ *         type="boolean",
+ *         description="Indica si la operación fue exitosa",
+ *         example=false
+ *     ),
+ *     @OA\Property(
+ *         property="message",
+ *         type="string",
+ *         description="Mensaje general del error",
+ *         example="Los datos proporcionados no son válidos"
+ *     ),
+ *     @OA\Property(
+ *         property="errors",
+ *         type="object",
+ *         description="Detalles específicos de errores por campo",
+ *         example={
+ *             "name": {"El campo nombre es obligatorio"},
+ *             "code": {"El código debe contener solo letras mayúsculas, números, guiones y guiones bajos"}
+ *         }
+ *     )
+ * )
+ *
+ * @OA\Schema(
+ *     schema="NotFoundResponse",
+ *     type="object",
+ *     title="Not Found Response",
+ *     description="Respuesta estándar para recursos no encontrados",
+ *     @OA\Property(
+ *         property="success",
+ *         type="boolean",
+ *         description="Indica si la operación fue exitosa",
+ *         example=false
+ *     ),
+ *     @OA\Property(
+ *         property="message",
+ *         type="string",
+ *         description="Mensaje del error",
+ *         example="La categoría de proceso no fue encontrada"
+ *     ),
+ *     @OA\Property(
+ *         property="error_code",
+ *         type="string",
+ *         description="Código específico del error",
+ *         example="RESOURCE_NOT_FOUND"
+ *     )
+ * )
+ *
+ * @OA\Schema(
+ *     schema="ErrorResponse",
+ *     type="object",
+ *     title="Error Response",
+ *     description="Respuesta estándar para errores del servidor",
+ *     @OA\Property(
+ *         property="success",
+ *         type="boolean",
+ *         description="Indica si la operación fue exitosa",
+ *         example=false
+ *     ),
+ *     @OA\Property(
+ *         property="message",
+ *         type="string",
+ *         description="Mensaje del error",
+ *         example="Ha ocurrido un error interno del servidor"
+ *     ),
+ *     @OA\Property(
+ *         property="error_code",
+ *         type="string",
+ *         description="Código específico del error",
+ *         example="INTERNAL_SERVER_ERROR"
+ *     ),
+ *     @OA\Property(
+ *         property="trace_id",
+ *         type="string",
+ *         description="ID de trazabilidad para debugging",
+ *         example="abc123def456",
+ *         nullable=true
+ *     )
+ * )
  */
 class SwaggerSchemas
 {

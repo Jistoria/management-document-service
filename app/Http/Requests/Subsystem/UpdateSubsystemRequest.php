@@ -16,7 +16,7 @@ class UpdateSubsystemRequest extends FormRequest
     {
         $subsystemId = $this->route('subsystem');
         return [
-            'name' => ['sometimes', 'string', 'max:255'],
+            'name' => ['sometimes', 'string', 'max:255',  Rule::unique('subsystems', 'name')->ignore($subsystemId)->whereNull('deleted_at')],
             'code' => ['sometimes', 'string', 'max:255', 'regex:/^[A-Z0-9_-]+$/', Rule::unique('subsystems', 'code')->ignore($subsystemId)->whereNull('deleted_at')],
             'updatedBy' => ['nullable', 'string', 'max:255'],
         ];

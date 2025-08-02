@@ -146,6 +146,10 @@ CREATE TABLE public.process_categories (
     created_at timestamp(0) without time zone,
     updated_at timestamp(0) without time zone,
     deleted_at timestamp(0) without time zone,
+    created_by character varying(255),
+    updated_by character varying(255),
+    deleted_by character varying(255),
+    version integer DEFAULT 1 NOT NULL,
     CONSTRAINT process_categories_pkey PRIMARY KEY (id),
     CONSTRAINT process_categories_subsystem_id_foreign FOREIGN KEY (subsystem_id) REFERENCES subsystems(id) ON DELETE CASCADE
 );

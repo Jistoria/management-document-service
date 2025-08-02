@@ -128,7 +128,7 @@ class HeadOfficeService
             throw new ModelNotFoundException("Sede no encontrada.");
         }
 
-        // Check if has active departments
+        // Check if it has active departments
         if ($headOffice->activeDepartments()->exists()) {
             throw new \InvalidArgumentException("No se puede eliminar la sede porque tiene departamentos activos.", HttpStatus::CONFLICT);
         }
@@ -169,11 +169,8 @@ class HeadOfficeService
 
         $headOffice = $this->findById($id);
 
-        if (!$headOffice) {
-            return null;
-        }
+        return $headOffice?->getFullHierarchy();
 
-        return $headOffice->getFullHierarchy();
     }
 
     /**

@@ -3,12 +3,16 @@
 namespace App\Services;
 
 use App\Models\ProcessCategory;
+use App\Traits\ValidatesUuid;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
 class ProcessCategoryService
 {
+
+    use ValidatesUuid;
+
     /**
      * Get all process categories with optional filtering
      */
@@ -63,6 +67,87 @@ class ProcessCategoryService
         }
     }
 
+    public function findById(string $id): ProcessCategory
+    {
+        $this->validateUuid($id);
+
+        return ProcessCategory::findOrFail($id);
+    }
+
+    public function findByCode($code): ProcessCategory
+    {
+        return ProcessCategory::findOrFail(['code' => $code]);
+    }
+
+    public function create(array $data): ProcessCategory
+    {
+        $data = ProcessCategory::convertToSnakeCase($data);
+
+        if($this->codeExists($data['code'])) {
+            throw new \InvalidArgumentException("El código '{$data['code']}' ya existe.");
+        }
+
+        if($this->nameExists($data['name'])) {
+            throw new \InvalidArgumentException("El nombre '{$data['name']}' ya existe.");
+        }
+
+        return ProcessCategory::create($data);
+
+    }
+
+    public function update(array $data, string $id): ProcessCategory
+    {
+        $this->validateUuid($id, ProcessCategory::class);
+
+        $data = ProcessCategory::convertToSnakeCase($data);
+
+        $processCategory = $this->findById($id);
+
+        if($this->codeExists($data['code'], $id)) {
+            throw new \InvalidArgumentException("El código '{$data['code']}' ya existe.");
+        }
+
+        if($this->nameExists($data['name'], $id)) {
+            throw new \InvalidArgumentException("El nombre '{$data['name']}' ya existe.");
+        }
+
+        $processCategory->update($data);
+
+        return $processCategory->fresh();
+    }
+
+    public function delete(string $id): bool
+    {
+        $this->validateUuid($id, ProcessCategory::class);
+        $processCategory = $this->findById($id);
+
+        return $processCategory->delete();
+    }
+
+
+    private function codeExists(string $code, ?string $excludeId = null): bool
+    {
+        $query = ProcessCategory::where('code', $code);
+
+        if ($excludeId) {
+            $this->validateUuid($excludeId);
+            $query->where('id', '!=', $excludeId);
+        }
+
+        return $query->exists();
+    }
+
+    private function nameExists(string $name, ?string $excludeId = null): bool
+    {
+        $query = ProcessCategory::where('name', $name);
+        if ($excludeId) {
+            $this->validateUuid($excludeId);
+            $query->where('id', '!=', $excludeId);
+        }
+
+        return $query->exists();
+    }
+
     /**
      * @param array $filters
      * @param Builder $query
@@ -92,10 +177,6 @@ class ProcessCategoryService
 
         $query->when(!empty($filters['code']), function ($q) use ($filters) {
             $q->where('code', $filters['code']);
-        });
-
-        $query->when(!empty($filters['department_id']), function ($q) use ($filters) {
-            $q->where('department_id', $filters['department_id']);
         });
 
         $query->when(!empty($filters['created_by']), function ($q) use ($filters) {

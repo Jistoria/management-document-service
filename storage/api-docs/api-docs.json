@@ -2953,6 +2953,587 @@
                 }
             }
         },
+        "/process-categories": {
+            "get": {
+                "tags": [
+                    "Process Categories"
+                ],
+                "summary": "Listar categorías de procesos",
+                "description": "Obtiene una lista paginada de categorías de procesos con filtros opcionales",
+                "operationId": "getProcessCategories",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Número de página para la paginación",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Número de elementos por página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Término de búsqueda para filtrar por nombre o código",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "maxLength": 255
+                        }
+                    },
+                    {
+                        "name": "code",
+                        "in": "query",
+                        "description": "Filtra por código específico de la categoría",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "maxLength": 255
+                        }
+                    },
+                    {
+                        "name": "createdBy",
+                        "in": "query",
+                        "description": "Filtra por el usuario que creó la categoría",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "maxLength": 255
+                        }
+                    },
+                    {
+                        "name": "subsystem_id",
+                        "in": "query",
+                        "description": "Filtra por UUID del subsistema asociado",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Campo por el cual ordenar los resultados",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "name",
+                                "code",
+                                "created_at",
+                                "updated_at"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "direction",
+                        "in": "query",
+                        "description": "Dirección del ordenamiento",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de categorías de procesos obtenida exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/ProcessCategory"
+                                                    }
+                                                },
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/Pagination"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación en los filtros proporcionados",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Process Categories"
+                ],
+                "summary": "Crear una nueva categoría de proceso",
+                "description": "Crea una nueva categoría de proceso con los datos proporcionados",
+                "operationId": "createProcessCategory",
+                "requestBody": {
+                    "description": "Datos de la categoría de proceso a crear",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StoreProcessCategoryRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Categoría de proceso creada exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "$ref": "#/components/schemas/ProcessCategory"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Errores de validación en los datos enviados",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Conflicto - Ya existe una categoría con el mismo código o nombre",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/process-categories/{categoryId}": {
+            "get": {
+                "tags": [
+                    "Process Categories"
+                ],
+                "summary": "Obtener una categoría de proceso específica",
+                "description": "Obtiene los detalles de una categoría de proceso por su ID",
+                "operationId": "getProcessCategory",
+                "parameters": [
+                    {
+                        "name": "categoryId",
+                        "in": "path",
+                        "description": "UUID de la categoría de proceso a obtener",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "description": "Relaciones adicionales a incluir (processes, subsystem)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Categoría de proceso obtenida exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "$ref": "#/components/schemas/ProcessCategory"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Categoría de proceso no encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NotFoundResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Process Categories"
+                ],
+                "summary": "Actualizar una categoría de proceso",
+                "description": "Actualiza los datos de una categoría de proceso existente",
+                "operationId": "updateProcessCategory",
+                "parameters": [
+                    {
+                        "name": "categoryId",
+                        "in": "path",
+                        "description": "UUID de la categoría de proceso a actualizar",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Datos actualizados de la categoría de proceso",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateProcessCategoryRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Categoría de proceso actualizada exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Categoría de proceso no encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NotFoundResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Errores de validación en los datos enviados",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Conflicto - Ya existe otra categoría con el mismo código o nombre",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Process Categories"
+                ],
+                "summary": "Eliminar una categoría de proceso",
+                "description": "Elimina (soft delete) una categoría de proceso específica",
+                "operationId": "deleteProcessCategory",
+                "parameters": [
+                    {
+                        "name": "categoryId",
+                        "in": "path",
+                        "description": "UUID de la categoría de proceso a eliminar",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Categoría de proceso eliminada exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Categoría de proceso no encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NotFoundResponse"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Conflicto - La categoría tiene procesos asociados y no puede eliminarse",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/process-categories/dropdown": {
+            "get": {
+                "tags": [
+                    "Process Categories"
+                ],
+                "summary": "Obtener categorías para dropdown",
+                "description": "Obtiene una lista simplificada de categorías de proceso para usar en dropdowns",
+                "operationId": "getProcessCategoriesDropdown",
+                "parameters": [
+                    {
+                        "name": "subsystem_id",
+                        "in": "query",
+                        "description": "Filtra las categorías por subsistema específico",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Buscar categorías por nombre o código",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "maxLength": 255
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de categorías para dropdown obtenida exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "$ref": "#/components/schemas/ProcessCategoryDropdownResponse"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/process-categories/{categoryId}/processes": {
+            "get": {
+                "tags": [
+                    "Process Categories"
+                ],
+                "summary": "Obtener procesos de una categoría",
+                "description": "Obtiene todos los procesos asociados a una categoría específica",
+                "operationId": "getProcessCategoryProcesses",
+                "parameters": [
+                    {
+                        "name": "categoryId",
+                        "in": "path",
+                        "description": "UUID de la categoría de proceso",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "include_children",
+                        "in": "query",
+                        "description": "Incluir procesos hijos (subprocesos)",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Procesos de la categoría obtenidos exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/Process"
+                                                    }
+                                                },
+                                                "total": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Categoría de proceso no encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NotFoundResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/subsystems": {
             "get": {
                 "tags": [
@@ -4937,6 +5518,272 @@
                     }
                 },
                 "type": "object"
+            },
+            "ProcessCategory": {
+                "title": "Process Category",
+                "description": "Entidad de categoría de proceso",
+                "properties": {
+                    "id": {
+                        "description": "Identificador único de la categoría de proceso",
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "550e8400-e29b-41d4-a716-446655440000"
+                    },
+                    "name": {
+                        "description": "Nombre de la categoría de proceso",
+                        "type": "string",
+                        "maxLength": 255,
+                        "example": "Procesos de Admisiones"
+                    },
+                    "code": {
+                        "description": "Código único de la categoría de proceso",
+                        "type": "string",
+                        "maxLength": 255,
+                        "example": "ADMISIONES",
+                        "nullable": true
+                    },
+                    "subsystemId": {
+                        "description": "ID del subsistema al que pertenece la categoría",
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "550e8400-e29b-41d4-a716-446655440001"
+                    },
+                    "createdAt": {
+                        "description": "Fecha y hora de creación",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-08-02T10:00:00Z"
+                    },
+                    "updatedAt": {
+                        "description": "Fecha y hora de última actualización",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-08-02T12:30:00Z"
+                    },
+                    "processes": {
+                        "description": "Lista de procesos asociados a esta categoría",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Process"
+                        },
+                        "nullable": true
+                    },
+                    "subsystem": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/Subsystem"
+                            }
+                        ],
+                        "nullable": true,
+                        "description": "Subsistema al que pertenece la categoría"
+                    },
+                    "processesCount": {
+                        "description": "Número de procesos asociados",
+                        "type": "integer",
+                        "example": 3
+                    }
+                },
+                "type": "object"
+            },
+            "Process": {
+                "title": "Process",
+                "description": "Entidad de proceso",
+                "properties": {
+                    "id": {
+                        "description": "Identificador único del proceso",
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "550e8400-e29b-41d4-a716-446655440002"
+                    },
+                    "name": {
+                        "description": "Nombre del proceso",
+                        "type": "string",
+                        "example": "Inscripción de Nuevos Estudiantes"
+                    },
+                    "code": {
+                        "description": "Código del proceso",
+                        "type": "string",
+                        "example": "INSCRIPCION",
+                        "nullable": true
+                    },
+                    "order": {
+                        "description": "Orden del proceso dentro de la categoría",
+                        "type": "integer",
+                        "example": 1
+                    }
+                },
+                "type": "object"
+            },
+            "StoreProcessCategoryRequest": {
+                "title": "Store Process Category Request",
+                "description": "Datos requeridos para crear una nueva categoría de proceso",
+                "required": [
+                    "name",
+                    "code",
+                    "subsystem_id"
+                ],
+                "properties": {
+                    "name": {
+                        "description": "Nombre de la categoría de proceso",
+                        "type": "string",
+                        "maxLength": 255,
+                        "example": "Procesos de Admisiones"
+                    },
+                    "code": {
+                        "description": "Código único de la categoría (solo letras mayúsculas, números, guiones y guiones bajos)",
+                        "type": "string",
+                        "maxLength": 255,
+                        "pattern": "^[A-Z0-9_-]+$",
+                        "example": "ADMISIONES"
+                    },
+                    "subsystem_id": {
+                        "description": "ID del subsistema al que pertenecerá la categoría",
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "550e8400-e29b-41d4-a716-446655440001"
+                    }
+                },
+                "type": "object"
+            },
+            "UpdateProcessCategoryRequest": {
+                "title": "Update Process Category Request",
+                "description": "Datos para actualizar una categoría de proceso existente",
+                "required": [
+                    "name",
+                    "code"
+                ],
+                "properties": {
+                    "name": {
+                        "description": "Nombre actualizado de la categoría de proceso",
+                        "type": "string",
+                        "maxLength": 255,
+                        "example": "Procesos de Admisiones Actualizados"
+                    },
+                    "code": {
+                        "description": "Código único actualizado de la categoría",
+                        "type": "string",
+                        "maxLength": 255,
+                        "pattern": "^[A-Z0-9_-]+$",
+                        "example": "ADMISIONES_V2"
+                    }
+                },
+                "type": "object"
+            },
+            "ProcessCategoryDropdownResponse": {
+                "title": "Process Category Dropdown Response",
+                "description": "Respuesta formateada para dropdowns de categorías de proceso",
+                "properties": {
+                    "options": {
+                        "description": "Lista de opciones para el dropdown",
+                        "type": "array",
+                        "items": {
+                            "properties": {
+                                "value": {
+                                    "description": "ID de la categoría",
+                                    "type": "string",
+                                    "format": "uuid",
+                                    "example": "550e8400-e29b-41d4-a716-446655440000"
+                                },
+                                "label": {
+                                    "description": "Nombre de la categoría para mostrar",
+                                    "type": "string",
+                                    "example": "Procesos de Admisiones"
+                                },
+                                "code": {
+                                    "description": "Código de la categoría",
+                                    "type": "string",
+                                    "example": "ADMISIONES"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "count": {
+                        "description": "Número total de opciones disponibles",
+                        "type": "integer",
+                        "example": 15
+                    }
+                },
+                "type": "object"
+            },
+            "ValidationErrorResponse": {
+                "title": "Validation Error Response",
+                "description": "Respuesta estándar para errores de validación",
+                "properties": {
+                    "success": {
+                        "description": "Indica si la operación fue exitosa",
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "message": {
+                        "description": "Mensaje general del error",
+                        "type": "string",
+                        "example": "Los datos proporcionados no son válidos"
+                    },
+                    "errors": {
+                        "description": "Detalles específicos de errores por campo",
+                        "type": "object",
+                        "example": {
+                            "name": [
+                                "El campo nombre es obligatorio"
+                            ],
+                            "code": [
+                                "El código debe contener solo letras mayúsculas, números, guiones y guiones bajos"
+                            ]
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "NotFoundResponse": {
+                "title": "Not Found Response",
+                "description": "Respuesta estándar para recursos no encontrados",
+                "properties": {
+                    "success": {
+                        "description": "Indica si la operación fue exitosa",
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "message": {
+                        "description": "Mensaje del error",
+                        "type": "string",
+                        "example": "La categoría de proceso no fue encontrada"
+                    },
+                    "error_code": {
+                        "description": "Código específico del error",
+                        "type": "string",
+                        "example": "RESOURCE_NOT_FOUND"
+                    }
+                },
+                "type": "object"
+            },
+            "ErrorResponse": {
+                "title": "Error Response",
+                "description": "Respuesta estándar para errores del servidor",
+                "properties": {
+                    "success": {
+                        "description": "Indica si la operación fue exitosa",
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "message": {
+                        "description": "Mensaje del error",
+                        "type": "string",
+                        "example": "Ha ocurrido un error interno del servidor"
+                    },
+                    "error_code": {
+                        "description": "Código específico del error",
+                        "type": "string",
+                        "example": "INTERNAL_SERVER_ERROR"
+                    },
+                    "trace_id": {
+                        "description": "ID de trazabilidad para debugging",
+                        "type": "string",
+                        "example": "abc123def456",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
             }
         },
         "securitySchemes": {
@@ -4971,6 +5818,10 @@
         {
             "name": "Departments",
             "description": "Departments"
+        },
+        {
+            "name": "Process Categories",
+            "description": "Process Categories"
         }
     ]
 }

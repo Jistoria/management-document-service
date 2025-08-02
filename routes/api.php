@@ -105,10 +105,12 @@ Route::prefix('subsystem-entity-links')->group(function () {
 // ProcessCategories Routes
 Route::prefix('process-categories')->group(function () {
     Route::get('/', [ProcessCategoryController::class, 'index']);
-    Route::get('/{categoryId}', [ProcessCategoryController::class, 'show']);
+    Route::get('/dropdown', [ProcessCategoryController::class, 'dropdown']);
+    Route::get('/{category}', [ProcessCategoryController::class, 'show']);
+    Route::get('/{category}/processes', [ProcessCategoryController::class, 'processes']);
     Route::post('/', [ProcessCategoryController::class, 'store']);
-    Route::put('/{categoryId}', [ProcessCategoryController::class, 'update']);
-    Route::delete('/{categoryId}', [ProcessCategoryController::class, 'destroy']);
+    Route::put('/{category}', [ProcessCategoryController::class, 'update']);
+    Route::delete('/{category}', [ProcessCategoryController::class, 'destroy']);
 });
 
 

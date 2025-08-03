@@ -142,7 +142,7 @@ class Process extends Model
      */
     public function scopeByCode($query, string $code)
     {
-        return $query->where('code', $code);
+        return $query->where('code', 'LIKE', "%{$code}%");
     }
 
     /**

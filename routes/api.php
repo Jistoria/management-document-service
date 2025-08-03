@@ -4,6 +4,7 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\HeadOfficeController;
 use App\Http\Controllers\CareerController;
 use App\Http\Controllers\ProcessCategoryController;
+use App\Http\Controllers\ProcessController;
 use App\Http\Controllers\SubsystemController;
 use App\Http\Controllers\SubsystemEntityLinkController;
 use App\Http\Controllers\SubsystemGroupController;
@@ -113,6 +114,20 @@ Route::prefix('process-categories')->group(function () {
     Route::delete('/{category}', [ProcessCategoryController::class, 'destroy']);
 });
 
+// Process Routes
+Route::prefix('processes')->group(function () {
+   Route::get('/', [ProcessController::class, 'index']);
+   Route::post('/', [ProcessController::class, 'store']);
+   Route::get('/{process}', [ProcessController::class, 'show']);
+   Route::put('/{process}', [ProcessController::class, 'update']);
+   Route::patch('/{process}', [ProcessController::class, 'update']);
+   Route::delete('/{process}', [ProcessController::class, 'destroy']);
+   Route::post('/{process}/restore', [ProcessController::class, 'restore']);
+   Route::get('/{process}/hierarchy', [ProcessController::class, 'hierarchy']);
+   Route::get('/{process}/statistics', [ProcessController::class, 'statistics']);
+   Route::get('/code/{code}', [ProcessController::class, 'findByCode']);
+   Route::post('/bulk-delete', [ProcessController::class, 'bulkDelete']);
+});
 
 
 // Nested route for careers by department

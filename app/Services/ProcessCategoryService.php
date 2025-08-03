@@ -74,9 +74,9 @@ class ProcessCategoryService
         return ProcessCategory::findOrFail($id);
     }
 
-    public function findByCode($code): ProcessCategory
+    public function findByCode($code): ProcessCategory|null
     {
-        return ProcessCategory::findOrFail(['code' => $code]);
+        return ProcessCategory::byCode($code)->first();
     }
 
     public function create(array $data): ProcessCategory
@@ -161,14 +161,6 @@ class ProcessCategoryService
                 $q2->where('name', 'LIKE', "%{$search}%")
                     ->orWhere('code', 'LIKE', "%{$search}%");
             });
-        });
-
-        $query->when(isset($filters['has_subsystems']), function ($q) use ($filters) {
-            $q->hasSubsystems($filters['has_subsystems']);
-        });
-
-        $query->when(!empty($filters['exclude_subsystem_id']), function ($q) use ($filters) {
-            $q->withoutSubsystemId($filters['exclude_subsystem_id']);
         });
 
         $query->when(!empty($filters['subsystem_id']), function ($q) use ($filters) {

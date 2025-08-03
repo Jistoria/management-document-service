@@ -12,7 +12,7 @@ use function App\Helpers\catchSync;
 
 class ProcessController extends Controller
 {
-    protected $processService;
+    protected ProcessService $processService;
     public function __construct(ProcessService $processService){
         $this->processService = $processService;
     }
@@ -37,6 +37,31 @@ class ProcessController extends Controller
 
             return new ProcessResource($process);
         }, status: HttpStatus::CREATED);
+    }
+
+    public function show($id) : JsonResponse
+    {
+        return catchSync(function () use ($id) {
+            $process = $this->processService->findById($id);
+            return new ProcessResource($process);
+        });
+    }
+
+    public function update(Request $request, $id) : JsonResponse
+    {
+        return catchSync(function () use ($request, $id) {
+            $process = $this->processService->update($id, $request->validated());
+
+            return new ProcessResource($process);
+        });
+    }
+
+    public function destroy($id) : JsonResponse
+    {
+        return catchSync(function () use ($id) {
+            $process = $this->processService->delete($id);
+            return new ProcessResource($process);
+        });
     }
 }
 

@@ -18,7 +18,7 @@ class ProcessController extends Controller
     }
 
 
-    public function index(Request $request) : JsonResponse
+    public function index(Request $request)
     {
         return ApiIndexBuilder::build(
             $this->processService,

@@ -164,7 +164,7 @@ class ProcessCategoryService
         });
 
         $query->when(!empty($filters['subsystem_id']), function ($q) use ($filters) {
-            $q->withSubsystemId($filters['subsystem_id']);
+            $q->bySubsystem($filters['subsystem_id']);
         });
 
         $query->when(!empty($filters['code']), function ($q) use ($filters) {

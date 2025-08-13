@@ -116,22 +116,27 @@ Route::prefix('process-categories')->group(function () {
 
 // Process Routes
 Route::prefix('processes')->group(function () {
-   Route::get('/', [ProcessController::class, 'index']);
-   Route::post('/', [ProcessController::class, 'store']);
-   Route::get('/{process}', [ProcessController::class, 'show']);
-   Route::put('/{process}', [ProcessController::class, 'update']);
-   Route::patch('/{process}', [ProcessController::class, 'update']);
-   Route::delete('/{process}', [ProcessController::class, 'destroy']);
-   Route::post('/{process}/restore', [ProcessController::class, 'restore']);
-   Route::get('/{process}/hierarchy', [ProcessController::class, 'hierarchy']);
-   Route::get('/{process}/statistics', [ProcessController::class, 'statistics']);
-   Route::get('/code/{code}', [ProcessController::class, 'findByCode']);
-   Route::post('/bulk-delete', [ProcessController::class, 'bulkDelete']);
+    Route::get('/', [ProcessController::class, 'index']);
+    Route::post('/', [ProcessController::class, 'store']);
+    Route::get('/{process}', [ProcessController::class, 'show']);
+    Route::put('/{process}', [ProcessController::class, 'update']);
+    Route::patch('/{process}', [ProcessController::class, 'update']);
+    Route::delete('/{process}', [ProcessController::class, 'destroy']);
+    Route::post('/{process}/restore', [ProcessController::class, 'restore']);
+    Route::get('/{process}/hierarchy', [ProcessController::class, 'hierarchy']);
+    Route::get('/{process}/statistics', [ProcessController::class, 'statistics']);
+    Route::get('/code/{code}', [ProcessController::class, 'findByCode']);
+    Route::post('/bulk-delete', [ProcessController::class, 'bulkDelete']);
 });
 
 
 // Nested route for careers by department
 Route::get('/departments/{departmentId}/careers', [CareerController::class, 'getByDepartment']);
+
+Route::middleware(['verify.jwt'])->group(function () {
+    Route::get('/secure/data', fn() => response()->json(['ok' => true]));
+});
+
 
 Route::fallback(function () {
     return response()->json(['message' => 'API connection successful.'], 200);

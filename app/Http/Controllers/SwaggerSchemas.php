@@ -126,6 +126,24 @@ namespace App\Http\Controllers;
  * )
  *
  * @OA\Schema(
+ *     schema="MetadataSchema",
+ *     type="object",
+ *     title="Metadata Schema",
+ *     description="Definition of a metadata schema",
+ *     @OA\Property(property="id", type="string", format="uuid", example="0197d795-7572-7331-903b-3aeed9fb34c2"),
+ *     @OA\Property(property="name", type="string", example="Invoice"),
+ *     @OA\Property(property="description", type="string", nullable=true),
+ *     @OA\Property(property="parentSchemaId", type="string", format="uuid", nullable=true),
+ *     @OA\Property(property="isCanonical", type="boolean", example=true),
+ *     @OA\Property(property="version", type="integer", example=1),
+ *     @OA\Property(property="externalSystemId", type="string", nullable=true),
+ *     @OA\Property(property="apiEndpoint", type="string", nullable=true),
+ *     @OA\Property(property="cacheTtl", type="integer", nullable=true, description="Cache time-to-live in seconds"),
+ *     @OA\Property(property="createdAt", type="string", format="date-time"),
+ *     @OA\Property(property="updatedAt", type="string", format="date-time")
+ * )
+ *
+ * @OA\Schema(
  *     schema="MetadataField",
  *     type="object",
  *     title="Metadata Field",

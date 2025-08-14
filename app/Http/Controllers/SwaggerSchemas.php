@@ -126,6 +126,29 @@ namespace App\Http\Controllers;
  * )
  *
  * @OA\Schema(
+ *     schema="MetadataField",
+ *     type="object",
+ *     title="Metadata Field",
+ *     description="Field definition within a metadata schema",
+ *     @OA\Property(property="id", type="string", format="uuid", example="0197d795-7572-7331-903b-3aeed9fb34c2"),
+ *     @OA\Property(property="schemaId", type="string", format="uuid", description="Parent schema ID"),
+ *     @OA\Property(property="name", type="string"),
+ *     @OA\Property(property="dataType", type="string", example="string"),
+ *     @OA\Property(property="isRequired", type="boolean"),
+ *     @OA\Property(property="defaultValue", type="string", nullable=true),
+ *     @OA\Property(property="validationRegex", type="string", nullable=true),
+ *     @OA\Property(property="fieldOrder", type="integer", nullable=true),
+ *     @OA\Property(property="lookupKeywords", type="array", @OA\Items(type="string"), nullable=true),
+ *     @OA\Property(property="ocrHint", type="string", nullable=true),
+ *     @OA\Property(property="ignoreInSimilarity", type="boolean"),
+ *     @OA\Property(property="isReference", type="boolean"),
+ *     @OA\Property(property="referenceEntity", type="string", nullable=true),
+ *     @OA\Property(property="referenceColumn", type="string", nullable=true),
+ *     @OA\Property(property="createdAt", type="string", format="date-time"),
+ *     @OA\Property(property="updatedAt", type="string", format="date-time")
+ * )
+ *
+ * @OA\Schema(
  *     schema="Pagination",
  *     type="object",
  *     title="Pagination",

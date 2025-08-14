@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Constants\MetadataFieldDataType;
 
 /**
  * Model for Metadata Fields
@@ -75,18 +76,7 @@ class MetadataField extends Model
     /**
      * Available data types for metadata fields.
      */
-    const DATA_TYPES = [
-        'string',
-        'integer',
-        'decimal',
-        'date',
-        'boolean',
-        'json',
-        'uuid',
-        'text',
-        'email',
-        'url'
-    ];
+    const DATA_TYPES = MetadataFieldDataType::ALL;
 
     /**
      * Get the metadata schema that owns this field.

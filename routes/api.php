@@ -9,6 +9,7 @@ use App\Http\Controllers\SubsystemController;
 use App\Http\Controllers\SubsystemEntityLinkController;
 use App\Http\Controllers\SubsystemGroupController;
 use App\Http\Controllers\DocumentTypeController;
+use App\Http\Controllers\MetadataFieldController;
 use Illuminate\Support\Facades\Route;
 
 // Head Offices Routes
@@ -148,6 +149,16 @@ Route::prefix('document-types')->group(function () {
     Route::get('/{document_type}/statistics', [DocumentTypeController::class, 'statistics']);
     Route::get('/code/{code}', [DocumentTypeController::class, 'findByCode']);
     Route::post('/bulk-delete', [DocumentTypeController::class, 'bulkDelete']);
+});
+
+Route::prefix('metadata-fields')->group(function () {
+    Route::get('/', [MetadataFieldController::class, 'index']);
+    Route::post('/', [MetadataFieldController::class, 'store']);
+    Route::get('/{metadata_field}', [MetadataFieldController::class, 'show']);
+    Route::put('/{metadata_field}', [MetadataFieldController::class, 'update']);
+    Route::patch('/{metadata_field}', [MetadataFieldController::class, 'update']);
+    Route::delete('/{metadata_field}', [MetadataFieldController::class, 'destroy']);
+    Route::post('/bulk-delete', [MetadataFieldController::class, 'bulkDelete']);
 });
 
 

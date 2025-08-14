@@ -4864,6 +4864,197 @@
                 }
             }
         },
+        "/required-documents": {
+            "get": {
+                "tags": [
+                    "RequiredDocuments"
+                ],
+                "summary": "List required documents",
+                "description": "Returns a list of required documents with support for pagination and collection formats",
+                "operationId": "getRequiredDocuments",
+                "responses": {
+                    "200": {
+                        "description": "Required documents retrieved successfully"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "RequiredDocuments"
+                ],
+                "summary": "Create required document",
+                "description": "Creates a new required document",
+                "operationId": "storeRequiredDocument",
+                "responses": {
+                    "201": {
+                        "description": "Required document created successfully"
+                    }
+                }
+            }
+        },
+        "/required-documents/{id}": {
+            "get": {
+                "tags": [
+                    "RequiredDocuments"
+                ],
+                "summary": "Show required document",
+                "description": "Returns the details of a required document",
+                "operationId": "showRequiredDocument",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Required document retrieved successfully"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "RequiredDocuments"
+                ],
+                "summary": "Update required document",
+                "description": "Updates an existing required document",
+                "operationId": "updateRequiredDocument",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Required document updated successfully"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "RequiredDocuments"
+                ],
+                "summary": "Delete required document",
+                "description": "Soft deletes a required document",
+                "operationId": "destroyRequiredDocument",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Required document deleted successfully"
+                    }
+                }
+            }
+        },
+        "/required-documents/{id}/restore": {
+            "post": {
+                "tags": [
+                    "RequiredDocuments"
+                ],
+                "summary": "Restore required document",
+                "description": "Restores a previously deleted required document",
+                "operationId": "restoreRequiredDocument",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Required document restored successfully"
+                    }
+                }
+            }
+        },
+        "/required-documents/{id}/statistics": {
+            "get": {
+                "tags": [
+                    "RequiredDocuments"
+                ],
+                "summary": "Required document statistics",
+                "description": "Returns statistics for a required document",
+                "operationId": "statisticsRequiredDocument",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Statistics retrieved successfully"
+                    }
+                }
+            }
+        },
+        "/required-documents/bulk-delete": {
+            "post": {
+                "tags": [
+                    "RequiredDocuments"
+                ],
+                "summary": "Bulk delete required documents",
+                "description": "Deletes multiple required documents in a single operation",
+                "operationId": "bulkDeleteRequiredDocuments",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "ids"
+                                ],
+                                "properties": {
+                                    "ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Bulk deletion performed successfully"
+                    }
+                }
+            }
+        },
         "/subsystems": {
             "get": {
                 "tags": [
@@ -6517,6 +6708,103 @@
                     }
                 ]
             },
+            "RequiredDocument": {
+                "title": "Required Document",
+                "description": "Defines a document required for a process or metadata schema",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "0197d795-7572-7331-903b-3aeed9fb34c2"
+                    },
+                    "processId": {
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": true
+                    },
+                    "documentTypeId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "academicRoleId": {
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": true
+                    },
+                    "metadataSchemaId": {
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": true
+                    },
+                    "order": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "mandatory": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "externalUserId": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "externalOrganizationId": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "RequiredDocumentDetailed": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/RequiredDocument"
+                    },
+                    {
+                        "properties": {
+                            "documentType": {
+                                "$ref": "#/components/schemas/DocumentType"
+                            },
+                            "process": {
+                                "description": "Included conditionally",
+                                "type": "object"
+                            },
+                            "statistics": {
+                                "description": "Statistics (included conditionally)",
+                                "type": "object"
+                            },
+                            "meta": {
+                                "properties": {
+                                    "resourceType": {
+                                        "type": "string",
+                                        "example": "required_document"
+                                    },
+                                    "generatedAt": {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    "context": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
             "MetadataSchema": {
                 "title": "Metadata Schema",
                 "description": "Definition of a metadata schema",
@@ -7403,6 +7691,10 @@
         {
             "name": "Process Categories",
             "description": "Process Categories"
+        },
+        {
+            "name": "RequiredDocuments",
+            "description": "RequiredDocuments"
         }
     ]
 }

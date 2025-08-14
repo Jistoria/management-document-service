@@ -8,6 +8,7 @@ use App\Http\Controllers\ProcessController;
 use App\Http\Controllers\SubsystemController;
 use App\Http\Controllers\SubsystemEntityLinkController;
 use App\Http\Controllers\SubsystemGroupController;
+use App\Http\Controllers\DocumentTypeController;
 use Illuminate\Support\Facades\Route;
 
 // Head Offices Routes
@@ -128,6 +129,27 @@ Route::prefix('processes')->group(function () {
    Route::get('/code/{code}', [ProcessController::class, 'findByCode']);
    Route::post('/bulk-delete', [ProcessController::class, 'bulkDelete']);
 });
+
+/*
+ * The following routes will be for documentary entities.
+ */
+
+Route::prefix('document-types')->group(function () {
+    // Standard CRUD routes
+    Route::get('/', [DocumentTypeController::class, 'index']);
+    Route::post('/', [DocumentTypeController::class, 'store']);
+    Route::get('/{document_type}', [DocumentTypeController::class, 'show']);
+    Route::put('/{document_type}', [DocumentTypeController::class, 'update']);
+    Route::patch('/{document_type}', [DocumentTypeController::class, 'update']);
+    Route::delete('/{document_type}', [DocumentTypeController::class, 'destroy']);
+
+    // Additional routes
+    Route::post('/{document_type}/restore', [DocumentTypeController::class, 'restore']);
+    Route::get('/{document_type}/statistics', [DocumentTypeController::class, 'statistics']);
+    Route::get('/code/{code}', [DocumentTypeController::class, 'findByCode']);
+    Route::post('/bulk-delete', [DocumentTypeController::class, 'bulkDelete']);
+});
+
 
 
 // Nested route for careers by department

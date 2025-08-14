@@ -110,4 +110,24 @@ class DocumentType extends Model
             ->pluck('process')
             ->unique('id');
     }
+
+    /**
+     * Convert camelCase array keys to snake_case for database operations
+     */
+    public static function convertToSnakeCase(array $data): array
+    {
+        $converted = [];
+        
+        $mapping = [
+            'createdBy' => 'created_by',
+            'updatedBy' => 'updated_by',
+        ];
+
+        foreach ($data as $key => $value) {
+            $snakeKey = $mapping[$key] ?? $key;
+            $converted[$snakeKey] = $value;
+        }
+
+        return $converted;
+    }
 }

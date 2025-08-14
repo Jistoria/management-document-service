@@ -80,6 +80,52 @@ namespace App\Http\Controllers;
  * )
  *
  * @OA\Schema(
+ *     schema="DocumentType",
+ *     type="object",
+ *     title="Document Type",
+ *     description="Tipo de documento del sistema",
+ *     @OA\Property(property="id", type="string", format="uuid", example="0197d795-7572-7331-903b-3aeed9fb34c2", description="ID único del tipo de documento"),
+ *     @OA\Property(property="name", type="string", example="Certificado Académico", description="Nombre del tipo de documento"),
+ *     @OA\Property(property="code", type="string", example="CERT_ACAD", description="Código único del tipo de documento"),
+ *     @OA\Property(property="description", type="string", example="Certificado de estudios académicos", description="Descripción del tipo de documento"),
+ *     @OA\Property(property="createdAt", type="string", format="date-time", example="2025-07-04T22:36:25.000000Z", description="Fecha de creación"),
+ *     @OA\Property(property="updatedAt", type="string", format="date-time", example="2025-07-04T22:36:47.000000Z", description="Fecha de última actualización"),
+ *     @OA\Property(property="createdBy", type="string", example="system", description="Usuario que creó el tipo de documento"),
+ *     @OA\Property(property="updatedBy", type="string", example="system", description="Usuario que actualizó el tipo de documento"),
+ *     @OA\Property(property="version", type="integer", example=1, description="Versión del registro"),
+ *     @OA\Property(property="requiredDocumentsCount", type="integer", example=5, description="Número de documentos requeridos asociados")
+ * )
+ *
+ * @OA\Schema(
+ *     schema="DocumentTypeDetailed",
+ *     allOf={
+ *         @OA\Schema(ref="#/components/schemas/DocumentType"),
+ *         @OA\Schema(
+ *             @OA\Property(
+ *                 property="requiredDocuments",
+ *                 type="object",
+ *                 description="Documentos requeridos asociados (incluido condicionalmente)"
+ *             ),
+ *             @OA\Property(
+ *                 property="statistics",
+ *                 type="object",
+ *                 description="Estadísticas del tipo de documento (incluido condicionalmente)",
+ *                 @OA\Property(property="requiredDocumentsCount", type="integer", example=5),
+ *                 @OA\Property(property="activeRequiredDocumentsCount", type="integer", example=3),
+ *                 @OA\Property(property="processesCount", type="integer", example=2)
+ *             ),
+ *             @OA\Property(
+ *                 property="meta",
+ *                 type="object",
+ *                 @OA\Property(property="resourceType", type="string", example="document_type"),
+ *                 @OA\Property(property="generatedAt", type="string", format="date-time"),
+ *                 @OA\Property(property="context", type="array", @OA\Items(type="string"))
+ *             )
+ *         )
+ *     }
+ * )
+ *
+ * @OA\Schema(
  *     schema="Pagination",
  *     type="object",
  *     title="Pagination",

@@ -9,9 +9,7 @@ use App\Models\Subsystem;
 use App\Models\SubsystemGroup;
 use App\Models\ProcessCategory;
 use App\Models\Process;
-use App\Models\DocumentType;
 use App\Models\AcademicRole;
-use App\Models\MetadataSchema;
 use App\Models\StorageUnitType;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -48,20 +46,17 @@ class ProductionSeeder extends Seeder
             // Create subsystem-entity relationships
             $this->createSubsystemEntityRelationships();
 
-            // Create standard document types
-            $this->createStandardDocumentTypes();
-
             // Create standard academic roles
             $this->createStandardAcademicRoles();
-
-            // Create base metadata schemas
-            $this->createBaseMetadataSchemas();
 
             // Create storage unit types
             $this->createStorageUnitTypes();
 
             // Create initial process structure
             $this->createInitialProcessStructure();
+
+            // Seed document related entities
+            $this->call(DocumentProductionSeeder::class);
 
             $this->command->info('✅ Seeder de producción completado exitosamente');
         } finally {
@@ -419,52 +414,6 @@ class ProductionSeeder extends Seeder
     /**
      * Create standard document types
      */
-    private function createStandardDocumentTypes(): void
-    {
-        $this->command->info('📄 Creando tipos de documento estándar...');
-
-        $documentTypes = [
-            // Documentos académicos
-            ['name' => 'Acta de Grado', 'code' => 'ACTA_GRADO'],
-            ['name' => 'Certificado de Estudio', 'code' => 'CERT_ESTUDIO'],
-            ['name' => 'Constancia de Matrícula', 'code' => 'CONST_MATRICULA'],
-            ['name' => 'Diploma', 'code' => 'DIPLOMA'],
-            ['name' => 'Transcript Académico', 'code' => 'TRANSCRIPT'],
-
-            // Documentos de investigación
-            ['name' => 'Proyecto de Investigación', 'code' => 'PROY_INVEST'],
-            ['name' => 'Informe de Investigación', 'code' => 'INF_INVEST'],
-            ['name' => 'Artículo Científico', 'code' => 'ART_CIENTIFICO'],
-            ['name' => 'Tesis de Grado', 'code' => 'TESIS'],
-            ['name' => 'Trabajo de Grado', 'code' => 'TRAB_GRADO'],
-
-            // Documentos administrativos
-            ['name' => 'Resolución', 'code' => 'RESOLUCION'],
-            ['name' => 'Memorando', 'code' => 'MEMORANDO'],
-            ['name' => 'Circular', 'code' => 'CIRCULAR'],
-            ['name' => 'Acta de Reunión', 'code' => 'ACTA_REUNION'],
-            ['name' => 'Informe Administrativo', 'code' => 'INF_ADMIN'],
-
-            // Documentos de laboratorio
-            ['name' => 'Protocolo de Laboratorio', 'code' => 'PROT_LAB'],
-            ['name' => 'Informe de Laboratorio', 'code' => 'INF_LAB'],
-            ['name' => 'Manual de Procedimientos', 'code' => 'MAN_PROC'],
-
-            // Documentos de prácticas
-            ['name' => 'Convenio de Práctica', 'code' => 'CONV_PRACTICA'],
-            ['name' => 'Informe de Práctica', 'code' => 'INF_PRACTICA'],
-            ['name' => 'Evaluación de Práctica', 'code' => 'EVAL_PRACTICA'],
-        ];
-
-        foreach ($documentTypes as $docTypeData) {
-            DocumentType::firstOrCreate([
-                'code' => $docTypeData['code']
-            ], $docTypeData);
-        }
-
-        $this->command->info("   ✓ Document Types: " . DocumentType::count());
-    }
-
     /**
      * Create standard academic roles
      */
@@ -517,40 +466,6 @@ class ProductionSeeder extends Seeder
     /**
      * Create base metadata schemas
      */
-    private function createBaseMetadataSchemas(): void
-    {
-        $this->command->info('📋 Creando esquemas de metadatos base...');
-
-        $metadataSchemas = [
-            [
-                'name' => 'Esquema Básico de Documento',
-                'description' => 'Esquema básico aplicable a cualquier documento del sistema',
-                'version' => 1,
-                'is_canonical' => true,
-            ],
-            [
-                'name' => 'Esquema de Trabajo de Grado',
-                'description' => 'Esquema específico para trabajos de grado y tesis',
-                'version' => 1,
-                'is_canonical' => true,
-            ],
-            [
-                'name' => 'Esquema de Investigación',
-                'description' => 'Esquema para proyectos e informes de investigación',
-                'version' => 1,
-                'is_canonical' => true,
-            ]
-        ];
-
-        foreach ($metadataSchemas as $schemaData) {
-            MetadataSchema::firstOrCreate([
-                'name' => $schemaData['name']
-            ], $schemaData);
-        }
-
-        $this->command->info("   ✓ Metadata Schemas: " . MetadataSchema::count());
-    }
-
     /**
      * Create storage unit types
      */

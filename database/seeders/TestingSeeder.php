@@ -43,6 +43,9 @@ class TestingSeeder extends Seeder
             // Crear datos de soporte
             $this->createSupportData();
 
+            // Crear entidades de documentos
+            $this->call(DocumentTestingSeeder::class);
+
             // Crear grupos de subsistemas y relaciones
             $this->createSubsystemGroupsAndRelationships();
 
@@ -181,22 +184,6 @@ class TestingSeeder extends Seeder
             Subsystem::create($subsystemData);
         }
 
-        // Create document types
-        $documentTypes = [
-            ['name' => 'Acta', 'code' => 'ACTA'],
-            ['name' => 'Certificado', 'code' => 'CERT'],
-            ['name' => 'Constancia', 'code' => 'CONST'],
-            ['name' => 'Informe', 'code' => 'INF'],
-            ['name' => 'Resolución', 'code' => 'RES'],
-            ['name' => 'Memorando', 'code' => 'MEM'],
-            ['name' => 'Circular', 'code' => 'CIRC'],
-            ['name' => 'Proyecto', 'code' => 'PROY'],
-        ];
-
-        foreach ($documentTypes as $docTypeData) {
-            DocumentType::create($docTypeData);
-        }
-
         // Create academic roles
         $academicRoles = [
             ['name' => 'Estudiante', 'code' => 'EST'],
@@ -212,30 +199,8 @@ class TestingSeeder extends Seeder
             AcademicRole::create($roleData);
         }
 
-        // Create sample metadata schemas
-        $metadataSchemas = [
-            [
-                'name' => 'Esquema de Proyecto de Grado',
-                'description' => 'Esquema para metadatos de proyectos de grado',
-                'version' => 1,
-                'is_canonical' => true,
-            ],
-            [
-                'name' => 'Esquema de Certificación',
-                'description' => 'Esquema para metadatos de certificaciones',
-                'version' => 1,
-                'is_canonical' => true,
-            ]
-        ];
-
-        foreach ($metadataSchemas as $schemaData) {
-            MetadataSchema::create($schemaData);
-        }
-
         $this->command->info("   ✓ Subsystems: " . Subsystem::count());
-        $this->command->info("   ✓ Document Types: " . DocumentType::count());
         $this->command->info("   ✓ Academic Roles: " . AcademicRole::count());
-        $this->command->info("   ✓ Metadata Schemas: " . MetadataSchema::count());
     }
 
     /**

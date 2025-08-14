@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class DocumentTypeResource extends JsonResource
+class DocumentTypeResource extends BaseResource
 {
     /**
      * Transform the resource into an array.
@@ -24,14 +24,14 @@ class DocumentTypeResource extends JsonResource
             'createdBy' => $this->created_by,
             'updatedBy' => $this->updated_by,
             'version' => $this->version,
-            
+
             // Conditional relationships
             'requiredDocuments' => RequiredDocumentResource::collection($this->whenLoaded('requiredDocuments')),
             'requiredDocumentsCount' => $this->when(
                 $this->relationLoaded('requiredDocuments'),
                 fn() => $this->requiredDocuments->count()
             ),
-            
+
             // Statistics (added via resolveIncludes)
             'statistics' => $this->when(
                 isset($this->statistics),
@@ -53,15 +53,25 @@ class DocumentTypeResource extends JsonResource
     protected function getMetaContext(Request $request): array
     {
         $context = ['basic'];
-        
+
         if ($this->relationLoaded('requiredDocuments')) {
             $context[] = 'requiredDocuments';
         }
-        
+
         if (isset($this->statistics)) {
             $context[] = 'statistics';
         }
 
         return $context;
+    }
+
+    protected function getMinimalFields(): array
+    {
+        // TODO: Implement getMinimalFields() method.
+    }
+
+    protected function getResourceType(): string
+    {
+        // TODO: Implement getResourceType() method.
     }
 }

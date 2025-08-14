@@ -46,13 +46,13 @@ class DocumentTypeService
     }
 
     /**
-     * Find document type by ID
+     * Find a document type by ID
      */
     public function findById(string $id): ?DocumentType
     {
         $this->validateUuid($id);
         return DocumentType::with(['requiredDocuments'])
-            ->find($id);
+            ->findOrFail($id);
     }
 
     /**
@@ -95,10 +95,6 @@ class DocumentTypeService
         $data = DocumentType::convertToSnakeCase($data);
 
         $documentType = $this->findById($id);
-
-        if (!$documentType) {
-            throw new ModelNotFoundException('Tipo de documento no encontrado');
-        }
 
         if (isset($data['code']) && $this->codeExists($data['code'], $id)) {
             throw new \InvalidArgumentException('Ya existe un tipo de documento con este código');
@@ -182,7 +178,7 @@ class DocumentTypeService
     public function bulkDelete(array $ids): int
     {
         $validIds = [];
-        
+
         foreach ($ids as $id) {
             if ($this->isValidUuid($id)) {
                 $validIds[] = $id;
@@ -212,11 +208,11 @@ class DocumentTypeService
     private function codeExists(string $code, ?string $excludeId = null): bool
     {
         $query = DocumentType::byCode($code);
-        
+
         if ($excludeId) {
             $query->where('id', '!=', $excludeId);
         }
-        
+
         return $query->exists();
     }
 
@@ -226,11 +222,11 @@ class DocumentTypeService
     private function nameExists(string $name, ?string $excludeId = null): bool
     {
         $query = DocumentType::where('name', $name);
-        
+
         if ($excludeId) {
             $query->where('id', '!=', $excludeId);
         }
-        
+
         return $query->exists();
     }
 
@@ -240,7 +236,7 @@ class DocumentTypeService
     public function resolveIncludes(array $requestedIncludes, $documentType): void
     {
         $allowedIncludes = ['requiredDocuments', 'statistics'];
-        
+
         foreach ($requestedIncludes as $include) {
             if (in_array($include, $allowedIncludes)) {
                 switch ($include) {
@@ -261,7 +257,7 @@ class DocumentTypeService
         $sortDirection = $filters['sort_direction'] ?? 'desc';
 
         $allowedSortFields = ['name', 'code', 'created_at', 'updated_at'];
-        
+
         if (in_array($sortBy, $allowedSortFields)) {
             $query->orderBy($sortBy, $sortDirection);
         }

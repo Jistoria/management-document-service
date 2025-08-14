@@ -2,6 +2,8 @@
 
 return [
 
+    'jwks_url' => env('AUTH_JWKS_URL', 'http://auth-service/.well-known/jwks.json'),
+
     /*
     |--------------------------------------------------------------------------
     | Authentication Defaults
@@ -16,6 +18,7 @@ return [
     'defaults' => [
         'guard' => env('AUTH_GUARD', 'web'),
         'passwords' => env('AUTH_PASSWORD_BROKER', 'users'),
+        'jwks_url' => env('AUTH_JWKS_URL', 'http://auth-service/.well-known/jwks.json'),
     ],
 
     /*

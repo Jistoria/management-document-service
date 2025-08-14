@@ -46,5 +46,14 @@ services:
       "
     restart: "no"
 
+  redis:
+    image: redis:7-alpine
+    container_name: redis_auth
+    ports:
+        - "6379:6379"
+    volumes:
+        - ./data/redis:/data
+
+
 volumes:
   postgres_data:

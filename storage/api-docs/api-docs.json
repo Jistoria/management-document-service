@@ -3404,6 +3404,885 @@
                 }
             }
         },
+        "/metadata-fields": {
+            "get": {
+                "tags": [
+                    "Metadata Fields"
+                ],
+                "summary": "List metadata fields",
+                "operationId": "2a63f3e46eb3eb759ee35ead0963d96f",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search by name",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "schema_id",
+                        "in": "query",
+                        "description": "Filter by schema ID",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "data_type",
+                        "in": "query",
+                        "description": "Filter by data type",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "is_required",
+                        "in": "query",
+                        "description": "Filter by required flag",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "is_reference",
+                        "in": "query",
+                        "description": "Filter by reference flag",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Metadata fields retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Metadata fields retrieved successfully"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/MetadataField"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Metadata Fields"
+                ],
+                "summary": "Create a metadata field",
+                "operationId": "a35cc0b1b8b32202e537463e9fcefb2b",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "schema_id",
+                                    "name",
+                                    "data_type"
+                                ],
+                                "properties": {
+                                    "schema_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "data_type": {
+                                        "type": "string"
+                                    },
+                                    "is_required": {
+                                        "type": "boolean"
+                                    },
+                                    "default_value": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "validation_regex": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "field_order": {
+                                        "type": "integer",
+                                        "nullable": true
+                                    },
+                                    "lookup_keywords": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "nullable": true
+                                    },
+                                    "ocr_hint": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "ignore_in_similarity": {
+                                        "type": "boolean"
+                                    },
+                                    "is_reference": {
+                                        "type": "boolean"
+                                    },
+                                    "reference_entity": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "reference_column": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Metadata field created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Metadata field created successfully"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/MetadataField"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/metadata-fields/{id}": {
+            "get": {
+                "tags": [
+                    "Metadata Fields"
+                ],
+                "summary": "Retrieve a metadata field",
+                "operationId": "a6abcfbb30994924e088508f6a4ebed0",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Metadata field ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Metadata field retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Metadata field retrieved successfully"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/MetadataField"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Metadata Fields"
+                ],
+                "summary": "Update a metadata field",
+                "operationId": "81d126cccf74c247649f775debbae142",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Metadata field ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "schema_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "data_type": {
+                                        "type": "string"
+                                    },
+                                    "is_required": {
+                                        "type": "boolean"
+                                    },
+                                    "default_value": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "validation_regex": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "field_order": {
+                                        "type": "integer",
+                                        "nullable": true
+                                    },
+                                    "lookup_keywords": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "nullable": true
+                                    },
+                                    "ocr_hint": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "ignore_in_similarity": {
+                                        "type": "boolean"
+                                    },
+                                    "is_reference": {
+                                        "type": "boolean"
+                                    },
+                                    "reference_entity": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "reference_column": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Metadata field updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Metadata field updated successfully"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/MetadataField"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Metadata Fields"
+                ],
+                "summary": "Delete a metadata field",
+                "operationId": "315159ec1b033453d91319c672391fa3",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Metadata field ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Metadata field deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Metadata field deleted successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "format": "uuid"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/metadata-fields/bulk-delete": {
+            "post": {
+                "tags": [
+                    "Metadata Fields"
+                ],
+                "summary": "Bulk delete metadata fields",
+                "operationId": "37ea17a1eb9b7b34ca470d0677bc12ea",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "ids"
+                                ],
+                                "properties": {
+                                    "ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Bulk deletion completed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Bulk deletion completed"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "deleted_count": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/metadata-schemas": {
+            "get": {
+                "tags": [
+                    "Metadata Schemas"
+                ],
+                "summary": "List metadata schemas",
+                "operationId": "80ae31cbb7056a6bce1f53068a3f0de7",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search by name",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "parent_schema_id",
+                        "in": "query",
+                        "description": "Filter by parent schema ID",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "is_canonical",
+                        "in": "query",
+                        "description": "Filter by canonical flag",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "external_system_id",
+                        "in": "query",
+                        "description": "Filter by external system ID",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Metadata schemas retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Metadata schemas retrieved successfully"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/MetadataSchema"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Metadata Schemas"
+                ],
+                "summary": "Create a metadata schema",
+                "operationId": "222402d36d2792361f183b8d7be82812",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "parent_schema_id": {
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "nullable": true
+                                    },
+                                    "is_canonical": {
+                                        "type": "boolean"
+                                    },
+                                    "external_system_id": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "api_endpoint": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "cache_ttl": {
+                                        "type": "integer",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Metadata schema created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Metadata schema created successfully"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/MetadataSchema"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/metadata-schemas/{id}": {
+            "get": {
+                "tags": [
+                    "Metadata Schemas"
+                ],
+                "summary": "Retrieve a metadata schema",
+                "operationId": "7bb22ca861fbd3dffb12f624510ee52d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Metadata schema ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Metadata schema retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Metadata schema retrieved successfully"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/MetadataSchema"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Metadata Schemas"
+                ],
+                "summary": "Update a metadata schema",
+                "operationId": "7f59d258fe95a4d02878ec4e67b3b4fa",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Metadata schema ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "parent_schema_id": {
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "nullable": true
+                                    },
+                                    "is_canonical": {
+                                        "type": "boolean",
+                                        "nullable": true
+                                    },
+                                    "external_system_id": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "api_endpoint": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "cache_ttl": {
+                                        "type": "integer",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Metadata schema updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Metadata schema updated successfully"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/MetadataSchema"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Metadata Schemas"
+                ],
+                "summary": "Delete a metadata schema",
+                "operationId": "593dccd007f6a8d1c132e9f99ccd5cf4",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Metadata schema ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Metadata schema deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Metadata schema deleted successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "format": "uuid"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/metadata-schemas/{id}/restore": {
+            "post": {
+                "tags": [
+                    "Metadata Schemas"
+                ],
+                "summary": "Restore a metadata schema",
+                "operationId": "3a9526a43b7b334c92b623c586f747dc",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Metadata schema ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Metadata schema restored successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Metadata schema restored successfully"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/MetadataSchema"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/metadata-schemas/bulk-delete": {
+            "post": {
+                "tags": [
+                    "Metadata Schemas"
+                ],
+                "summary": "Bulk delete metadata schemas",
+                "operationId": "af341a2b1c5dec16cf471c7a9f9df736",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "ids"
+                                ],
+                                "properties": {
+                                    "ids": {
+                                        "description": "Array of metadata schema IDs to delete",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Bulk deletion completed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Bulk deletion completed"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "deleted_count": {
+                                                    "type": "integer",
+                                                    "example": 3
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/process-categories": {
             "get": {
                 "tags": [
@@ -5638,6 +6517,132 @@
                     }
                 ]
             },
+            "MetadataSchema": {
+                "title": "Metadata Schema",
+                "description": "Definition of a metadata schema",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "0197d795-7572-7331-903b-3aeed9fb34c2"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Invoice"
+                    },
+                    "description": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "parentSchemaId": {
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": true
+                    },
+                    "isCanonical": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "version": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "externalSystemId": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "apiEndpoint": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "cacheTtl": {
+                        "description": "Cache time-to-live in seconds",
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "MetadataField": {
+                "title": "Metadata Field",
+                "description": "Field definition within a metadata schema",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "0197d795-7572-7331-903b-3aeed9fb34c2"
+                    },
+                    "schemaId": {
+                        "description": "Parent schema ID",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "dataType": {
+                        "type": "string",
+                        "example": "string"
+                    },
+                    "isRequired": {
+                        "type": "boolean"
+                    },
+                    "defaultValue": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "validationRegex": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "fieldOrder": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "lookupKeywords": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "nullable": true
+                    },
+                    "ocrHint": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "ignoreInSimilarity": {
+                        "type": "boolean"
+                    },
+                    "isReference": {
+                        "type": "boolean"
+                    },
+                    "referenceEntity": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "referenceColumn": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
             "Pagination": {
                 "title": "Pagination",
                 "description": "Información de paginación",
@@ -6362,6 +7367,14 @@
         {
             "name": "HeadOffices",
             "description": "Operaciones para gestión de Sedes"
+        },
+        {
+            "name": "Metadata Fields",
+            "description": "API endpoints for managing metadata fields"
+        },
+        {
+            "name": "Metadata Schemas",
+            "description": "API endpoints for managing metadata schemas"
         },
         {
             "name": "Subsystems",

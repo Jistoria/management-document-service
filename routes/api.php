@@ -9,6 +9,7 @@ use App\Http\Controllers\SubsystemController;
 use App\Http\Controllers\SubsystemEntityLinkController;
 use App\Http\Controllers\SubsystemGroupController;
 use App\Http\Controllers\DocumentTypeController;
+use App\Http\Controllers\RequiredDocumentController;
 use App\Http\Controllers\MetadataFieldController;
 use App\Http\Controllers\MetadataSchemaController;
 use Illuminate\Support\Facades\Route;
@@ -150,6 +151,21 @@ Route::prefix('document-types')->group(function () {
     Route::get('/{document_type}/statistics', [DocumentTypeController::class, 'statistics']);
     Route::get('/code/{code}', [DocumentTypeController::class, 'findByCode']);
     Route::post('/bulk-delete', [DocumentTypeController::class, 'bulkDelete']);
+});
+
+Route::prefix('required-documents')->group(function () {
+    // Standard CRUD routes
+    Route::get('/', [RequiredDocumentController::class, 'index']);
+    Route::post('/', [RequiredDocumentController::class, 'store']);
+    Route::get('/{required_document}', [RequiredDocumentController::class, 'show']);
+    Route::put('/{required_document}', [RequiredDocumentController::class, 'update']);
+    Route::patch('/{required_document}', [RequiredDocumentController::class, 'update']);
+    Route::delete('/{required_document}', [RequiredDocumentController::class, 'destroy']);
+
+    // Additional routes
+    Route::post('/{required_document}/restore', [RequiredDocumentController::class, 'restore']);
+    Route::get('/{required_document}/statistics', [RequiredDocumentController::class, 'statistics']);
+    Route::post('/bulk-delete', [RequiredDocumentController::class, 'bulkDelete']);
 });
 
 Route::prefix('metadata-schemas')->group(function () {

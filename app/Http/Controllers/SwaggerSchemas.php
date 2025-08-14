@@ -122,6 +122,41 @@ namespace App\Http\Controllers;
  *                 @OA\Property(property="context", type="array", @OA\Items(type="string"))
  *             )
  *         )
+ *     } 
+ * )
+
+ * @OA\Schema(
+ *     schema="RequiredDocument",
+ *     type="object",
+ *     title="Required Document",
+ *     description="Defines a document required for a process or metadata schema",
+ *     @OA\Property(property="id", type="string", format="uuid", example="0197d795-7572-7331-903b-3aeed9fb34c2"),
+ *     @OA\Property(property="processId", type="string", format="uuid", nullable=true),
+ *     @OA\Property(property="documentTypeId", type="string", format="uuid"),
+ *     @OA\Property(property="academicRoleId", type="string", format="uuid", nullable=true),
+ *     @OA\Property(property="metadataSchemaId", type="string", format="uuid", nullable=true),
+ *     @OA\Property(property="order", type="integer", example=1),
+ *     @OA\Property(property="mandatory", type="boolean", example=true),
+ *     @OA\Property(property="externalUserId", type="string", nullable=true),
+ *     @OA\Property(property="externalOrganizationId", type="string", nullable=true),
+ *     @OA\Property(property="createdAt", type="string", format="date-time"),
+ *     @OA\Property(property="updatedAt", type="string", format="date-time")
+ * )
+ *
+ * @OA\Schema(
+ *     schema="RequiredDocumentDetailed",
+ *     allOf={
+ *         @OA\Schema(ref="#/components/schemas/RequiredDocument"),
+ *        @OA\Schema(
+ *            @OA\Property(property="documentType", ref="#/components/schemas/DocumentType", description="Included conditionally"),
+ *            @OA\Property(property="process", type="object", description="Included conditionally"),
+ *            @OA\Property(property="statistics", type="object", description="Statistics (included conditionally)"),
+ *            @OA\Property(property="meta", type="object",
+ *                @OA\Property(property="resourceType", type="string", example="required_document"),
+ *                @OA\Property(property="generatedAt", type="string", format="date-time"),
+ *                @OA\Property(property="context", type="array", @OA\Items(type="string"))
+ *            )
+ *        )
  *     }
  * )
  *

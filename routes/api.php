@@ -10,6 +10,7 @@ use App\Http\Controllers\SubsystemEntityLinkController;
 use App\Http\Controllers\SubsystemGroupController;
 use App\Http\Controllers\DocumentTypeController;
 use App\Http\Controllers\MetadataFieldController;
+use App\Http\Controllers\MetadataSchemaController;
 use Illuminate\Support\Facades\Route;
 
 // Head Offices Routes
@@ -149,6 +150,18 @@ Route::prefix('document-types')->group(function () {
     Route::get('/{document_type}/statistics', [DocumentTypeController::class, 'statistics']);
     Route::get('/code/{code}', [DocumentTypeController::class, 'findByCode']);
     Route::post('/bulk-delete', [DocumentTypeController::class, 'bulkDelete']);
+});
+
+Route::prefix('metadata-schemas')->group(function () {
+    Route::get('/', [MetadataSchemaController::class, 'index']);
+    Route::post('/', [MetadataSchemaController::class, 'store']);
+    Route::get('/{metadata_schema}', [MetadataSchemaController::class, 'show']);
+    Route::put('/{metadata_schema}', [MetadataSchemaController::class, 'update']);
+    Route::patch('/{metadata_schema}', [MetadataSchemaController::class, 'update']);
+    Route::delete('/{metadata_schema}', [MetadataSchemaController::class, 'destroy']);
+
+    Route::post('/{metadata_schema}/restore', [MetadataSchemaController::class, 'restore']);
+    Route::post('/bulk-delete', [MetadataSchemaController::class, 'bulkDelete']);
 });
 
 Route::prefix('metadata-fields')->group(function () {

@@ -169,6 +169,10 @@ class ApiIndexBuilder
         $camelCaseFilters = [
             'headOfficeId' => 'head_office_id',
             'departmentId' => 'department_id',
+            'processId' => 'process_id',
+            'documentTypeId' => 'document_type_id',
+            'academicRoleId' => 'academic_role_id',
+            'metadataSchemaId' => 'metadata_schema_id',
         ];
 
         foreach ($camelCaseFilters as $camelCase => $snakeCase) {

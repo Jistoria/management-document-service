@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\Auditable;
+use App\Traits\HasCamelCaseAttributes;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -30,7 +31,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class RequiredDocument extends Model
 {
-    use HasFactory, HasUuids, SoftDeletes, Auditable;
+    use HasFactory, HasUuids, SoftDeletes, Auditable, HasCamelCaseAttributes;
 
     /**
      * The table associated with the model.

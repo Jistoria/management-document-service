@@ -200,6 +200,20 @@ Route::middleware(['verify.jwt'])->group(function () {
 });
 
 
+
+Route::middleware(['auth.service', 'roles.service'])->group(function () {
+    Route::get('/documentos/prueba', function () {
+        // Accede al user_id si lo guardaste en el middleware
+        $userId = request()->attributes->get('user_id');
+
+        return response()->json([
+            'message' => 'Acceso concedido',
+            'user_id' => $userId,
+        ]);
+    });
+});
+
+
 Route::fallback(function () {
     return response()->json(['message' => 'API connection successful.'], 200);
 });

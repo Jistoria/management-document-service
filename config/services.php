@@ -14,6 +14,17 @@ return [
     |
     */
 
+    'kafka' => [
+        'brokers' => env('KAFKA_BROKERS'),
+        'client_id' => env('KAFKA_CLIENT_ID'),
+        'security_protocol' => env('KAFKA_SECURITY_PROTOCOL'),
+        'sasl_username' => env('KAFKA_SASL_USERNAME'),
+        'sasl_password' => env('KAFKA_SASL_PASSWORD'),
+        'sasl_mechanisms' => env('KAFKA_SASL_MECHANISMS'),
+        'debug' => env('KAFKA_DEBUG'),
+        'e2e' => env('KAFKA_E2E'),
+    ],
+
     'postmark' => [
         'token' => env('POSTMARK_TOKEN'),
     ],

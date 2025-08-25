@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Process;
 use App\Models\ProcessCategory;
 use App\Traits\ValidatesUuid;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -83,16 +84,15 @@ class ProcessCategoryService
     {
         $data = ProcessCategory::convertToSnakeCase($data);
 
-        if($this->codeExists($data['code'])) {
+        if ($this->codeExists($data['code'])) {
             throw new \InvalidArgumentException("El código '{$data['code']}' ya existe.");
         }
 
-        if($this->nameExists($data['name'])) {
+        if ($this->nameExists($data['name'])) {
             throw new \InvalidArgumentException("El nombre '{$data['name']}' ya existe.");
         }
 
         return ProcessCategory::create($data);
-
     }
 
     public function update(array $data, string $id): ProcessCategory
@@ -103,11 +103,11 @@ class ProcessCategoryService
 
         $processCategory = $this->findById($id);
 
-        if($this->codeExists($data['code'], $id)) {
+        if ($this->codeExists($data['code'], $id)) {
             throw new \InvalidArgumentException("El código '{$data['code']}' ya existe.");
         }
 
-        if($this->nameExists($data['name'], $id)) {
+        if ($this->nameExists($data['name'], $id)) {
             throw new \InvalidArgumentException("El nombre '{$data['name']}' ya existe.");
         }
 
@@ -124,6 +124,12 @@ class ProcessCategoryService
         return $processCategory->delete();
     }
 
+    public function getProcesses(string $categoryId): Collection
+    {
+        $this->validateUuid($categoryId, ProcessCategory::class);
+
+        return Process::where('process_category_id', $categoryId)->get();
+    }
 
     private function codeExists(string $code, ?string $excludeId = null): bool
     {

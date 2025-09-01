@@ -115,6 +115,8 @@ services:
               condition: service_completed_successfully
           db:
               condition: service_healthy
+      networks:
+          - management-net
 
   scheduler:
       image: management-app
@@ -129,6 +131,8 @@ services:
               condition: service_completed_successfully
           db:
               condition: service_healthy
+      networks:
+          - management-net
 
 
 volumes:

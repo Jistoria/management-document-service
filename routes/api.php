@@ -195,9 +195,9 @@ Route::prefix('metadata-fields')->group(function () {
 // Nested route for careers by department
 Route::get('/departments/{departmentId}/careers', [CareerController::class, 'getByDepartment']);
 
-Route::middleware(['verify.jwt'])->group(function () {
-    Route::get('/secure/data', fn() => response()->json(['ok' => true]));
-});
+// Route::middleware(['verify.jwt'])->group(function () {
+//     Route::get('/secure/data', fn() => response()->json(['ok' => true]));
+// });
 
 
 

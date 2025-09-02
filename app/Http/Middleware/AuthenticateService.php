@@ -27,8 +27,14 @@ class AuthenticateService
         // Obtener clave de cache según el tipo de token
         $cacheKey = $this->getCacheKey($tokenType, $tokenHash);
 
+        Log::info('[AuthenticateService] Validating token', [
+            'type' => $tokenType,
+            'hash' => substr($tokenHash, 0, 8),
+            'cache_key' => $cacheKey
+        ]);
+
         // Verificar en Redis si ya fue validado por el auth-service
-        $validationData = Redis::get($cacheKey);
+        $validationData = Redis::connection('default')->get($cacheKey);
         if (!$validationData) {
             Log::warning('[AuthenticateService] Token not found in cache', [
                 'type' => $tokenType,
@@ -102,10 +108,10 @@ class AuthenticateService
     private function getCacheKey(string $tokenType, string $tokenHash): string
     {
         return match ($tokenType) {
-            'local' => "jwt:local:{$tokenHash}",
-            'azure' => "jwt:validated:{$tokenHash}",
-            'microservice' => "jwt:ms:{$tokenHash}",
-            default => "jwt:validated:{$tokenHash}"
+            'local' => "laravel_database_local_token:{$tokenHash}",
+            'azure' => "laravel_database_azure_token:{$tokenHash}",
+            'microservice' => "laravel_database_ms_token:{$tokenHash}",
+            default => "laravel_database_local_token:{$tokenHash}"
         };
     }
 }

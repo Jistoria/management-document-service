@@ -12,7 +12,7 @@ class RolesService
 {
     public function __construct(private string $requiredPermission = 'document.view') {}
 
-    public function handle(Request $request, Closure $next, string|null $requiredPermission)
+    public function handle(Request $request, Closure $next, $requiredPermission = null)
     {
         $this->requiredPermission = $requiredPermission ?? $this->requiredPermission;
 
@@ -25,11 +25,10 @@ class RolesService
         }
 
         // Obtener ID o CODE del microservicio desde headers
-        $microId = $request->header('X-Microservice-ID');
-        $microCode = $request->header('X-Microservice-Code');
+        $microCode = config('app.name'); // Usar nombre de la app como código
 
-        if (!$microId && !$microCode) {
-            return response()->json(['message' => 'Falta X-Microservice-ID o X-Microservice-Code'], 400);
+        if (!$microCode) {
+            return response()->json(['message' => 'Falta X-Microservice-Code'], 400);
         }
 
         // Obtener sesión unificada desde Redis
@@ -40,12 +39,19 @@ class RolesService
 
         Log::info('[RolesService] Session data retrieved', [
             'user_id' => $sessionData['user_id'] ?? 'unknown',
-            'microservice_id' => $microId,
             'microservice_code' => $microCode
         ]);
 
         // Localizar datos del microservicio en la sesión
-        $microserviceEntry = $this->findMicroserviceEntry($sessionData, $microId, $microCode);
+        $microserviceEntry = $this->findMicroserviceEntry($sessionData, null, $microCode);
+
+        Log::info('[RolesService] Microservice lookup', [
+            'microCode' => $microCode,
+            'found_entry' => $microserviceEntry ? 'yes' : 'no',
+            'available_codes' => array_keys($sessionData['microservices_by_code'] ?? []),
+            'session_structure' => array_keys($sessionData)
+        ]);
+
         if (!$microserviceEntry) {
             return response()->json(['message' => 'Microservicio no autorizado en sesión'], 403);
         }
@@ -65,12 +71,12 @@ class RolesService
         }
 
         // Propagar datos útiles a la request
-        $this->setRequestAttributes($request, $sessionData, $microserviceEntry, $microId);
+        $this->setRequestAttributes($request, $sessionData, $microserviceEntry, $microCode);
 
         Log::info('[RolesService] Authorization successful', [
             'user_id' => $sessionData['user_id'],
             'permission' => $this->requiredPermission,
-            'microservice' => $microserviceEntry['code'] ?? $microId
+            'microservice' => $microserviceEntry['code'] ?? $microCode
         ]);
 
         return $next($request);
@@ -82,11 +88,21 @@ class RolesService
     private function getUnifiedSession(string $tokenHash, string $tokenType): ?array
     {
         // Primero intentar obtener sesión específica del microservicio
-        $sessionKey = "ms:session:{$tokenHash}";
-        $sessionData = Redis::get($sessionKey);
+        $sessionKey = "laravel_database_ms:session:{$tokenHash}";
+        $sessionData = Redis::connection('default')->get($sessionKey);
 
         if ($sessionData) {
             return json_decode($sessionData, true) ?: null;
+        }
+
+        // Para tokens locales, intentar la clave de sesión local
+        if ($tokenType === 'local') {
+            $localSessionKey = "laravel_database_local:session:{$tokenHash}";
+            $sessionData = Redis::connection('default')->get($localSessionKey);
+
+            if ($sessionData) {
+                return json_decode($sessionData, true) ?: null;
+            }
         }
 
         // Si no existe sesión específica, construir desde datos de validación
@@ -99,7 +115,7 @@ class RolesService
     private function buildSessionFromValidation(string $tokenHash, string $tokenType): ?array
     {
         $cacheKey = $this->getCacheKey($tokenType, $tokenHash);
-        $validationData = Redis::get($cacheKey);
+        $validationData = Redis::connection('default')->get($cacheKey);
 
         if (!$validationData) {
             return null;
@@ -127,13 +143,13 @@ class RolesService
     /**
      * Construye sesión para tokens de microservicio
      */
-    private function buildMicroserviceSession(array $validation, int $userId): array
+    private function buildMicroserviceSession(array $validation, string $userId): array
     {
         $claims = $validation['claims'] ?? [];
 
         // Obtener datos del usuario desde cache o construir básicos
-        $userCacheKey = "graph:user:{$userId}";
-        $userData = Redis::get($userCacheKey);
+        $userCacheKey = "laravel_database_graph:user:{$userId}";
+        $userData = Redis::connection('default')->get($userCacheKey);
 
         if ($userData) {
             $userData = json_decode($userData, true);
@@ -152,24 +168,46 @@ class RolesService
             'token_type' => 'microservice'
         ];
     }
-
     /**
      * Construye sesión para tokens locales
      */
-    private function buildLocalSession(array $validation, int $userId): array
+    private function buildLocalSession(array $validation, string $userId): array
     {
         // Obtener datos del usuario local desde cache
-        $userCacheKey = "local:user:{$userId}";
-        $userData = Redis::get($userCacheKey);
+        $userCacheKey = "laravel_database_local:user:{$userId}";
+        $userData = Redis::connection('default')->get($userCacheKey);
 
         if ($userData) {
             $userData = json_decode($userData, true);
-            return [
-                'user_id' => $userId,
-                'microservices_by_id' => $userData['microservices_by_id'] ?? [],
-                'microservices_by_code' => $userData['microservices_by_code'] ?? [],
-                'token_type' => 'local'
-            ];
+
+            // Si el usuario tiene datos de microservicios, usarlos
+            if (isset($userData['microservices_by_id']) || isset($userData['microservices_by_code'])) {
+                return [
+                    'user_id' => $userId,
+                    'microservices_by_id' => $userData['microservices_by_id'] ?? [],
+                    'microservices_by_code' => $userData['microservices_by_code'] ?? [],
+                    'token_type' => 'local'
+                ];
+            }
+
+            // Si no tiene datos de microservicios pero tiene permisos, construir estructura básica
+            if (isset($userData['permissions'])) {
+                $appName = config('app.name');
+                $microserviceData = [
+                    'id' => $appName,
+                    'code' => $appName,
+                    'name' => $appName,
+                    'permissions' => $userData['permissions'],
+                    'roles' => $userData['roles'] ?? []
+                ];
+
+                return [
+                    'user_id' => $userId,
+                    'microservices_by_id' => [$appName => $microserviceData],
+                    'microservices_by_code' => [$appName => $microserviceData],
+                    'token_type' => 'local'
+                ];
+            }
         }
 
         return [
@@ -179,7 +217,6 @@ class RolesService
             'token_type' => 'local'
         ];
     }
-
     /**
      * Construye índice de microservicios por ID
      */
@@ -245,10 +282,10 @@ class RolesService
     private function getCacheKey(string $tokenType, string $tokenHash): string
     {
         return match ($tokenType) {
-            'local' => "jwt:local:{$tokenHash}",
-            'azure' => "jwt:validated:{$tokenHash}",
-            'microservice' => "jwt:ms:{$tokenHash}",
-            default => "jwt:validated:{$tokenHash}"
+            'local' => "laravel_database_local_token:{$tokenHash}",
+            'azure' => "laravel_database_azure_token:{$tokenHash}",
+            'microservice' => "laravel_database_ms_token:{$tokenHash}",
+            default => "laravel_database_local_token:{$tokenHash}"
         };
     }
 }

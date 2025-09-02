@@ -201,14 +201,16 @@ Route::get('/departments/{departmentId}/careers', [CareerController::class, 'get
 
 
 
-Route::middleware(['auth.service', 'roles.service'])->group(function () {
+Route::middleware(['auth.service', 'roles.service:md.document_type.list'])->group(function () {
     Route::get('/documentos/prueba', function () {
         // Accede al user_id si lo guardaste en el middleware
         $userId = request()->attributes->get('user_id');
+        $permissions = request()->attributes->get('microservice_permissions');
 
         return response()->json([
             'message' => 'Acceso concedido',
             'user_id' => $userId,
+            'available_permissions' => $permissions,
         ]);
     });
 });

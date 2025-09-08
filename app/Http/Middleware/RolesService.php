@@ -154,7 +154,7 @@ class RolesService
     private function buildSession(array $validation, string $userId): array
     {
         // Obtener datos del usuario local desde cache
-        $userCacheKey = "laravel_database_:user:{$userId}";
+        $userCacheKey = "laravel_database_user:{$userId}";
         $userData = Redis::connection('default')->get($userCacheKey);
 
         if ($userData) {

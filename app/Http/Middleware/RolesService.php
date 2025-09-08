@@ -121,34 +121,6 @@ class RolesService
     }
 
     /**
-     * Construye sesión para tokens de microservicio
-     */
-    private function buildMicroserviceSession(array $validation, string $userId): array
-    {
-        $claims = $validation['claims'] ?? [];
-
-        // Obtener datos del usuario desde cache o construir básicos
-        $userCacheKey = "laravel_database_graph:user:{$userId}";
-        $userData = Redis::connection('default')->get($userCacheKey);
-
-        if ($userData) {
-            $userData = json_decode($userData, true);
-        } else {
-            $userData = [
-                'id' => $userId,
-                'microservices_data' => []
-            ];
-        }
-
-        return [
-            'user_id' => $userId,
-            'microservices_by_id' => $this->buildMicroservicesById($userData['microservices_data'] ?? []),
-            'microservices_by_code' => $this->buildMicroservicesByCode($userData['microservices_data'] ?? []),
-            'tenant_id' => $claims['tid'] ?? 'default',
-            'token_type' => 'microservice'
-        ];
-    }
-    /**
      * Construye sesión para tokens locales
      */
     private function buildSession(array $validation, string $userId): array

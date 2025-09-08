@@ -195,20 +195,22 @@ Route::prefix('metadata-fields')->group(function () {
 // Nested route for careers by department
 Route::get('/departments/{departmentId}/careers', [CareerController::class, 'getByDepartment']);
 
-Route::middleware(['verify.jwt'])->group(function () {
-    Route::get('/secure/data', fn() => response()->json(['ok' => true]));
-});
+// Route::middleware(['verify.jwt'])->group(function () {
+//     Route::get('/secure/data', fn() => response()->json(['ok' => true]));
+// });
 
 
 
-Route::middleware(['auth.service', 'roles.service'])->group(function () {
+Route::middleware(['auth.service', 'roles.service:md.document_type.list'])->group(function () {
     Route::get('/documentos/prueba', function () {
         // Accede al user_id si lo guardaste en el middleware
         $userId = request()->attributes->get('user_id');
+        $permissions = request()->attributes->get('microservice_permissions');
 
         return response()->json([
             'message' => 'Acceso concedido',
             'user_id' => $userId,
+            'available_permissions' => $permissions,
         ]);
     });
 });

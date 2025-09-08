@@ -17,22 +17,17 @@ class RolesService
         $this->requiredPermission = $requiredPermission ?? $this->requiredPermission;
 
         $tokenHash = $request->attributes->get('token_hash');
-        $tokenType = $request->attributes->get('token_type');
         $tokenValidation = $request->attributes->get('token_validation');
 
-        if (!$tokenHash || !$tokenType || !$tokenValidation) {
+        if (!$tokenHash || !$tokenValidation) {
             return response()->json(['message' => 'Datos de autenticación faltantes'], 401);
         }
 
         // Obtener ID o CODE del microservicio desde headers
-        $microCode = config('app.name'); // Usar nombre de la app como código
-
-        if (!$microCode) {
-            return response()->json(['message' => 'Falta X-Microservice-Code'], 400);
-        }
+        $microCode = 'management-document-service'; // Usar nombre de la app como código
 
         // Obtener sesión unificada desde Redis
-        $sessionData = $this->getUnifiedSession($tokenHash, $tokenType);
+        $sessionData = $this->getSession($tokenHash);
         if (!$sessionData) {
             return response()->json(['message' => 'Sesión no encontrada'], 403);
         }
@@ -41,6 +36,7 @@ class RolesService
             'user_id' => $sessionData['user_id'] ?? 'unknown',
             'microservice_code' => $microCode
         ]);
+
 
         // Localizar datos del microservicio en la sesión
         $microserviceEntry = $this->findMicroserviceEntry($sessionData, null, $microCode);
@@ -53,7 +49,7 @@ class RolesService
         ]);
 
         if (!$microserviceEntry) {
-            return response()->json(['message' => 'Microservicio no autorizado en sesión'], 403);
+            return response()->json(['message' => 'No permission'], 403);
         }
 
         // Validar permiso requerido
@@ -85,36 +81,26 @@ class RolesService
     /**
      * Obtiene la sesión unificada desde Redis
      */
-    private function getUnifiedSession(string $tokenHash, string $tokenType): ?array
+    private function getSession(string $tokenHash): ?array
     {
         // Primero intentar obtener sesión específica del microservicio
-        $sessionKey = "laravel_database_ms:session:{$tokenHash}";
+        $sessionKey = "laravel_database_session:{$tokenHash}";
         $sessionData = Redis::connection('default')->get($sessionKey);
 
         if ($sessionData) {
             return json_decode($sessionData, true) ?: null;
         }
 
-        // Para tokens locales, intentar la clave de sesión local
-        if ($tokenType === 'local') {
-            $localSessionKey = "laravel_database_local:session:{$tokenHash}";
-            $sessionData = Redis::connection('default')->get($localSessionKey);
-
-            if ($sessionData) {
-                return json_decode($sessionData, true) ?: null;
-            }
-        }
-
         // Si no existe sesión específica, construir desde datos de validación
-        return $this->buildSessionFromValidation($tokenHash, $tokenType);
+        return $this->buildSessionFromValidation($tokenHash);
     }
 
     /**
      * Construye datos de sesión desde la validación del token
      */
-    private function buildSessionFromValidation(string $tokenHash, string $tokenType): ?array
+    private function buildSessionFromValidation(string $tokenHash): ?array
     {
-        $cacheKey = $this->getCacheKey($tokenType, $tokenHash);
+        $cacheKey = $this->getCacheKey($tokenHash);
         $validationData = Redis::connection('default')->get($cacheKey);
 
         if (!$validationData) {
@@ -131,13 +117,7 @@ class RolesService
             return null;
         }
 
-        // Para tokens de microservicio, obtener datos específicos
-        if ($tokenType === 'microservice' || $tokenType === 'azure') {
-            return $this->buildMicroserviceSession($validation, $userId);
-        }
-
-        // Para tokens locales, obtener datos del usuario
-        return $this->buildLocalSession($validation, $userId);
+        return $this->buildSession($validation, $userId);
     }
 
     /**
@@ -171,10 +151,10 @@ class RolesService
     /**
      * Construye sesión para tokens locales
      */
-    private function buildLocalSession(array $validation, string $userId): array
+    private function buildSession(array $validation, string $userId): array
     {
         // Obtener datos del usuario local desde cache
-        $userCacheKey = "laravel_database_local:user:{$userId}";
+        $userCacheKey = "laravel_database_:user:{$userId}";
         $userData = Redis::connection('default')->get($userCacheKey);
 
         if ($userData) {
@@ -250,14 +230,15 @@ class RolesService
      */
     private function findMicroserviceEntry(array $sessionData, ?string $microId, ?string $microCode): ?array
     {
+        Log::info('[RolesService] Session data retrieved', ['session_data' => $sessionData, 'micro_id' => $microId, 'micro_code' => $microCode]);
         // Buscar por ID primero
-        if ($microId && isset($sessionData['microservices_by_id'][$microId])) {
-            return $sessionData['microservices_by_id'][$microId];
+        if ($microId && isset($sessionData['microservices_data']['by_id'][$microId])) {
+            return $sessionData['by_id'][$microId];
         }
 
         // Buscar por código si no se encontró por ID
-        if ($microCode && isset($sessionData['microservices_by_code'][$microCode])) {
-            return $sessionData['microservices_by_code'][$microCode];
+        if ($microCode && isset($sessionData['microservices_data']['by_code'][$microCode])) {
+            return $sessionData['microservices_data']['by_code'][$microCode];
         }
 
         return null;
@@ -279,13 +260,8 @@ class RolesService
     /**
      * Obtiene la clave de cache según el tipo de token
      */
-    private function getCacheKey(string $tokenType, string $tokenHash): string
+    private function getCacheKey(string $tokenHash): string
     {
-        return match ($tokenType) {
-            'local' => "laravel_database_local_token:{$tokenHash}",
-            'azure' => "laravel_database_azure_token:{$tokenHash}",
-            'microservice' => "laravel_database_ms_token:{$tokenHash}",
-            default => "laravel_database_local_token:{$tokenHash}"
-        };
+        return "laravel_database_token:{$tokenHash}";
     }
 }

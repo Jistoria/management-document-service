@@ -17,177 +17,249 @@ use Illuminate\Support\Facades\Route;
 // Head Offices Routes
 Route::prefix('head-offices')->group(function () {
     // Standard CRUD routes
-    Route::get('/', [HeadOfficeController::class, 'index']);
-    Route::post('/', [HeadOfficeController::class, 'store']);
-    Route::get('/{head_office}', [HeadOfficeController::class, 'show']);
-    Route::put('/{head_office}', [HeadOfficeController::class, 'update']);
-    Route::patch('/{head_office}', [HeadOfficeController::class, 'update']);
-    Route::delete('/{head_office}', [HeadOfficeController::class, 'destroy']);
+    Route::get('/', [HeadOfficeController::class, 'index'])
+        ->middleware(['auth.service', 'permission:head_office.read']);
+    Route::post('/', [HeadOfficeController::class, 'store'])
+        ->middleware(['auth.service', 'permission:head_office.create']);
+    Route::get('/{head_office}', [HeadOfficeController::class, 'show'])
+        ->middleware(['auth.service', 'permission:head_office.read']);
+    Route::put('/{head_office}', [HeadOfficeController::class, 'update'])
+        ->middleware(['auth.service', 'permission:head_office.update']);
+    Route::patch('/{head_office}', [HeadOfficeController::class, 'update'])
+        ->middleware(['auth.service', 'permission:head_office.update']);
+    Route::delete('/{head_office}', [HeadOfficeController::class, 'destroy'])
+        ->middleware(['auth.service', 'permission:head_office.delete']);
 
     // Additional routes
-    Route::post('/{head_office}/restore', [HeadOfficeController::class, 'restore']);
-    Route::get('/{head_office}/hierarchy', [HeadOfficeController::class, 'hierarchy']);
-    Route::get('/{head_office}/statistics', [HeadOfficeController::class, 'statistics']);
-    Route::get('/code/{code}', [HeadOfficeController::class, 'findByCode']);
-    Route::post('/bulk-delete', [HeadOfficeController::class, 'bulkDelete']);
+    Route::post('/bulk-delete', [HeadOfficeController::class, 'bulkDelete'])
+        ->middleware(['auth.service', 'permission:head_office.delete']);
 });
 
 // Departments Routes
 Route::prefix('departments')->group(function () {
     // Standard CRUD routes
-    Route::get('/', [DepartmentController::class, 'index']);
-    Route::post('/', [DepartmentController::class, 'store']);
-    Route::get('/{department}', [DepartmentController::class, 'show']);
-    Route::put('/{department}', [DepartmentController::class, 'update']);
-    Route::patch('/{department}', [DepartmentController::class, 'update']);
-    Route::delete('/{department}', [DepartmentController::class, 'destroy']);
+    Route::get('/', [DepartmentController::class, 'index'])
+        ->middleware(['auth.service', 'permission:department.read']);
+    Route::post('/', [DepartmentController::class, 'store'])
+        ->middleware(['auth.service', 'permission:department.create']);
+    Route::get('/{department}', [DepartmentController::class, 'show'])
+        ->middleware(['auth.service', 'permission:department.read']);
+    Route::put('/{department}', [DepartmentController::class, 'update'])
+        ->middleware(['auth.service', 'permission:department.update']);
+    Route::patch('/{department}', [DepartmentController::class, 'update'])
+        ->middleware(['auth.service', 'permission:department.update']);
+    Route::delete('/{department}', [DepartmentController::class, 'destroy'])
+        ->middleware(['auth.service', 'permission:department.delete']);
 
     // Additional routes
-    Route::post('/{department}/restore', [DepartmentController::class, 'restore']);
-    Route::get('/{department}/hierarchy', [DepartmentController::class, 'hierarchy']);
-    Route::get('/{department}/statistics', [DepartmentController::class, 'statistics']);
-    Route::get('/code/{code}', [DepartmentController::class, 'findByCode']);
-    Route::post('/bulk-delete', [DepartmentController::class, 'bulkDelete']);
+    Route::post('/bulk-delete', [DepartmentController::class, 'bulkDelete'])
+        ->middleware(['auth.service', 'permission:department.delete']);
 });
 
 // Careers Routes
 Route::prefix('careers')->group(function () {
     // Standard CRUD routes
-    Route::get('/', [CareerController::class, 'index']);
-    Route::post('/', [CareerController::class, 'store']);
-    Route::get('/{career}', [CareerController::class, 'show']);
-    Route::put('/{career}', [CareerController::class, 'update']);
-    Route::patch('/{career}', [CareerController::class, 'update']);
-    Route::delete('/{career}', [CareerController::class, 'destroy']);
+    Route::get('/', [CareerController::class, 'index'])
+        ->middleware(['auth.service', 'permission:career.read']);
+    Route::post('/', [CareerController::class, 'store'])
+        ->middleware(['auth.service', 'permission:career.create']);
+    Route::get('/{career}', [CareerController::class, 'show'])
+        ->middleware(['auth.service', 'permission:career.read']);
+    Route::put('/{career}', [CareerController::class, 'update'])
+        ->middleware(['auth.service', 'permission:career.update']);
+    Route::patch('/{career}', [CareerController::class, 'update'])
+        ->middleware(['auth.service', 'permission:career.update']);
+    Route::delete('/{career}', [CareerController::class, 'destroy'])
+        ->middleware(['auth.service', 'permission:career.delete']);
 
     // Additional routes
-    Route::post('/{career}/restore', [CareerController::class, 'restore']);
-    Route::get('/{career}/hierarchy', [CareerController::class, 'hierarchy']);
-    Route::get('/{career}/statistics', [CareerController::class, 'statistics']);
-    Route::get('/code/{code}', [CareerController::class, 'findByCode']);
-    Route::post('/bulk-delete', [CareerController::class, 'bulkDelete']);
+    Route::post('/bulk-delete', [CareerController::class, 'bulkDelete'])
+        ->middleware(['auth.service', 'permission:career.delete']);
 });
 
 // Subsystems Routes
 Route::prefix('subsystems')->group(function () {
     // Standard CRUD routes
-    Route::get('/', [SubsystemController::class, 'index']);
-    Route::post('/', [SubsystemController::class, 'store']);
-    Route::get('/{subsystem}', [SubsystemController::class, 'show']);
-    Route::put('/{subsystem}', [SubsystemController::class, 'update']);
-    Route::patch('/{subsystem}', [SubsystemController::class, 'update']);
-    Route::delete('/{subsystem}', [SubsystemController::class, 'destroy']);
+    Route::get('/', [SubsystemController::class, 'index'])
+        ->middleware(['auth.service', 'permission:subsystem.read']);
+    Route::post('/', [SubsystemController::class, 'store'])
+        ->middleware(['auth.service', 'permission:subsystem.create']);
+    Route::get('/{subsystem}', [SubsystemController::class, 'show'])
+        ->middleware(['auth.service', 'permission:subsystem.read']);
+    Route::put('/{subsystem}', [SubsystemController::class, 'update'])
+        ->middleware(['auth.service', 'permission:subsystem.update']);
+    Route::patch('/{subsystem}', [SubsystemController::class, 'update'])
+        ->middleware(['auth.service', 'permission:subsystem.update']);
+    Route::delete('/{subsystem}', [SubsystemController::class, 'destroy'])
+        ->middleware(['auth.service', 'permission:subsystem.delete']);
 
     // Additional routes
-    Route::post('/{subsystem}/restore', [SubsystemController::class, 'restore']);
-    Route::get('/{subsystem}/hierarchy', [SubsystemController::class, 'hierarchy']);
-    Route::get('/{subsystem}/statistics', [SubsystemController::class, 'statistics']);
-    Route::get('/code/{code}', [SubsystemController::class, 'findByCode']);
-    Route::post('/bulk-delete', [SubsystemController::class, 'bulkDelete']);
+    Route::post('/bulk-delete', [SubsystemController::class, 'bulkDelete'])
+        ->middleware(['auth.service', 'permission:subsystem.delete']);
 });
 
 // Subsystem Groups Routes
 Route::prefix('subsystem-groups')->group(function () {
-    Route::get('/', [SubsystemGroupController::class, 'index']);
-    Route::post('/', [SubsystemGroupController::class, 'store']);
-    Route::get('/{subsystemGroup}', [SubsystemGroupController::class, 'show']);
-    Route::put('/{subsystemGroup}', [SubsystemGroupController::class, 'update']);
-    Route::patch('/{subsystemGroup}', [SubsystemGroupController::class, 'update']);
-    Route::delete('/{subsystemGroup}', [SubsystemGroupController::class, 'destroy']);
+    Route::get('/', [SubsystemGroupController::class, 'index'])
+        ->middleware(['auth.service', 'permission:subsystem_group.read']);
+    Route::post('/', [SubsystemGroupController::class, 'store'])
+        ->middleware(['auth.service', 'permission:subsystem_group.create']);
+    Route::get('/{subsystemGroup}', [SubsystemGroupController::class, 'show'])
+        ->middleware(['auth.service', 'permission:subsystem_group.read']);
+    Route::put('/{subsystemGroup}', [SubsystemGroupController::class, 'update'])
+        ->middleware(['auth.service', 'permission:subsystem_group.update']);
+    Route::patch('/{subsystemGroup}', [SubsystemGroupController::class, 'update'])
+        ->middleware(['auth.service', 'permission:subsystem_group.update']);
+    Route::delete('/{subsystemGroup}', [SubsystemGroupController::class, 'destroy'])
+        ->middleware(['auth.service', 'permission:subsystem_group.delete']);
 
-    //Grouped Subsystems
-    Route::put('/{subsystemGroup}/subsystems', [SubsystemGroupController::class, 'syncSubsystems']);
+    // Grouped Subsystems (sync)
+    Route::put('/{subsystemGroup}/subsystems', [SubsystemGroupController::class, 'syncSubsystems'])
+        ->middleware(['auth.service', 'permission:subsystem_group.update']);
 });
 
 // Subsystem Entity Links Routes
 Route::prefix('subsystem-entity-links')->group(function () {
-    Route::get('/', [SubsystemEntityLinkController::class, 'index']);       // GET with query params
-    Route::post('/', [SubsystemEntityLinkController::class, 'store']);      // POST attachment
-    Route::put('/{subsystemId}', [SubsystemEntityLinkController::class, 'update']);
-    Route::delete('/', [SubsystemEntityLinkController::class, 'destroy']);  // DELETE detach
+    Route::get('/', [SubsystemEntityLinkController::class, 'index'])
+        ->middleware(['auth.service', 'permission:subsystem_entity_link.read']);   // consulta
+    Route::post('/', [SubsystemEntityLinkController::class, 'store'])
+        ->middleware(['auth.service', 'permission:subsystem_entity_link.create']); // attach
+    Route::put('/{subsystemId}', [SubsystemEntityLinkController::class, 'update'])
+        ->middleware(['auth.service', 'permission:subsystem_entity_link.update']); // update_link
+    Route::delete('/', [SubsystemEntityLinkController::class, 'destroy'])
+        ->middleware(['auth.service', 'permission:subsystem_entity_link.delete']); // detach
 });
 
-// ProcessCategories Routes
+// Process Categories Routes
 Route::prefix('process-categories')->group(function () {
-    Route::get('/', [ProcessCategoryController::class, 'index']);
-    Route::get('/dropdown', [ProcessCategoryController::class, 'dropdown']);
-    Route::get('/{category}', [ProcessCategoryController::class, 'show']);
-    Route::get('/{category}/processes', [ProcessCategoryController::class, 'processes']);
-    Route::post('/', [ProcessCategoryController::class, 'store']);
-    Route::put('/{category}', [ProcessCategoryController::class, 'update']);
-    Route::delete('/{category}', [ProcessCategoryController::class, 'destroy']);
+    Route::get('/', [ProcessCategoryController::class, 'index'])
+        ->middleware(['auth.service', 'permission:process_category.read']);
+    Route::get('/dropdown', [ProcessCategoryController::class, 'dropdown'])
+        ->middleware(['auth.service', 'permission:process_category.read']);
+    Route::get('/{category}', [ProcessCategoryController::class, 'show'])
+        ->middleware(['auth.service', 'permission:process_category.read']);
+    Route::get('/{category}/processes', [ProcessCategoryController::class, 'processes'])
+        ->middleware(['auth.service', 'permission:process_category.read']);
+    Route::post('/', [ProcessCategoryController::class, 'store'])
+        ->middleware(['auth.service', 'permission:process_category.create']);
+    Route::put('/{category}', [ProcessCategoryController::class, 'update'])
+        ->middleware(['auth.service', 'permission:process_category.update']);
+    Route::delete('/{category}', [ProcessCategoryController::class, 'destroy'])
+        ->middleware(['auth.service', 'permission:process_category.delete']);
 });
 
 // Process Routes
+// Process Routes
 Route::prefix('processes')->group(function () {
-    Route::get('/', [ProcessController::class, 'index']);
-    Route::post('/', [ProcessController::class, 'store']);
-    Route::get('/{process}', [ProcessController::class, 'show']);
-    Route::put('/{process}', [ProcessController::class, 'update']);
-    Route::patch('/{process}', [ProcessController::class, 'update']);
-    Route::delete('/{process}', [ProcessController::class, 'destroy']);
-    Route::post('/{process}/restore', [ProcessController::class, 'restore']);
-    Route::get('/{process}/hierarchy', [ProcessController::class, 'hierarchy']);
-    Route::get('/{process}/statistics', [ProcessController::class, 'statistics']);
-    Route::get('/code/{code}', [ProcessController::class, 'findByCode']);
-    Route::post('/bulk-delete', [ProcessController::class, 'bulkDelete']);
+    Route::get('/', [ProcessController::class, 'index'])
+        ->middleware(['auth.service', 'permission:process.read']);
+    Route::post('/', [ProcessController::class, 'store'])
+        ->middleware(['auth.service', 'permission:process.create']);
+    Route::get('/{process}', [ProcessController::class, 'show'])
+        ->middleware(['auth.service', 'permission:process.read']);
+    Route::put('/{process}', [ProcessController::class, 'update'])
+        ->middleware(['auth.service', 'permission:process.update']);
+    Route::patch('/{process}', [ProcessController::class, 'update'])
+        ->middleware(['auth.service', 'permission:process.update']);
+    Route::delete('/{process}', [ProcessController::class, 'destroy'])
+        ->middleware(['auth.service', 'permission:process.delete']);
+
+    // Extra mapeados
+    Route::post('/{process}/restore', [ProcessController::class, 'restore'])
+        ->middleware(['auth.service', 'permission:process.update']);   // restore -> update
+    Route::get('/{process}/hierarchy', [ProcessController::class, 'hierarchy'])
+        ->middleware(['auth.service', 'permission:process.read']);     // hierarchy -> read
+    Route::get('/{process}/statistics', [ProcessController::class, 'statistics'])
+        ->middleware(['auth.service', 'permission:process.read']);     // statistics -> read
+    Route::get('/code/{code}', [ProcessController::class, 'findByCode'])
+        ->middleware(['auth.service', 'permission:process.read']);     // find_by_code -> read
+    Route::post('/bulk-delete', [ProcessController::class, 'bulkDelete'])
+        ->middleware(['auth.service', 'permission:process.delete']);   // bulk-delete -> delete
 });
+
 
 /*
  * The following routes will be for documentary entities.
  */
 
+// Document Types Routes
 Route::prefix('document-types')->group(function () {
-    // Standard CRUD routes
-    Route::get('/', [DocumentTypeController::class, 'index']);
-    Route::post('/', [DocumentTypeController::class, 'store']);
-    Route::get('/{document_type}', [DocumentTypeController::class, 'show']);
-    Route::put('/{document_type}', [DocumentTypeController::class, 'update']);
-    Route::patch('/{document_type}', [DocumentTypeController::class, 'update']);
-    Route::delete('/{document_type}', [DocumentTypeController::class, 'destroy']);
+    Route::get('/', [DocumentTypeController::class, 'index'])
+        ->middleware(['auth.service', 'permission:document_type.read']);
+    Route::post('/', [DocumentTypeController::class, 'store'])
+        ->middleware(['auth.service', 'permission:document_type.create']);
+    Route::get('/{document_type}', [DocumentTypeController::class, 'show'])
+        ->middleware(['auth.service', 'permission:document_type.read']);
+    Route::put('/{document_type}', [DocumentTypeController::class, 'update'])
+        ->middleware(['auth.service', 'permission:document_type.update']);
+    Route::patch('/{document_type}', [DocumentTypeController::class, 'update'])
+        ->middleware(['auth.service', 'permission:document_type.update']);
+    Route::delete('/{document_type}', [DocumentTypeController::class, 'destroy'])
+        ->middleware(['auth.service', 'permission:document_type.delete']);
 
-    // Additional routes
-    Route::post('/{document_type}/restore', [DocumentTypeController::class, 'restore']);
-    Route::get('/{document_type}/statistics', [DocumentTypeController::class, 'statistics']);
-    Route::get('/code/{code}', [DocumentTypeController::class, 'findByCode']);
-    Route::post('/bulk-delete', [DocumentTypeController::class, 'bulkDelete']);
+    // Extra
+    Route::post('/bulk-delete', [DocumentTypeController::class, 'bulkDelete'])
+        ->middleware(['auth.service', 'permission:document_type.delete']); // bulk-delete -> delete
 });
 
+// Required Documents Routes
 Route::prefix('required-documents')->group(function () {
-    // Standard CRUD routes
-    Route::get('/', [RequiredDocumentController::class, 'index']);
-    Route::post('/', [RequiredDocumentController::class, 'store']);
-    Route::get('/{required_document}', [RequiredDocumentController::class, 'show']);
-    Route::put('/{required_document}', [RequiredDocumentController::class, 'update']);
-    Route::patch('/{required_document}', [RequiredDocumentController::class, 'update']);
-    Route::delete('/{required_document}', [RequiredDocumentController::class, 'destroy']);
+    Route::get('/', [RequiredDocumentController::class, 'index'])
+        ->middleware(['auth.service', 'permission:required_document.read']);
+    Route::post('/', [RequiredDocumentController::class, 'store'])
+        ->middleware(['auth.service', 'permission:required_document.create']);
+    Route::get('/{required_document}', [RequiredDocumentController::class, 'show'])
+        ->middleware(['auth.service', 'permission:required_document.read']);
+    Route::put('/{required_document}', [RequiredDocumentController::class, 'update'])
+        ->middleware(['auth.service', 'permission:required_document.update']);
+    Route::patch('/{required_document}', [RequiredDocumentController::class, 'update'])
+        ->middleware(['auth.service', 'permission:required_document.update']);
+    Route::delete('/{required_document}', [RequiredDocumentController::class, 'destroy'])
+        ->middleware(['auth.service', 'permission:required_document.delete']);
 
-    // Additional routes
-    Route::post('/{required_document}/restore', [RequiredDocumentController::class, 'restore']);
-    Route::get('/{required_document}/statistics', [RequiredDocumentController::class, 'statistics']);
-    Route::post('/bulk-delete', [RequiredDocumentController::class, 'bulkDelete']);
+    // Extra
+    Route::post('/bulk-delete', [RequiredDocumentController::class, 'bulkDelete'])
+        ->middleware(['auth.service', 'permission:required_document.delete']); // bulk-delete -> delete
 });
 
+// Metadata Schemas Routes
 Route::prefix('metadata-schemas')->group(function () {
-    Route::get('/', [MetadataSchemaController::class, 'index']);
-    Route::post('/', [MetadataSchemaController::class, 'store']);
-    Route::get('/{metadata_schema}', [MetadataSchemaController::class, 'show']);
-    Route::put('/{metadata_schema}', [MetadataSchemaController::class, 'update']);
-    Route::patch('/{metadata_schema}', [MetadataSchemaController::class, 'update']);
-    Route::delete('/{metadata_schema}', [MetadataSchemaController::class, 'destroy']);
+    Route::get('/', [MetadataSchemaController::class, 'index'])
+        ->middleware(['auth.service', 'permission:metadata_schema.read']);
+    Route::post('/', [MetadataSchemaController::class, 'store'])
+        ->middleware(['auth.service', 'permission:metadata_schema.create']);
+    Route::get('/{metadata_schema}', [MetadataSchemaController::class, 'show'])
+        ->middleware(['auth.service', 'permission:metadata_schema.read']);
+    Route::put('/{metadata_schema}', [MetadataSchemaController::class, 'update'])
+        ->middleware(['auth.service', 'permission:metadata_schema.update']);
+    Route::patch('/{metadata_schema}', [MetadataSchemaController::class, 'update'])
+        ->middleware(['auth.service', 'permission:metadata_schema.update']);
+    Route::delete('/{metadata_schema}', [MetadataSchemaController::class, 'destroy'])
+        ->middleware(['auth.service', 'permission:metadata_schema.delete']);
 
-    Route::post('/{metadata_schema}/restore', [MetadataSchemaController::class, 'restore']);
-    Route::post('/bulk-delete', [MetadataSchemaController::class, 'bulkDelete']);
+    // Extra
+    Route::post('/bulk-delete', [MetadataSchemaController::class, 'bulkDelete'])
+        ->middleware(['auth.service', 'permission:metadata_schema.delete']); // bulk-delete -> delete
 });
 
+// Metadata Fields Routes
 Route::prefix('metadata-fields')->group(function () {
-    Route::get('/', [MetadataFieldController::class, 'index']);
-    Route::post('/', [MetadataFieldController::class, 'store']);
-    Route::get('/{metadata_field}', [MetadataFieldController::class, 'show']);
-    Route::put('/{metadata_field}', [MetadataFieldController::class, 'update']);
-    Route::patch('/{metadata_field}', [MetadataFieldController::class, 'update']);
-    Route::delete('/{metadata_field}', [MetadataFieldController::class, 'destroy']);
-    Route::post('/bulk-delete', [MetadataFieldController::class, 'bulkDelete']);
+    Route::get('/', [MetadataFieldController::class, 'index'])
+        ->middleware(['auth.service', 'permission:metadata_field.read']);
+    Route::post('/', [MetadataFieldController::class, 'store'])
+        ->middleware(['auth.service', 'permission:metadata_field.create']);
+    Route::get('/{metadata_field}', [MetadataFieldController::class, 'show'])
+        ->middleware(['auth.service', 'permission:metadata_field.read']);
+    Route::put('/{metadata_field}', [MetadataFieldController::class, 'update'])
+        ->middleware(['auth.service', 'permission:metadata_field.update']);
+    Route::patch('/{metadata_field}', [MetadataFieldController::class, 'update'])
+        ->middleware(['auth.service', 'permission:metadata_field.update']);
+    Route::delete('/{metadata_field}', [MetadataFieldController::class, 'destroy'])
+        ->middleware(['auth.service', 'permission:metadata_field.delete']);
+
+    // Extra
+    Route::post('/bulk-delete', [MetadataFieldController::class, 'bulkDelete'])
+        ->middleware(['auth.service', 'permission:metadata_field.delete']); // bulk-delete -> delete
 });
 
 
@@ -201,7 +273,7 @@ Route::get('/departments/{departmentId}/careers', [CareerController::class, 'get
 
 
 
-Route::middleware(['auth.service', 'roles.service:md.document_type.list'])->group(function () {
+Route::middleware(['auth.service', 'permission:md.document_type.list'])->group(function () {
     Route::get('/documentos/prueba', function () {
         // Accede al user_id si lo guardaste en el middleware
         $userId = request()->attributes->get('user_id');

@@ -14,7 +14,7 @@ class RolesService
 
     public function handle(Request $request, Closure $next, $requiredPermission = null)
     {
-        $this->requiredPermission = $requiredPermission ?? $this->requiredPermission;
+        $this->requiredPermission = 'md.'.($requiredPermission ?? $this->requiredPermission);
 
         $tokenHash = $request->attributes->get('token_hash');
         $tokenValidation = $request->attributes->get('token_validation');

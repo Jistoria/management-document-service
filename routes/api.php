@@ -12,6 +12,8 @@ use App\Http\Controllers\DocumentTypeController;
 use App\Http\Controllers\RequiredDocumentController;
 use App\Http\Controllers\MetadataFieldController;
 use App\Http\Controllers\MetadataSchemaController;
+use App\Http\Controllers\StorageUnitController;
+use App\Http\Controllers\StorageUnitTypeController;
 use Illuminate\Support\Facades\Route;
 
 // Head Offices Routes
@@ -260,6 +262,38 @@ Route::prefix('metadata-fields')->group(function () {
     // Extra
     Route::post('/bulk-delete', [MetadataFieldController::class, 'bulkDelete'])
         ->middleware(['auth.service', 'permission:metadata_field.delete']); // bulk-delete -> delete
+});
+
+// Storage Unit Types Routes
+Route::prefix('storage-unit-types')->group(function () {
+    Route::get('/', [StorageUnitTypeController::class, 'index'])
+        ->middleware(['auth.service', 'permission:storage_unit_type.read']);
+    Route::post('/', [StorageUnitTypeController::class, 'store'])
+        ->middleware(['auth.service', 'permission:storage_unit_type.create']);
+    Route::get('/{storage_unit_type}', [StorageUnitTypeController::class, 'show'])
+        ->middleware(['auth.service', 'permission:storage_unit_type.read']);
+    Route::put('/{storage_unit_type}', [StorageUnitTypeController::class, 'update'])
+        ->middleware(['auth.service', 'permission:storage_unit_type.update']);
+    Route::patch('/{storage_unit_type}', [StorageUnitTypeController::class, 'update'])
+        ->middleware(['auth.service', 'permission:storage_unit_type.update']);
+    Route::delete('/{storage_unit_type}', [StorageUnitTypeController::class, 'destroy'])
+        ->middleware(['auth.service', 'permission:storage_unit_type.delete']);
+});
+
+// Storage Units Routes
+Route::prefix('storage-units')->group(function () {
+    Route::get('/', [StorageUnitController::class, 'index'])
+        ->middleware(['auth.service', 'permission:storage_unit.read']);
+    Route::post('/', [StorageUnitController::class, 'store'])
+        ->middleware(['auth.service', 'permission:storage_unit.create']);
+    Route::get('/{storage_unit}', [StorageUnitController::class, 'show'])
+        ->middleware(['auth.service', 'permission:storage_unit.read']);
+    Route::put('/{storage_unit}', [StorageUnitController::class, 'update'])
+        ->middleware(['auth.service', 'permission:storage_unit.update']);
+    Route::patch('/{storage_unit}', [StorageUnitController::class, 'update'])
+        ->middleware(['auth.service', 'permission:storage_unit.update']);
+    Route::delete('/{storage_unit}', [StorageUnitController::class, 'destroy'])
+        ->middleware(['auth.service', 'permission:storage_unit.delete']);
 });
 
 

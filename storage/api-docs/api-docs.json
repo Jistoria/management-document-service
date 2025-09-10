@@ -14,7 +14,7 @@
     },
     "servers": [
         {
-            "url": "http://127.0.0.1:8000/api",
+            "url": "http://127.0.0.1:8002/api",
             "description": "Local Development Server"
         }
     ],
@@ -2529,7 +2529,12 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             },
             "post": {
                 "tags": [
@@ -5051,6 +5056,489 @@
                 "responses": {
                     "200": {
                         "description": "Bulk deletion performed successfully"
+                    }
+                }
+            }
+        },
+        "/storage-units": {
+            "get": {
+                "tags": [
+                    "StorageUnits"
+                ],
+                "summary": "Listar unidades de almacenamiento",
+                "description": "Retorna el listado de unidades de almacenamiento",
+                "operationId": "getStorageUnits",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Búsqueda por etiqueta o código",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "storageUnitTypeId",
+                        "in": "query",
+                        "description": "Filtrar por tipo de unidad",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "parentId",
+                        "in": "query",
+                        "description": "Filtrar por unidad padre",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "code",
+                        "in": "query",
+                        "description": "Filtrar por código",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "perPage",
+                        "in": "query",
+                        "description": "Elementos por página",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "format",
+                        "in": "query",
+                        "description": "Formato de respuesta",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "collection",
+                                "paginate",
+                                "minimal",
+                                "dropdown",
+                                "pluck"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "description": "Relaciones a incluir",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sortBy",
+                        "in": "query",
+                        "description": "Campo para ordenar",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sortDir",
+                        "in": "query",
+                        "description": "Dirección de orden",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Unidades de almacenamiento obtenidas exitosamente"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "StorageUnits"
+                ],
+                "summary": "Crear unidad de almacenamiento",
+                "description": "Crea una nueva unidad de almacenamiento",
+                "operationId": "storeStorageUnit",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "storageUnitTypeId",
+                                    "label"
+                                ],
+                                "properties": {
+                                    "storageUnitTypeId": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "parentId": {
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "nullable": true
+                                    },
+                                    "label": {
+                                        "type": "string"
+                                    },
+                                    "code": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Unidad de almacenamiento creada exitosamente"
+                    }
+                }
+            }
+        },
+        "/storage-units/{id}": {
+            "get": {
+                "tags": [
+                    "StorageUnits"
+                ],
+                "summary": "Mostrar unidad de almacenamiento",
+                "description": "Obtiene los detalles de una unidad de almacenamiento",
+                "operationId": "showStorageUnit",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Unidad de almacenamiento obtenida exitosamente"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "StorageUnits"
+                ],
+                "summary": "Actualizar unidad de almacenamiento",
+                "description": "Actualiza los datos de una unidad de almacenamiento",
+                "operationId": "updateStorageUnit",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "storageUnitTypeId": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "parentId": {
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "nullable": true
+                                    },
+                                    "label": {
+                                        "type": "string"
+                                    },
+                                    "code": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Unidad de almacenamiento actualizada exitosamente"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "StorageUnits"
+                ],
+                "summary": "Eliminar unidad de almacenamiento",
+                "description": "Elimina una unidad de almacenamiento",
+                "operationId": "deleteStorageUnit",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Unidad de almacenamiento eliminada exitosamente"
+                    }
+                }
+            }
+        },
+        "/storage-unit-types": {
+            "get": {
+                "tags": [
+                    "StorageUnitTypes"
+                ],
+                "summary": "Listar tipos de unidad",
+                "description": "Retorna el listado de tipos de unidad de almacenamiento",
+                "operationId": "getStorageUnitTypes",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Búsqueda por nombre o código",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "code",
+                        "in": "query",
+                        "description": "Filtrar por código",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "level",
+                        "in": "query",
+                        "description": "Filtrar por nivel",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "created_by",
+                        "in": "query",
+                        "description": "Filtrar por creador",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "perPage",
+                        "in": "query",
+                        "description": "Elementos por página",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "format",
+                        "in": "query",
+                        "description": "Formato de respuesta",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "collection",
+                                "paginate",
+                                "minimal",
+                                "dropdown",
+                                "pluck"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "description": "Relaciones a incluir",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sortBy",
+                        "in": "query",
+                        "description": "Campo para ordenar",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sortDir",
+                        "in": "query",
+                        "description": "Dirección de orden",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Tipos de unidad obtenidos exitosamente"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "StorageUnitTypes"
+                ],
+                "summary": "Crear tipo de unidad",
+                "description": "Crea un nuevo tipo de unidad de almacenamiento",
+                "operationId": "storeStorageUnitType",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "code",
+                                    "level"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "code": {
+                                        "type": "string"
+                                    },
+                                    "level": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Tipo de unidad creado exitosamente"
+                    }
+                }
+            }
+        },
+        "/storage-unit-types/{id}": {
+            "get": {
+                "tags": [
+                    "StorageUnitTypes"
+                ],
+                "summary": "Mostrar tipo de unidad",
+                "description": "Obtiene los detalles de un tipo de unidad de almacenamiento",
+                "operationId": "showStorageUnitType",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Tipo de unidad obtenido exitosamente"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "StorageUnitTypes"
+                ],
+                "summary": "Actualizar tipo de unidad",
+                "description": "Actualiza un tipo de unidad de almacenamiento",
+                "operationId": "updateStorageUnitType",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "code": {
+                                        "type": "string"
+                                    },
+                                    "level": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tipo de unidad actualizado exitosamente"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "StorageUnitTypes"
+                ],
+                "summary": "Eliminar tipo de unidad",
+                "description": "Elimina un tipo de unidad de almacenamiento",
+                "operationId": "deleteStorageUnitType",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Tipo de unidad eliminado exitosamente"
                     }
                 }
             }
@@ -7651,6 +8139,11 @@
             }
         }
     },
+    "security": [
+        {
+            "bearerAuth": []
+        }
+    ],
     "tags": [
         {
             "name": "HeadOffices",
@@ -7695,6 +8188,14 @@
         {
             "name": "RequiredDocuments",
             "description": "RequiredDocuments"
+        },
+        {
+            "name": "StorageUnits",
+            "description": "StorageUnits"
+        },
+        {
+            "name": "StorageUnitTypes",
+            "description": "StorageUnitTypes"
         }
     ]
 }

@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 
 /**
+ * @OA\OpenApi(
+ *   security={{"bearerAuth":{}}}
+ * )
  * @OA\Info(
  *     title="Management Document Service API",
  *     version="1.0.0",
@@ -18,7 +21,7 @@ namespace App\Http\Controllers;
  * )
  *
  * @OA\Server(
- *     url="http://127.0.0.1:8000/api",
+ *     url="http://127.0.0.1:8002/api",
  *     description="Local Development Server"
  * )
  *
@@ -34,7 +37,4 @@ namespace App\Http\Controllers;
  *     bearerFormat="JWT"
  * )
  */
-abstract class Controller
-{
-
-}
+abstract class Controller {}

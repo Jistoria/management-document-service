@@ -173,6 +173,8 @@ class ApiIndexBuilder
             'documentTypeId' => 'document_type_id',
             'academicRoleId' => 'academic_role_id',
             'metadataSchemaId' => 'metadata_schema_id',
+            'storageUnitTypeId' => 'storage_unit_type_id',
+            'parentId' => 'parent_id',
         ];
 
         foreach ($camelCaseFilters as $camelCase => $snakeCase) {

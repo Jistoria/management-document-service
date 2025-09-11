@@ -34,10 +34,10 @@ services:
       - ./docker/init-db.sh:/docker-entrypoint-initdb.d/01-init-db.sh:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U user123 -d management_db"]
-      interval: 15s
-      timeout: 10s
-      retries: 5
-      start_period: 30s
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
     networks:
         - management-net
 
@@ -48,10 +48,10 @@ services:
     container_name: db-sync-checker
     profiles: ["debug"]  # Solo se ejecuta con docker-compose --profile debug up
     depends_on:
-      postgres:
+      db:
         condition: service_healthy
     environment:
-      PGHOST: postgres
+      PGHOST: db
       PGDATABASE: management_db
       PGUSER: user123
       PGPASSWORD: pass123
@@ -64,6 +64,8 @@ services:
         echo '✅ Verificación completada';
       "
     restart: "no"
+    networks:
+        - management-net
 
   app:
     build:
@@ -86,6 +88,8 @@ services:
         - thesis-net
         - management-net
     depends_on:
+        init:
+           condition: service_completed_successfully
         db:
            condition: service_healthy
 
@@ -102,26 +106,26 @@ services:
     networks:
         - management-net
 
-  queue:
-      image: management-app
-      container_name: management-queue
-      command: php artisan queue:work --verbose --tries=1 --timeout=90
-      volumes:
-          - .:/var/www
-      depends_on:
-          app:
-              condition: service_started
-          init:
-              condition: service_completed_successfully
-          db:
-              condition: service_healthy
-      networks:
-          - management-net
+#   queue:
+#       image: management-app
+#       container_name: management-queue
+#       command: php artisan queue:work --verbose --tries=1 --timeout=90
+#       volumes:
+#           - .:/var/www
+#       depends_on:
+#           app:
+#               condition: service_started
+#           init:
+#               condition: service_completed_successfully
+#           db:
+#               condition: service_healthy
+#       networks:
+#           - management-net
 
-  scheduler:
+  consumer-auth:
       image: management-app
-      container_name: management-scheduler
-      command: php artisan schedule:work
+      container_name: management-consumer-auth
+      command: php artisan auth-sync:consume
       volumes:
           - .:/var/www
       depends_on:
@@ -132,6 +136,7 @@ services:
           db:
               condition: service_healthy
       networks:
+          - thesis-net
           - management-net
 
 

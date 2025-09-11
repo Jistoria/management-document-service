@@ -388,7 +388,57 @@ CREATE TABLE public.audit_metrics (
     CONSTRAINT chk_positive_counts CHECK (count_value >= 0),
     CONSTRAINT chk_valid_granularity CHECK (granularity::text = ANY (ARRAY['hour'::character varying, 'day'::character varying, 'week'::character varying, 'month'::character varying]::text[]))
 );
+-- =====================================================================================
+-- INBOX AUTH SERVICE
+-- =====================================================================================
+-- 1) Bandeja de entrada (idempotencia)
+CREATE TABLE public.inbox_events (
+  id              bigserial PRIMARY KEY,
+  topic           text NOT NULL,
+  partition       int  NOT NULL,
+  offset_value    bigint NOT NULL,
+  key             text NULL,
+  headers         jsonb NULL,
+  payload         jsonb NOT NULL,
+  received_at     timestamptz NOT NULL DEFAULT now(),
+  processed_at    timestamptz NULL,
+  error           text NULL,
+  UNIQUE (topic, partition, offset_value)
+);
 
+-- 2) Usuarios espejo
+CREATE TABLE public.md_auth_users (
+  tenant_id       uuid NULL,
+  user_id         uuid NOT NULL,
+  name            text NULL,
+  email           text NULL,
+  status          text NULL,
+  deleted_at      timestamptz NULL,
+  updated_at_src  timestamptz NULL, -- desde snapshot/evento fuente
+  updated_at      timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (tenant_id, user_id)
+);
+
+CREATE INDEX md_auth_users_email_idx ON md_auth_users (email);
+
+-- 3) Permisos (catálogo local por slug)
+CREATE TABLE public.md_auth_permissions (
+  permission_slug text PRIMARY KEY
+);
+
+-- 4) Asignación usuario-permiso (por tenant)
+CREATE TABLE public.md_auth_user_permissions (
+  tenant_id       uuid NULL,
+  user_id         uuid NOT NULL,
+  permission_slug text NOT NULL REFERENCES md_auth_permissions(permission_slug) ON DELETE RESTRICT,
+  granted_by      uuid NULL,
+  reason          text NULL,
+  created_at      timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (tenant_id, user_id, permission_slug)
+);
+
+CREATE INDEX md_auth_user_perm_user_idx ON md_auth_user_permissions (tenant_id, user_id);
+CREATE INDEX md_auth_user_perm_perm_idx ON md_auth_user_permissions (permission_slug);
 -- =====================================================================================
 -- CONFIGURACIÓN DE MICROSERVICIOS
 -- =====================================================================================

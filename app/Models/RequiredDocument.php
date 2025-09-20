@@ -79,6 +79,14 @@ class RequiredDocument extends Model
     }
 
     /**
+    * Get the metadataschema this document
+    */
+    public function metadataSchema() : BelongsTo
+    {
+        return $this->belongsTo(MetadataSchema::class);
+    }
+
+    /**
      * Get the document type for this required document.
      */
     public function documentType(): BelongsTo

@@ -46,7 +46,6 @@ services:
   db-sync-checker:
     image: postgres:16
     container_name: db-sync-checker
-    profiles: ["debug"]  # Solo se ejecuta con docker-compose --profile debug up
     depends_on:
       db:
         condition: service_healthy

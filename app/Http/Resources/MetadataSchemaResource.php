@@ -15,11 +15,9 @@ class MetadataSchemaResource extends BaseResource
             'parentSchemaId' => $this->parent_schema_id,
             'isCanonical' => $this->is_canonical,
             'version' => $this->version,
-            'externalSystemId' => $this->external_system_id,
-            'apiEndpoint' => $this->api_endpoint,
-            'cacheTtl' => $this->cache_ttl,
             'createdAt' => $this->created_at?->toISOString(),
             'updatedAt' => $this->updated_at?->toISOString(),
+            'metadataFields' => new MetadataFieldResource($this->whenLoaded('metadataFields')),
         ];
     }
 

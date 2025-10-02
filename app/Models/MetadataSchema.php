@@ -52,9 +52,6 @@ class MetadataSchema extends Model
         'parent_schema_id',
         'is_canonical',
         'version',
-        'external_system_id',
-        'api_endpoint',
-        'cache_ttl',
         'created_by',
         'updated_by'
     ];

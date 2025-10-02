@@ -17,30 +17,16 @@ class RequiredDocumentResource extends BaseResource
             'id' => $this->id,
             'processId' => $this->process_id,
             'documentTypeId' => $this->document_type_id,
-            'academicRoleId' => $this->academic_role_id,
             'metadataSchemaId' => $this->metadata_schema_id,
             'order' => $this->order,
-            'mandatory' => $this->mandatory,
-            'externalUserId' => $this->external_user_id,
-            'externalOrganizationId' => $this->external_organization_id,
             'createdAt' => $this->created_at?->toISOString(),
             'updatedAt' => $this->updated_at?->toISOString(),
+            'createdBy' => $this->createdBy,
+            'updatedBy' => $this->updatedBy,
 
-            // Conditional relationships
             'documentType' => new DocumentTypeResource($this->whenLoaded('documentType')),
             'process' => new ProcessResource($this->whenLoaded('process')),
-            'academicRole' => $this->whenLoaded('academicRole'),
-            'metadataSchema' => $this->whenLoaded('metadataSchema'),
-
-            // Statistics (added via resolveIncludes)
-            'statistics' => $this->when(isset($this->statistics), $this->statistics),
-
-            // Meta information
-            'meta' => $this->when($request->get('include_meta', false), [
-                'resourceType' => 'required_document',
-                'generatedAt' => now()->toISOString(),
-                'context' => $this->getMetaContext($request)
-            ])
+            'metadataSchema' => new MetadataSchemaResource($this->whenLoaded('metadataSchema')),
         ];
     }
 

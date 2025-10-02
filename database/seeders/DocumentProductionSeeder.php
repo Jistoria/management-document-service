@@ -161,7 +161,6 @@ class DocumentProductionSeeder extends Seeder
                         'document_type_id' => $docType->id,
                         'metadata_schema_id' => $schema->id,
                         'order' => $req['order'],
-                        'mandatory' => true,
                     ]
                 );
             }

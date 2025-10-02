@@ -280,18 +280,19 @@ CREATE TABLE public.required_documents (
     id uuid NOT NULL,
     process_id uuid,
     document_type_id uuid NOT NULL,
-    academic_role_id uuid,
+    code_default text DEFAULT 'S/N' NOT NULL,
     "order" integer DEFAULT 0 NOT NULL,
-    mandatory boolean DEFAULT true NOT NULL,
+    url_resource text,
+    is_public boolean DEFAULT false NOT NULL,
     created_at timestamp(0) without time zone,
     updated_at timestamp(0) without time zone,
     deleted_at timestamp(0) without time zone,
-    external_user_id character varying(255),
-    external_organization_id character varying(255),
+    created_by character varying(255),
+    updated_by character varying(255),
+    deleted_by character varying(255),
     metadata_schema_id uuid,
     CONSTRAINT required_documents_pkey PRIMARY KEY (id),
     CONSTRAINT required_documents_document_type_id_foreign FOREIGN KEY (document_type_id) REFERENCES document_types(id) ON DELETE CASCADE,
-    CONSTRAINT required_documents_academic_role_id_foreign FOREIGN KEY (academic_role_id) REFERENCES academic_roles(id) ON DELETE SET NULL,
     CONSTRAINT required_documents_process_id_foreign FOREIGN KEY (process_id) REFERENCES processes(id) ON DELETE CASCADE,
     CONSTRAINT required_documents_metadata_schema_id_foreign FOREIGN KEY (metadata_schema_id) REFERENCES metadata_schemas(id) ON DELETE SET NULL,
     CONSTRAINT chk_required_documents_has_reference CHECK (process_id IS NOT NULL OR metadata_schema_id IS NOT NULL),
@@ -307,13 +308,12 @@ CREATE TABLE public.storage_unit_types (
     id uuid NOT NULL,
     name character varying(255) NOT NULL,
     code character varying(255) NOT NULL,
-    level integer NOT NULL,
+    can_have_children boolean DEFAULT false,
     created_at timestamp(0) without time zone,
     updated_at timestamp(0) without time zone,
     deleted_at timestamp(0) without time zone,
     CONSTRAINT storage_unit_types_pkey PRIMARY KEY (id),
-    CONSTRAINT storage_unit_types_code_unique UNIQUE (code),
-    CONSTRAINT chk_level_positive CHECK (level > 0)
+    CONSTRAINT storage_unit_types_code_unique UNIQUE (code)
 );
 
 -- Tabla: Unidades de almacenamiento con jerarquía
@@ -361,6 +361,7 @@ CREATE TABLE public.audit_logs (
     change_metadata jsonb,
     business_context jsonb,
     created_at timestamp(0) without time zone DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp(0) without time zone,
     CONSTRAINT audit_logs_pkey PRIMARY KEY (id),
     CONSTRAINT chk_valid_action CHECK (action::text = ANY (ARRAY['INSERT'::character varying, 'UPDATE'::character varying, 'DELETE'::character varying, 'SOFT_DELETE'::character varying, 'RESTORE'::character varying, 'BULK_INSERT'::character varying, 'BULK_UPDATE'::character varying, 'BULK_DELETE'::character varying]::text[])),
     CONSTRAINT chk_record_version_logic CHECK (action::text = 'INSERT'::text AND record_version_before IS NULL OR action::text = 'UPDATE'::text AND record_version_before IS NOT NULL AND record_version_after >= record_version_before OR (action::text = ANY (ARRAY['DELETE'::character varying, 'SOFT_DELETE'::character varying]::text[])) AND record_version_before IS NOT NULL OR action::text = 'RESTORE'::text AND record_version_before IS NOT NULL)
@@ -765,8 +766,6 @@ COMMENT ON COLUMN public.external_apis.service_name IS 'Nombre del microservicio
 COMMENT ON COLUMN public.external_apis.auth_method IS 'Método de autenticación: bearer, basic, api_key, oauth2';
 
 COMMENT ON COLUMN public.required_documents.process_id IS 'ID del proceso (nullable) - permite documentos independientes de procesos específicos';
-COMMENT ON COLUMN public.required_documents.external_user_id IS 'ID del usuario desde microservicio de autenticación';
-COMMENT ON COLUMN public.required_documents.external_organization_id IS 'ID de organización externa';
 COMMENT ON COLUMN public.required_documents.metadata_schema_id IS 'ID del esquema de metadatos - permite reutilizar esquemas normalizados entre documentos';
 
 COMMENT ON COLUMN public.document_types.created_by IS 'ID usuario externo que creó el registro';

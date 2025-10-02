@@ -300,7 +300,7 @@ class ProductionSeeder extends Seeder
 
         // Obtener entidades
         $sedePrincipal = HeadOffice::where('code', 'PRINCIPAL')->first();
-        
+
         $deptIngenieria = Department::where('code', 'INGYTEC')->first();
         $deptCiencias = Department::where('code', 'CIENCIAS')->first();
         $deptSalud = Department::where('code', 'SALUD')->first();
@@ -323,7 +323,7 @@ class ProductionSeeder extends Seeder
             foreach ($departments as $dept) {
                 if ($dept) {
                     $sga->departments()->syncWithoutDetaching([$dept->id]);
-                    
+
                     // También relacionar con todas las carreras del departamento
                     $careers = Career::where('department_id', $dept->id)->get();
                     foreach ($careers as $career) {
@@ -339,7 +339,7 @@ class ProductionSeeder extends Seeder
             foreach ($departments as $dept) {
                 if ($dept) {
                     $biblioteca->departments()->syncWithoutDetaching([$dept->id]);
-                    
+
                     $careers = Career::where('department_id', $dept->id)->get();
                     foreach ($careers as $career) {
                         $biblioteca->careers()->syncWithoutDetaching([$career->id]);
@@ -354,7 +354,7 @@ class ProductionSeeder extends Seeder
             foreach ($techDepartments as $dept) {
                 if ($dept) {
                     $laboratorios->departments()->syncWithoutDetaching([$dept->id]);
-                    
+
                     $careers = Career::where('department_id', $dept->id)->get();
                     foreach ($careers as $career) {
                         $laboratorios->careers()->syncWithoutDetaching([$career->id]);
@@ -369,7 +369,7 @@ class ProductionSeeder extends Seeder
             foreach ($departments as $dept) {
                 if ($dept) {
                     $investigacion->departments()->syncWithoutDetaching([$dept->id]);
-                    
+
                     $careers = Career::where('department_id', $dept->id)->get();
                     foreach ($careers as $career) {
                         $investigacion->careers()->syncWithoutDetaching([$career->id]);
@@ -384,7 +384,7 @@ class ProductionSeeder extends Seeder
             foreach ($departments as $dept) {
                 if ($dept) {
                     $practicas->departments()->syncWithoutDetaching([$dept->id]);
-                    
+
                     $careers = Career::where('department_id', $dept->id)->get();
                     foreach ($careers as $career) {
                         $practicas->careers()->syncWithoutDetaching([$career->id]);
@@ -399,7 +399,7 @@ class ProductionSeeder extends Seeder
             foreach ($departments as $dept) {
                 if ($dept) {
                     $graduacion->departments()->syncWithoutDetaching([$dept->id]);
-                    
+
                     $careers = Career::where('department_id', $dept->id)->get();
                     foreach ($careers as $career) {
                         $graduacion->careers()->syncWithoutDetaching([$career->id]);
@@ -475,24 +475,34 @@ class ProductionSeeder extends Seeder
 
         $storageUnitTypes = [
             [
-                'name' => 'Archivo Digital',
-                'code' => 'DIGITAL',
-                'level' => 1,
+                'name' => 'Archivo Central',
+                'code' => 'ARCHIVO_CENTRAL',
+                'can_have_children' => true,
             ],
             [
-                'name' => 'Archivo Físico',
-                'code' => 'FISICO',
-                'level' => 1,
+                'name' => 'Sección',
+                'code' => 'SECCION',
+                'can_have_children' => true,
             ],
             [
-                'name' => 'Archivo Híbrido',
-                'code' => 'HIBRIDO',
-                'level' => 2,
+                'name' => 'Serie',
+                'code' => 'SERIE',
+                'can_have_children' => true,
             ],
             [
-                'name' => 'Repositorio Institucional',
-                'code' => 'REPOSITORIO',
-                'level' => 3,
+                'name' => 'Subserie',
+                'code' => 'SUBSERIE',
+                'can_have_children' => true,
+            ],
+            [
+                'name' => 'Caja',
+                'code' => 'CAJA',
+                'can_have_children' => true, // puede contener carpetas
+            ],
+            [
+                'name' => 'Carpeta',
+                'code' => 'CARPETA',
+                'can_have_children' => false, // nivel final
             ],
         ];
 

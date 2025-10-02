@@ -18,7 +18,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $id
  * @property string $name
  * @property string $code
- * @property int $level
+ * @property boolean $can_have_children
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  * @property \Carbon\Carbon|null $deleted_at
@@ -38,7 +38,7 @@ class StorageUnitType extends Model
     protected $fillable = [
         'name',
         'code',
-        'level'
+        'can_have_children',
     ];
 
     /**
@@ -48,7 +48,7 @@ class StorageUnitType extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
-        'level' => 'integer'
+        'can_have_children' => 'boolean',
     ];
 
     /**
@@ -85,9 +85,9 @@ class StorageUnitType extends Model
     /**
      * Scope to filter by level.
      */
-    public function scopeByLevel($query, int $level)
+    public function scopeByCanHaveChildren($query, bool $canHaveChildren = true)
     {
-        return $query->where('level', $level);
+        return $query->where('can_have_children', $canHaveChildren);
     }
 
     /**

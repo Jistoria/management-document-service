@@ -151,7 +151,6 @@ Route::prefix('process-categories')->group(function () {
 });
 
 // Process Routes
-// Process Routes
 Route::prefix('processes')->group(function () {
     Route::get('/', [ProcessController::class, 'index'])
         ->middleware(['auth.service', 'permission:process.read']);
@@ -166,15 +165,9 @@ Route::prefix('processes')->group(function () {
     Route::delete('/{process}', [ProcessController::class, 'destroy'])
         ->middleware(['auth.service', 'permission:process.delete']);
 
-    // Extra mapeados
+    // Extras
     Route::post('/{process}/restore', [ProcessController::class, 'restore'])
         ->middleware(['auth.service', 'permission:process.update']);   // restore -> update
-    Route::get('/{process}/hierarchy', [ProcessController::class, 'hierarchy'])
-        ->middleware(['auth.service', 'permission:process.read']);     // hierarchy -> read
-    Route::get('/{process}/statistics', [ProcessController::class, 'statistics'])
-        ->middleware(['auth.service', 'permission:process.read']);     // statistics -> read
-    Route::get('/code/{code}', [ProcessController::class, 'findByCode'])
-        ->middleware(['auth.service', 'permission:process.read']);     // find_by_code -> read
     Route::post('/bulk-delete', [ProcessController::class, 'bulkDelete'])
         ->middleware(['auth.service', 'permission:process.delete']);   // bulk-delete -> delete
 });
@@ -306,22 +299,6 @@ Route::get('/departments/{departmentId}/careers', [CareerController::class, 'get
 // });
 
 
-
-Route::middleware(['auth.service', 'permission:md.document_type.list'])->group(function () {
-    Route::get('/documentos/prueba', function () {
-        // Accede al user_id si lo guardaste en el middleware
-        $userId = request()->attributes->get('user_id');
-        $permissions = request()->attributes->get('microservice_permissions');
-
-        return response()->json([
-            'message' => 'Acceso concedido',
-            'user_id' => $userId,
-            'available_permissions' => $permissions,
-        ]);
-    });
-});
-
-
 Route::fallback(function () {
-    return response()->json(['message' => 'API connection successful.'], 200);
+    return response()->json(['message' => 'API connection successful.']);
 });

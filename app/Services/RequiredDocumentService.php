@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Carbon\CarbonImmutable;
+use Illuminate\Support\Str;
 
 /**
  * Service for Required Document business logic
@@ -17,6 +19,15 @@ use Illuminate\Pagination\LengthAwarePaginator;
 class RequiredDocumentService
 {
     use ValidatesUuid;
+
+
+    /**
+     * Patrón por defecto para generar el código cuando no se envía 'code_default'.
+     * No incluye secuencial. Si en el futuro quieres soporte a {SEQ}, extiende la lógica
+     * en generateDefaultCode().
+     */
+    private const DEFAULT_CODE_PATTERN = '{SUBSYSTEM}-{PROCESS}-{CATEGORY}-{YEAR}';
+
 
     /**
      * Retrieve all required documents matching filters.
@@ -53,7 +64,17 @@ class RequiredDocumentService
     public function create(array $data): RequiredDocument
     {
         $data = RequiredDocument::convertToSnakeCase($data);
-        return RequiredDocument::create($data);
+
+        $requiredDocument = new RequiredDocument($data);
+
+        if ($data['generateDefaultCode']){
+            $code = $this->generateDefaultCode($requiredDocument);
+            $requiredDocument->code_default = $code;
+        }
+
+        $requiredDocument->save();
+
+        return $requiredDocument;
     }
 
     /**
@@ -128,6 +149,95 @@ class RequiredDocumentService
 
         return RequiredDocument::whereIn('id', $validIds)->delete();
     }
+
+    /**
+     * Generate a preview of the default code for a RequiredDocument (sin modificar DB).
+     * Útil para un endpoint tipo: GET /required-documents/{id}/code/preview
+     */
+    public function previewDefaultCode(string $id, ?string $isoDate = null): ?string
+    {
+        $this->validateUuid($id);
+
+        /** @var RequiredDocument $rd */
+        $rd = RequiredDocument::query()
+            ->with([
+                'process.processCategory.subsystem',
+            ])
+            ->findOrFail($id);
+
+        return $this->generateDefaultCode($rd, $isoDate ? CarbonImmutable::parse($isoDate) : null, $preview = true);
+    }
+
+    /**
+     * Genera el code_default por defecto usando {SUBSYSTEM}-{PROCESS}-{CATEGORY}-{YEAR}.
+     * - Si faltan relaciones o códigos, devuelve null (no fuerza "NA" en BD).
+     * - Si $preview=true, no persiste nada (sólo devuelve el string).
+     * - Reutilizable: si mañana agregas secuencial o cambias estructura, extiende aquí.
+     */
+    public function generateDefaultCode(RequiredDocument $requiredDocument, ?CarbonImmutable $date = null, bool $preview = false): ?string
+    {
+        $requiredDocument->loadMissing(['process.processCategory.subsystem']);
+
+        $process        = $requiredDocument->process;
+        $category       = $process?->processCategory;
+        $subsystem      = $category?->subsystem;
+
+        if (!$process || !$category || !$subsystem) {
+            return null;
+        }
+
+        $processCode   = trim((string) ($process->code ?? ''));
+        $categoryCode  = trim((string) ($category->code ?? ''));
+        $subsystemCode = trim((string) ($subsystem->code ?? ''));
+
+        if ($processCode === '' || $categoryCode === '' || $subsystemCode === '') {
+            return null;
+        }
+
+        $date = $date ?? CarbonImmutable::now();
+
+        $pattern = self::DEFAULT_CODE_PATTERN;
+
+        $map = [
+            '{SUBSYSTEM}' => $subsystemCode,
+            '{PROCESS}'   => $processCode,
+            '{CATEGORY}'  => $categoryCode,
+            '{YEAR}'      => (string) $date->year,
+        ];
+
+        $code = strtr($pattern, $map);
+
+        // Normalización extra si se requiere (por ejemplo, evitar dobles guiones, etc.)
+        $code = preg_replace('/-{2,}/', '-', $code ?? '') ?? $code;
+        $code = trim($code, "- \t\n\r\0\x0B");
+
+        return $code ?: null;
+    }
+
+    /**
+     * Determina si debemos autogenerar 'code_default' al crear.
+     */
+    private function shouldAutogenerateCodeDefault(RequiredDocument $rd, $incomingValue): bool
+    {
+        if (!array_key_exists('code_default', (array) $incomingValue)) {
+            return $this->isEmptyOrSN($rd->code_default);
+        }
+
+        // Si sí vino la clave, validamos su contenido
+        $val = is_array($incomingValue) ? null : $incomingValue;
+        return $this->isEmptyOrSN($val);
+    }
+
+    /**
+     * Determina si un valor es vacío o "S/N" (case-insensitive, con espacios).
+     */
+    private function isEmptyOrSN($value): bool
+    {
+        $val = trim((string) ($value ?? ''));
+        return $val === '' || Str::upper($val) === 'S/N';
+    }
+
+
 
     /**
      * Resolve includes for resources.

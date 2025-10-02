@@ -19,9 +19,7 @@ class StoreRequiredDocumentRequest extends BaseFormRequest
             'academicRoleId' => ['nullable', 'uuid', 'exists:academic_roles,id'],
             'metadataSchemaId' => ['nullable', 'uuid', 'exists:metadata_schemas,id', 'required_without:processId'],
             'order' => ['nullable', 'integer', 'min:0'],
-            'mandatory' => ['nullable', 'boolean'],
-            'externalUserId' => ['nullable', 'string', 'max:255'],
-            'externalOrganizationId' => ['nullable', 'string', 'max:255'],
+            'generateDefaultCode' => ['nullable', 'boolean'],
         ];
     }
 
@@ -45,14 +43,6 @@ class StoreRequiredDocumentRequest extends BaseFormRequest
 
             'order.integer' => 'El orden debe ser un número entero',
             'order.min' => 'El orden no puede ser negativo',
-
-            'mandatory.boolean' => 'El campo obligatorio debe ser verdadero o falso',
-
-            'externalUserId.string' => 'El ID de usuario externo debe ser una cadena de texto',
-            'externalUserId.max' => 'El ID de usuario externo no puede exceder 255 caracteres',
-
-            'externalOrganizationId.string' => 'El ID de organización externa debe ser una cadena de texto',
-            'externalOrganizationId.max' => 'El ID de organización externa no puede exceder 255 caracteres',
         ];
     }
 
@@ -64,9 +54,7 @@ class StoreRequiredDocumentRequest extends BaseFormRequest
             'academicRoleId' => 'rol académico',
             'metadataSchemaId' => 'esquema de metadatos',
             'order' => 'orden',
-            'mandatory' => 'obligatorio',
-            'externalUserId' => 'ID de usuario externo',
-            'externalOrganizationId' => 'ID de organización externa',
+            'mandatory' => 'obligatorio'
         ];
     }
 

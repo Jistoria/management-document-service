@@ -20,14 +20,16 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $id
  * @property string $process_id
  * @property string $document_type_id
- * @property string|null $academic_role_id
  * @property int $order
- * @property bool $mandatory
+ * @property string $code_default
+ * @property bool $is_public
+ * @property string $url_resource
+ * @property string $created_by
+ * @property string $updated_by
+ * @property string deleted_by
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  * @property \Carbon\Carbon|null $deleted_at
- * @property string|null $external_user_id
- * @property string|null $external_organization_id
  */
 class RequiredDocument extends Model
 {
@@ -45,11 +47,13 @@ class RequiredDocument extends Model
         'process_id',
         'document_type_id',
         'academic_role_id',
-        'metadata_schema_id', // 👈 Nuevo campo
+        'code_default',
+        'url_resource',
+        'is_public',
+        'metadata_schema_id',
         'order',
-        'mandatory',
-        'external_user_id',
-        'external_organization_id'
+        'created_by',
+        'updated_by'
     ];
 
     /**
@@ -59,8 +63,7 @@ class RequiredDocument extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
-        'order' => 'integer',
-        'mandatory' => 'boolean'
+        'order' => 'integer'
     ];
 
     /**
@@ -69,6 +72,15 @@ class RequiredDocument extends Model
     protected $hidden = [
         'deleted_at'
     ];
+
+    /**
+     * Get the metadataSchema that this document.
+     */
+    public function metadataSchema(): BelongsTo
+    {
+        return $this->belongsTo(MetadataSchema::class, 'metadata_schema_id');
+    }
+
 
     /**
      * Get the process that requires this document.
@@ -124,30 +136,6 @@ class RequiredDocument extends Model
     public function scopeByAcademicRole($query, ?string $academicRoleId = null)
     {
         return $query->where('academic_role_id', $academicRoleId);
-    }
-
-    /**
-     * Scope to filter by external user.
-     */
-    public function scopeByExternalUser($query, string $externalUserId)
-    {
-        return $query->where('external_user_id', $externalUserId);
-    }
-
-    /**
-     * Scope to filter by external organization.
-     */
-    public function scopeByExternalOrganization($query, string $externalOrganizationId)
-    {
-        return $query->where('external_organization_id', $externalOrganizationId);
-    }
-
-    /**
-     * Scope to get only mandatory documents.
-     */
-    public function scopeMandatory($query)
-    {
-        return $query->where('mandatory', true);
     }
 
     /**

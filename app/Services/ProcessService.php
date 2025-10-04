@@ -9,6 +9,8 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
+use function PHPUnit\Framework\isNull;
+
 class ProcessService
 {
     use ValidatesUuid;
@@ -35,6 +37,12 @@ class ProcessService
     public function create(array $data): Process
     {
         $data = Process::convertToSnakeCase($data);
+
+        if (isNull($data['order'])) {
+            $maxOrder = Process::where('process_category_id', $data['process_category_id'])
+                ->max('order');
+            $data['order'] = $maxOrder !== null ? $maxOrder + 1 : 1;
+        }
 
         return Process::create($data);
     }

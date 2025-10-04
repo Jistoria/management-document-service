@@ -34,7 +34,6 @@ class StoreProcessCategoryRequest extends BaseFormRequest
                 'required',
                 'string',
                 'max:255',
-                'regex:/^[A-Z0-9_-]+$/',
                 Rule::unique('process_categories', 'code')->whereNull('deleted_at')
             ],
             'subsystem_id' => [

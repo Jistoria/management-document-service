@@ -83,6 +83,43 @@ class ProcessService
         return Process::findOrFail($id);
     }
 
+    public function resolveIncludes(array $includes, Process $process): void
+    {
+        if (empty($includes)) {
+            return;
+        }
+
+        $available = [
+            'processCategory' => 'processCategory',
+            'process_category' => 'processCategory',
+            'category' => 'processCategory',
+            'parent' => 'parent',
+            'children' => 'children',
+            'requiredDocuments' => 'requiredDocuments',
+            'required_documents' => 'requiredDocuments',
+        ];
+
+        $relationsMap = [];
+
+        foreach ($includes as $include) {
+            $normalized = trim((string) $include);
+
+            if ($normalized === '') {
+                continue;
+            }
+
+            if (isset($available[$normalized])) {
+                $relationsMap[$available[$normalized]] = true;
+            }
+        }
+
+        $relations = array_keys($relationsMap);
+
+        if (!empty($relations)) {
+            $process->load($relations);
+        }
+    }
+
     public function parentExists(string $id): bool
     {
         $query = Process::query()->where('parent_id', $id)->where('deleted_at', NULL);
@@ -134,6 +171,10 @@ class ProcessService
 
         $query->when(!empty($filters['created_by']), function ($q) use ($filters) {
             $q->where('created_by', $filters['created_by']);
+        });
+
+        $query->when(!empty($filters['parent_id']) || array_key_exists('parent_id', $filters) && $filters['parent_id'] === null, function ($q) use ($filters) {
+            $q->ByParent($filters['parent_id'] ?? null);
         });
     }
 }

@@ -4,9 +4,6 @@ namespace App\Http\Controllers;
 
 
 /**
- * @OA\OpenApi(
- *   security={{"bearerAuth":{}}}
- * )
  * @OA\Info(
  *     title="Management Document Service API",
  *     version="1.0.0",
@@ -36,11 +33,9 @@ namespace App\Http\Controllers;
  *     scheme="bearer",
  *     bearerFormat="JWT"
  * )
- *
  * @OA\OpenApi(
- * security={{"bearerAuth":{}}}
+ *     security={{"bearerAuth":{}}}
  * )
- *
  *
  *
  */

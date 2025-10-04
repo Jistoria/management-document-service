@@ -2529,12 +2529,7 @@
                             }
                         }
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             },
             "post": {
                 "tags": [
@@ -4574,72 +4569,6 @@
                 }
             }
         },
-        "/process-categories/dropdown": {
-            "get": {
-                "tags": [
-                    "Process Categories"
-                ],
-                "summary": "Obtener categorías para dropdown",
-                "description": "Obtiene una lista simplificada de categorías de proceso para usar en dropdowns",
-                "operationId": "getProcessCategoriesDropdown",
-                "parameters": [
-                    {
-                        "name": "subsystem_id",
-                        "in": "query",
-                        "description": "Filtra las categorías por subsistema específico",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    },
-                    {
-                        "name": "search",
-                        "in": "query",
-                        "description": "Buscar categorías por nombre o código",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "maxLength": 255
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Lista de categorías para dropdown obtenida exitosamente",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "allOf": [
-                                        {
-                                            "$ref": "#/components/schemas/SuccessResponse"
-                                        },
-                                        {
-                                            "properties": {
-                                                "data": {
-                                                    "$ref": "#/components/schemas/ProcessCategoryDropdownResponse"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Error interno del servidor",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Error"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/process-categories/{categoryId}/processes": {
             "get": {
                 "tags": [
@@ -4711,17 +4640,649 @@
                 }
             }
         },
+        "/processes": {
+            "get": {
+                "tags": [
+                    "Processes"
+                ],
+                "summary": "Listar procesos",
+                "description": "Obtiene un listado de procesos con soporte para paginación, formatos alternativos y filtros por categoría, código y creador.",
+                "operationId": "getProcesses",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Buscar por nombre o código",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "processCategoryId",
+                        "in": "query",
+                        "description": "Filtrar por ID de categoría de proceso",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "parentId",
+                        "in": "query",
+                        "description": "Filtrar por ID de proceso padre",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "nullable": true
+                        }
+                    },
+                    {
+                        "name": "code",
+                        "in": "query",
+                        "description": "Filtrar por código exacto",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "createdBy",
+                        "in": "query",
+                        "description": "Filtrar por usuario creador",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "format",
+                        "in": "query",
+                        "description": "Formato de respuesta (collection, paginate, minimal, dropdown, pluck)",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "collection",
+                                "paginate",
+                                "minimal",
+                                "dropdown",
+                                "pluck"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "perPage",
+                        "in": "query",
+                        "description": "Elementos por página cuando se usa paginación",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Número de página cuando se usa paginación",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Procesos obtenidos exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Procesos obtenidos exitosamente"
+                                        },
+                                        "data": {
+                                            "oneOf": [
+                                                {
+                                                    "properties": {
+                                                        "data": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/components/schemas/Process"
+                                                            }
+                                                        },
+                                                        "count": {
+                                                            "type": "integer",
+                                                            "example": 10
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                {
+                                                    "properties": {
+                                                        "data": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/components/schemas/Process"
+                                                            }
+                                                        },
+                                                        "pagination": {
+                                                            "$ref": "#/components/schemas/Pagination"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Processes"
+                ],
+                "summary": "Crear proceso",
+                "description": "Crea un nuevo proceso dentro de una categoría especificada.",
+                "operationId": "storeProcess",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProcessCreateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Proceso creado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Proceso creado exitosamente"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/ProcessDetailed"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error de negocio o datos duplicados",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/processes/{id}": {
+            "get": {
+                "tags": [
+                    "Processes"
+                ],
+                "summary": "Obtener proceso",
+                "description": "Retorna la información detallada de un proceso por su identificador.",
+                "operationId": "showProcess",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del proceso",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "description": "Relaciones a incluir (processCategory,parent,children,requiredDocuments)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Proceso obtenido exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Proceso obtenido exitosamente"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/ProcessDetailed"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Proceso no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NotFoundResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Processes"
+                ],
+                "summary": "Actualizar proceso",
+                "description": "Actualiza los datos de un proceso existente.",
+                "operationId": "updateProcess",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del proceso",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProcessUpdateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Proceso actualizado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Proceso actualizado exitosamente"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/ProcessDetailed"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error de negocio o datos duplicados",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Proceso no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NotFoundResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Processes"
+                ],
+                "summary": "Eliminar proceso",
+                "description": "Elimina un proceso existente.",
+                "operationId": "deleteProcess",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del proceso",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Proceso eliminado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Proceso eliminado exitosamente"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "format": "uuid"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Proceso no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NotFoundResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/required-documents": {
             "get": {
                 "tags": [
                     "RequiredDocuments"
                 ],
-                "summary": "List required documents",
-                "description": "Returns a list of required documents with support for pagination and collection formats",
+                "summary": "Listar documentos requeridos",
+                "description": "Obtiene el listado de documentos requeridos con soporte para filtros, paginación y diferentes formatos de respuesta",
                 "operationId": "getRequiredDocuments",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Buscar por código u otros campos",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "processId",
+                        "in": "query",
+                        "description": "Filtrar por ID de proceso",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "documentTypeId",
+                        "in": "query",
+                        "description": "Filtrar por ID de tipo de documento",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "academicRoleId",
+                        "in": "query",
+                        "description": "Filtrar por ID de rol académico",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "metadataSchemaId",
+                        "in": "query",
+                        "description": "Filtrar por ID de esquema de metadatos",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "isPublic",
+                        "in": "query",
+                        "description": "Filtrar por visibilidad pública",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "perPage",
+                        "in": "query",
+                        "description": "Elementos por página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "format",
+                        "in": "query",
+                        "description": "Formato de respuesta (collection, paginate, minimal, dropdown, pluck)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "collection",
+                                "paginate",
+                                "minimal",
+                                "dropdown",
+                                "pluck"
+                            ]
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": "Required documents retrieved successfully"
+                        "description": "Documentos requeridos obtenidos exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Required documents retrieved successfully"
+                                        },
+                                        "data": {
+                                            "oneOf": [
+                                                {
+                                                    "properties": {
+                                                        "data": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/components/schemas/RequiredDocument"
+                                                            }
+                                                        },
+                                                        "count": {
+                                                            "type": "integer",
+                                                            "example": 5
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                {
+                                                    "properties": {
+                                                        "data": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/components/schemas/RequiredDocument"
+                                                            }
+                                                        },
+                                                        "pagination": {
+                                                            "$ref": "#/components/schemas/Pagination"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
                     }
                 }
             },
@@ -4729,12 +5290,62 @@
                 "tags": [
                     "RequiredDocuments"
                 ],
-                "summary": "Create required document",
-                "description": "Creates a new required document",
+                "summary": "Crear documento requerido",
+                "description": "Crea un nuevo documento requerido",
                 "operationId": "storeRequiredDocument",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RequiredDocumentCreateRequest"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "201": {
-                        "description": "Required document created successfully"
+                        "description": "Documento requerido creado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Required document created successfully"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/RequiredDocumentDetailed"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -4744,23 +5355,73 @@
                 "tags": [
                     "RequiredDocuments"
                 ],
-                "summary": "Show required document",
-                "description": "Returns the details of a required document",
+                "summary": "Obtener documento requerido",
+                "description": "Retorna el detalle de un documento requerido",
                 "operationId": "showRequiredDocument",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
+                        "description": "ID del documento requerido",
                         "required": true,
                         "schema": {
                             "type": "string",
                             "format": "uuid"
                         }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "description": "Relaciones a incluir (documentType,process,metadataSchema)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Required document retrieved successfully"
+                        "description": "Documento requerido obtenido exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Required document retrieved successfully"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/RequiredDocumentDetailed"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Documento requerido no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
                     }
                 }
             },
@@ -4768,13 +5429,14 @@
                 "tags": [
                     "RequiredDocuments"
                 ],
-                "summary": "Update required document",
-                "description": "Updates an existing required document",
+                "summary": "Actualizar documento requerido",
+                "description": "Actualiza un documento requerido existente",
                 "operationId": "updateRequiredDocument",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
+                        "description": "ID del documento requerido",
                         "required": true,
                         "schema": {
                             "type": "string",
@@ -4782,9 +5444,69 @@
                         }
                     }
                 ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RequiredDocumentUpdateRequest"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
-                        "description": "Required document updated successfully"
+                        "description": "Documento requerido actualizado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Required document updated successfully"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/RequiredDocumentDetailed"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Documento requerido no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
                     }
                 }
             },
@@ -4792,13 +5514,14 @@
                 "tags": [
                     "RequiredDocuments"
                 ],
-                "summary": "Delete required document",
-                "description": "Soft deletes a required document",
+                "summary": "Eliminar documento requerido",
+                "description": "Elimina lógicamente un documento requerido",
                 "operationId": "destroyRequiredDocument",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
+                        "description": "ID del documento requerido",
                         "required": true,
                         "schema": {
                             "type": "string",
@@ -4808,7 +5531,53 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Required document deleted successfully"
+                        "description": "Documento requerido eliminado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Required document deleted successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "deleted": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Documento requerido no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -4818,13 +5587,14 @@
                 "tags": [
                     "RequiredDocuments"
                 ],
-                "summary": "Restore required document",
-                "description": "Restores a previously deleted required document",
+                "summary": "Restaurar documento requerido",
+                "description": "Restaura un documento requerido eliminado previamente",
                 "operationId": "restoreRequiredDocument",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
+                        "description": "ID del documento requerido",
                         "required": true,
                         "schema": {
                             "type": "string",
@@ -4834,7 +5604,47 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Required document restored successfully"
+                        "description": "Documento requerido restaurado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Required document restored successfully"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/RequiredDocumentDetailed"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Documento requerido no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -4844,13 +5654,14 @@
                 "tags": [
                     "RequiredDocuments"
                 ],
-                "summary": "Required document statistics",
-                "description": "Returns statistics for a required document",
+                "summary": "Estadísticas de documento requerido",
+                "description": "Obtiene estadísticas asociadas a un documento requerido",
                 "operationId": "statisticsRequiredDocument",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
+                        "description": "ID del documento requerido",
                         "required": true,
                         "schema": {
                             "type": "string",
@@ -4860,7 +5671,47 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Statistics retrieved successfully"
+                        "description": "Estadísticas obtenidas exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Required document statistics retrieved successfully"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/RequiredDocumentStatistics"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Documento requerido no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -4870,34 +5721,68 @@
                 "tags": [
                     "RequiredDocuments"
                 ],
-                "summary": "Bulk delete required documents",
-                "description": "Deletes multiple required documents in a single operation",
+                "summary": "Eliminación masiva de documentos requeridos",
+                "description": "Elimina múltiples documentos requeridos en una sola operación",
                 "operationId": "bulkDeleteRequiredDocuments",
                 "requestBody": {
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "required": [
-                                    "ids"
-                                ],
-                                "properties": {
-                                    "ids": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "uuid"
-                                        }
-                                    }
-                                },
-                                "type": "object"
+                                "$ref": "#/components/schemas/RequiredDocumentBulkDeleteRequest"
                             }
                         }
                     }
                 },
                 "responses": {
                     "200": {
-                        "description": "Bulk deletion performed successfully"
+                        "description": "Documentos requeridos eliminados exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Required documents deleted successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "deleted_count": {
+                                                    "type": "integer",
+                                                    "example": 3
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -4908,7 +5793,7 @@
                     "StorageUnits"
                 ],
                 "summary": "Listar unidades de almacenamiento",
-                "description": "Retorna el listado de unidades de almacenamiento",
+                "description": "Retorna el listado de unidades de almacenamiento con soporte para filtros, jerarquía e incluye relaciones opcionales",
                 "operationId": "getStorageUnits",
                 "parameters": [
                     {
@@ -4946,6 +5831,14 @@
                         }
                     },
                     {
+                        "name": "include",
+                        "in": "query",
+                        "description": "Relaciones a incluir (storageUnitType,parent,children)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
                         "name": "perPage",
                         "in": "query",
                         "description": "Elementos por página",
@@ -4956,7 +5849,7 @@
                     {
                         "name": "format",
                         "in": "query",
-                        "description": "Formato de respuesta",
+                        "description": "Formato de respuesta (collection, paginate, minimal, dropdown, pluck)",
                         "schema": {
                             "type": "string",
                             "enum": [
@@ -4966,14 +5859,6 @@
                                 "dropdown",
                                 "pluck"
                             ]
-                        }
-                    },
-                    {
-                        "name": "include",
-                        "in": "query",
-                        "description": "Relaciones a incluir",
-                        "schema": {
-                            "type": "string"
                         }
                     },
                     {
@@ -4999,7 +5884,77 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Unidades de almacenamiento obtenidas exitosamente"
+                        "description": "Unidades de almacenamiento obtenidas exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unidades de almacenamiento obtenidas exitosamente"
+                                        },
+                                        "data": {
+                                            "oneOf": [
+                                                {
+                                                    "properties": {
+                                                        "data": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/components/schemas/StorageUnit"
+                                                            }
+                                                        },
+                                                        "count": {
+                                                            "type": "integer",
+                                                            "example": 15
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                {
+                                                    "properties": {
+                                                        "data": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/components/schemas/StorageUnit"
+                                                            }
+                                                        },
+                                                        "pagination": {
+                                                            "$ref": "#/components/schemas/Pagination"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
                     }
                 }
             },
@@ -5015,36 +5970,54 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "required": [
-                                    "storageUnitTypeId",
-                                    "label"
-                                ],
-                                "properties": {
-                                    "storageUnitTypeId": {
-                                        "type": "string",
-                                        "format": "uuid"
-                                    },
-                                    "parentId": {
-                                        "type": "string",
-                                        "format": "uuid",
-                                        "nullable": true
-                                    },
-                                    "label": {
-                                        "type": "string"
-                                    },
-                                    "code": {
-                                        "type": "string",
-                                        "nullable": true
-                                    }
-                                },
-                                "type": "object"
+                                "$ref": "#/components/schemas/StorageUnitCreateRequest"
                             }
                         }
                     }
                 },
                 "responses": {
                     "201": {
-                        "description": "Unidad de almacenamiento creada exitosamente"
+                        "description": "Unidad de almacenamiento creada exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unidad de almacenamiento creada exitosamente"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/StorageUnitDetailed"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -5054,13 +6027,14 @@
                 "tags": [
                     "StorageUnits"
                 ],
-                "summary": "Mostrar unidad de almacenamiento",
+                "summary": "Obtener unidad de almacenamiento",
                 "description": "Obtiene los detalles de una unidad de almacenamiento",
                 "operationId": "showStorageUnit",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
+                        "description": "ID de la unidad de almacenamiento",
                         "required": true,
                         "schema": {
                             "type": "string",
@@ -5070,7 +6044,47 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Unidad de almacenamiento obtenida exitosamente"
+                        "description": "Unidad de almacenamiento obtenida exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unidad de almacenamiento obtenida exitosamente"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/StorageUnitDetailed"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Unidad de almacenamiento no encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
                     }
                 }
             },
@@ -5085,6 +6099,7 @@
                     {
                         "name": "id",
                         "in": "path",
+                        "description": "ID de la unidad de almacenamiento",
                         "required": true,
                         "schema": {
                             "type": "string",
@@ -5097,32 +6112,64 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "properties": {
-                                    "storageUnitTypeId": {
-                                        "type": "string",
-                                        "format": "uuid"
-                                    },
-                                    "parentId": {
-                                        "type": "string",
-                                        "format": "uuid",
-                                        "nullable": true
-                                    },
-                                    "label": {
-                                        "type": "string"
-                                    },
-                                    "code": {
-                                        "type": "string",
-                                        "nullable": true
-                                    }
-                                },
-                                "type": "object"
+                                "$ref": "#/components/schemas/StorageUnitUpdateRequest"
                             }
                         }
                     }
                 },
                 "responses": {
                     "200": {
-                        "description": "Unidad de almacenamiento actualizada exitosamente"
+                        "description": "Unidad de almacenamiento actualizada exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unidad de almacenamiento actualizada exitosamente"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/StorageUnitDetailed"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Unidad de almacenamiento no encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
                     }
                 }
             },
@@ -5137,6 +6184,7 @@
                     {
                         "name": "id",
                         "in": "path",
+                        "description": "ID de la unidad de almacenamiento",
                         "required": true,
                         "schema": {
                             "type": "string",
@@ -5146,7 +6194,63 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Unidad de almacenamiento eliminada exitosamente"
+                        "description": "Unidad de almacenamiento eliminada exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unidad de almacenamiento eliminada exitosamente"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "format": "uuid"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "No se puede eliminar la unidad por dependencias",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Unidad de almacenamiento no encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -5156,8 +6260,8 @@
                 "tags": [
                     "StorageUnitTypes"
                 ],
-                "summary": "Listar tipos de unidad",
-                "description": "Retorna el listado de tipos de unidad de almacenamiento",
+                "summary": "Listar tipos de unidades de almacenamiento",
+                "description": "Retorna el listado de tipos de unidades de almacenamiento con soporte para filtros y múltiples formatos",
                 "operationId": "getStorageUnitTypes",
                 "parameters": [
                     {
@@ -5187,7 +6291,15 @@
                     {
                         "name": "created_by",
                         "in": "query",
-                        "description": "Filtrar por creador",
+                        "description": "Filtrar por usuario creador",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "description": "Relaciones a incluir (storageUnits)",
                         "schema": {
                             "type": "string"
                         }
@@ -5203,7 +6315,7 @@
                     {
                         "name": "format",
                         "in": "query",
-                        "description": "Formato de respuesta",
+                        "description": "Formato de respuesta (collection, paginate, minimal, dropdown, pluck)",
                         "schema": {
                             "type": "string",
                             "enum": [
@@ -5213,14 +6325,6 @@
                                 "dropdown",
                                 "pluck"
                             ]
-                        }
-                    },
-                    {
-                        "name": "include",
-                        "in": "query",
-                        "description": "Relaciones a incluir",
-                        "schema": {
-                            "type": "string"
                         }
                     },
                     {
@@ -5246,7 +6350,77 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Tipos de unidad obtenidos exitosamente"
+                        "description": "Tipos de unidad obtenidos exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Tipos de unidad obtenidos exitosamente"
+                                        },
+                                        "data": {
+                                            "oneOf": [
+                                                {
+                                                    "properties": {
+                                                        "data": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/components/schemas/StorageUnitType"
+                                                            }
+                                                        },
+                                                        "count": {
+                                                            "type": "integer",
+                                                            "example": 10
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                {
+                                                    "properties": {
+                                                        "data": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/components/schemas/StorageUnitType"
+                                                            }
+                                                        },
+                                                        "pagination": {
+                                                            "$ref": "#/components/schemas/Pagination"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
                     }
                 }
             },
@@ -5254,7 +6428,7 @@
                 "tags": [
                     "StorageUnitTypes"
                 ],
-                "summary": "Crear tipo de unidad",
+                "summary": "Crear tipo de unidad de almacenamiento",
                 "description": "Crea un nuevo tipo de unidad de almacenamiento",
                 "operationId": "storeStorageUnitType",
                 "requestBody": {
@@ -5262,30 +6436,54 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "required": [
-                                    "name",
-                                    "code",
-                                    "level"
-                                ],
-                                "properties": {
-                                    "name": {
-                                        "type": "string"
-                                    },
-                                    "code": {
-                                        "type": "string"
-                                    },
-                                    "level": {
-                                        "type": "integer"
-                                    }
-                                },
-                                "type": "object"
+                                "$ref": "#/components/schemas/StorageUnitTypeCreateRequest"
                             }
                         }
                     }
                 },
                 "responses": {
                     "201": {
-                        "description": "Tipo de unidad creado exitosamente"
+                        "description": "Tipo de unidad creado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Tipo de unidad creado exitosamente"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/StorageUnitTypeDetailed"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -5295,13 +6493,14 @@
                 "tags": [
                     "StorageUnitTypes"
                 ],
-                "summary": "Mostrar tipo de unidad",
+                "summary": "Obtener tipo de unidad",
                 "description": "Obtiene los detalles de un tipo de unidad de almacenamiento",
                 "operationId": "showStorageUnitType",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
+                        "description": "ID del tipo de unidad",
                         "required": true,
                         "schema": {
                             "type": "string",
@@ -5311,7 +6510,47 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Tipo de unidad obtenido exitosamente"
+                        "description": "Tipo de unidad obtenido exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Tipo de unidad obtenido exitosamente"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/StorageUnitTypeDetailed"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Tipo de unidad no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
                     }
                 }
             },
@@ -5326,6 +6565,7 @@
                     {
                         "name": "id",
                         "in": "path",
+                        "description": "ID del tipo de unidad",
                         "required": true,
                         "schema": {
                             "type": "string",
@@ -5338,25 +6578,64 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "properties": {
-                                    "name": {
-                                        "type": "string"
-                                    },
-                                    "code": {
-                                        "type": "string"
-                                    },
-                                    "level": {
-                                        "type": "integer"
-                                    }
-                                },
-                                "type": "object"
+                                "$ref": "#/components/schemas/StorageUnitTypeUpdateRequest"
                             }
                         }
                     }
                 },
                 "responses": {
                     "200": {
-                        "description": "Tipo de unidad actualizado exitosamente"
+                        "description": "Tipo de unidad actualizado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Tipo de unidad actualizado exitosamente"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/StorageUnitTypeDetailed"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Tipo de unidad no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
                     }
                 }
             },
@@ -5371,6 +6650,7 @@
                     {
                         "name": "id",
                         "in": "path",
+                        "description": "ID del tipo de unidad",
                         "required": true,
                         "schema": {
                             "type": "string",
@@ -5380,7 +6660,63 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Tipo de unidad eliminado exitosamente"
+                        "description": "Tipo de unidad eliminado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Tipo de unidad eliminado exitosamente"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "format": "uuid"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "No se puede eliminar el tipo por dependencias",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Tipo de unidad no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -7043,52 +8379,78 @@
                 "description": "Defines a document required for a process or metadata schema",
                 "properties": {
                     "id": {
+                        "description": "Identificador del documento requerido",
                         "type": "string",
                         "format": "uuid",
                         "example": "0197d795-7572-7331-903b-3aeed9fb34c2"
                     },
                     "processId": {
+                        "description": "Proceso asociado al documento requerido",
                         "type": "string",
                         "format": "uuid",
                         "nullable": true
                     },
                     "documentTypeId": {
+                        "description": "Tipo de documento solicitado",
                         "type": "string",
                         "format": "uuid"
                     },
                     "academicRoleId": {
+                        "description": "Rol académico al que aplica",
                         "type": "string",
                         "format": "uuid",
                         "nullable": true
                     },
                     "metadataSchemaId": {
+                        "description": "Esquema de metadatos alternativo",
                         "type": "string",
                         "format": "uuid",
                         "nullable": true
                     },
+                    "codeDefault": {
+                        "description": "Código por defecto usado para identificar el documento",
+                        "type": "string",
+                        "example": "ADM-POST-REQ-2024"
+                    },
+                    "urlResource": {
+                        "description": "URL del recurso de referencia",
+                        "type": "string",
+                        "example": "https://example.com/templates/doc.pdf",
+                        "nullable": true
+                    },
+                    "isPublic": {
+                        "description": "Indica si el documento es visible públicamente",
+                        "type": "boolean",
+                        "example": false
+                    },
                     "order": {
+                        "description": "Orden de presentación",
                         "type": "integer",
                         "example": 1
                     },
-                    "mandatory": {
-                        "type": "boolean",
-                        "example": true
-                    },
-                    "externalUserId": {
+                    "createdBy": {
+                        "description": "Usuario que creó el documento",
                         "type": "string",
+                        "example": "system",
                         "nullable": true
                     },
-                    "externalOrganizationId": {
+                    "updatedBy": {
+                        "description": "Usuario que actualizó el documento",
                         "type": "string",
+                        "example": "admin",
                         "nullable": true
                     },
                     "createdAt": {
+                        "description": "Fecha de creación",
                         "type": "string",
-                        "format": "date-time"
+                        "format": "date-time",
+                        "example": "2024-05-01T12:00:00Z"
                     },
                     "updatedAt": {
+                        "description": "Fecha de última actualización",
                         "type": "string",
-                        "format": "date-time"
+                        "format": "date-time",
+                        "example": "2024-05-15T18:30:00Z"
                     }
                 },
                 "type": "object"
@@ -7104,11 +8466,15 @@
                                 "$ref": "#/components/schemas/DocumentType"
                             },
                             "process": {
-                                "description": "Included conditionally",
+                                "description": "Proceso asociado (incluido condicionalmente)",
                                 "type": "object"
                             },
-                            "statistics": {
-                                "description": "Statistics (included conditionally)",
+                            "metadataSchema": {
+                                "description": "Esquema de metadatos relacionado (incluido condicionalmente)",
+                                "type": "object"
+                            },
+                            "academicRole": {
+                                "description": "Rol académico relacionado (incluido condicionalmente)",
                                 "type": "object"
                             },
                             "meta": {
@@ -7134,6 +8500,427 @@
                         "type": "object"
                     }
                 ]
+            },
+            "RequiredDocumentCreateRequest": {
+                "title": "Create Required Document Request",
+                "required": [
+                    "documentTypeId"
+                ],
+                "properties": {
+                    "processId": {
+                        "description": "Proceso al que aplica el documento (requerido si no se envía metadataSchemaId)",
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": true
+                    },
+                    "documentTypeId": {
+                        "description": "Tipo de documento requerido",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "academicRoleId": {
+                        "description": "Rol académico específico",
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": true
+                    },
+                    "metadataSchemaId": {
+                        "description": "Esquema de metadatos alternativo (requerido si no se envía processId)",
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": true
+                    },
+                    "codeDefault": {
+                        "description": "Código personalizado para el documento",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "urlResource": {
+                        "description": "URL del recurso de referencia",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "isPublic": {
+                        "description": "Visibilidad pública del documento",
+                        "type": "boolean",
+                        "nullable": true
+                    },
+                    "order": {
+                        "description": "Orden en el que se solicita el documento",
+                        "type": "integer",
+                        "minimum": 0,
+                        "nullable": true
+                    },
+                    "generateDefaultCode": {
+                        "description": "Genera automáticamente el código por defecto usando el patrón del servicio",
+                        "type": "boolean",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "RequiredDocumentUpdateRequest": {
+                "title": "Update Required Document Request",
+                "properties": {
+                    "processId": {
+                        "description": "Proceso asociado",
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": true
+                    },
+                    "documentTypeId": {
+                        "description": "Tipo de documento requerido",
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": true
+                    },
+                    "academicRoleId": {
+                        "description": "Rol académico asociado",
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": true
+                    },
+                    "metadataSchemaId": {
+                        "description": "Esquema de metadatos alternativo",
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": true
+                    },
+                    "codeDefault": {
+                        "description": "Código personalizado del documento",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "urlResource": {
+                        "description": "URL del recurso de referencia",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "isPublic": {
+                        "description": "Visibilidad pública del documento",
+                        "type": "boolean",
+                        "nullable": true
+                    },
+                    "order": {
+                        "description": "Orden en el que se solicita el documento",
+                        "type": "integer",
+                        "minimum": 0,
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "RequiredDocumentStatistics": {
+                "title": "Required Document Statistics",
+                "description": "Estadísticas asociadas a un documento requerido",
+                "properties": {
+                    "total_documents_for_process": {
+                        "description": "Total de documentos del proceso",
+                        "type": "integer",
+                        "example": 5
+                    },
+                    "mandatory_documents_for_process": {
+                        "description": "Documentos obligatorios del proceso",
+                        "type": "integer",
+                        "example": 3
+                    }
+                },
+                "type": "object"
+            },
+            "RequiredDocumentBulkDeleteRequest": {
+                "title": "Bulk Delete Required Documents Request",
+                "required": [
+                    "ids"
+                ],
+                "properties": {
+                    "ids": {
+                        "description": "Listado de IDs a eliminar",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "StorageUnitType": {
+                "title": "Storage Unit Type",
+                "description": "Tipo de unidad de almacenamiento",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "0197d795-7572-7331-903b-3aeed9fb34c2"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Edificio"
+                    },
+                    "code": {
+                        "type": "string",
+                        "example": "BUILDING"
+                    },
+                    "level": {
+                        "type": "integer",
+                        "example": 0
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "createdBy": {
+                        "type": "string",
+                        "example": "system",
+                        "nullable": true
+                    },
+                    "updatedBy": {
+                        "type": "string",
+                        "example": "system",
+                        "nullable": true
+                    },
+                    "version": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "storageUnitsCount": {
+                        "type": "integer",
+                        "example": 4,
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "StorageUnitTypeDetailed": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/StorageUnitType"
+                    },
+                    {
+                        "properties": {
+                            "storageUnits": {
+                                "description": "Unidades asociadas (incluidas condicionalmente)",
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/StorageUnit"
+                                }
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "StorageUnitTypeCreateRequest": {
+                "title": "Create Storage Unit Type Request",
+                "required": [
+                    "name",
+                    "code",
+                    "level"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "Edificio"
+                    },
+                    "code": {
+                        "type": "string",
+                        "example": "BUILDING"
+                    },
+                    "level": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "example": 0
+                    }
+                },
+                "type": "object"
+            },
+            "StorageUnitTypeUpdateRequest": {
+                "title": "Update Storage Unit Type Request",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "Edificio"
+                    },
+                    "code": {
+                        "type": "string",
+                        "example": "BUILDING"
+                    },
+                    "level": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "example": 1
+                    }
+                },
+                "type": "object"
+            },
+            "StorageUnit": {
+                "title": "Storage Unit",
+                "description": "Unidad de almacenamiento",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "0197d795-7572-7331-903b-3aeed9fb34c2"
+                    },
+                    "storageUnitTypeId": {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "0197d795-7572-7331-903b-3aeed9fb34c2"
+                    },
+                    "parentId": {
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": true
+                    },
+                    "label": {
+                        "type": "string",
+                        "example": "Archivo Central"
+                    },
+                    "code": {
+                        "type": "string",
+                        "example": "ARCH-001",
+                        "nullable": true
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "createdBy": {
+                        "type": "string",
+                        "example": "system",
+                        "nullable": true
+                    },
+                    "updatedBy": {
+                        "type": "string",
+                        "example": "system",
+                        "nullable": true
+                    },
+                    "version": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "childrenCount": {
+                        "type": "integer",
+                        "example": 2,
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "StorageUnitDetailed": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/StorageUnit"
+                    },
+                    {
+                        "properties": {
+                            "storageUnitType": {
+                                "$ref": "#/components/schemas/StorageUnitType"
+                            },
+                            "parent": {
+                                "oneOf": [
+                                    {
+                                        "$ref": "#/components/schemas/StorageUnit"
+                                    }
+                                ],
+                                "nullable": true,
+                                "description": "Unidad padre (incluida condicionalmente)"
+                            },
+                            "children": {
+                                "description": "Subunidades (incluidas condicionalmente)",
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/StorageUnit"
+                                }
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "StorageUnitCreateRequest": {
+                "title": "Create Storage Unit Request",
+                "required": [
+                    "storageUnitTypeId",
+                    "label"
+                ],
+                "properties": {
+                    "storageUnitTypeId": {
+                        "description": "ID del tipo de unidad",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "parentId": {
+                        "description": "ID de la unidad padre",
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": true
+                    },
+                    "label": {
+                        "description": "Etiqueta de la unidad",
+                        "type": "string"
+                    },
+                    "code": {
+                        "description": "Código de la unidad",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "createdBy": {
+                        "description": "Usuario creador",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "updatedBy": {
+                        "description": "Usuario actualizador",
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "StorageUnitUpdateRequest": {
+                "title": "Update Storage Unit Request",
+                "properties": {
+                    "storageUnitTypeId": {
+                        "description": "ID del tipo de unidad",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "parentId": {
+                        "description": "ID de la unidad padre",
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": true
+                    },
+                    "label": {
+                        "description": "Etiqueta de la unidad",
+                        "type": "string"
+                    },
+                    "code": {
+                        "description": "Código de la unidad",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "createdBy": {
+                        "description": "Usuario creador",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "updatedBy": {
+                        "description": "Usuario actualizador",
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
             },
             "MetadataSchema": {
                 "title": "Metadata Schema",
@@ -7782,21 +9569,204 @@
                         "format": "uuid",
                         "example": "550e8400-e29b-41d4-a716-446655440002"
                     },
+                    "processCategoryId": {
+                        "description": "ID de la categoría a la que pertenece",
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "550e8400-e29b-41d4-a716-446655440010"
+                    },
+                    "parentId": {
+                        "description": "Proceso padre en caso de jerarquías",
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "550e8400-e29b-41d4-a716-446655440099",
+                        "nullable": true
+                    },
                     "name": {
                         "description": "Nombre del proceso",
                         "type": "string",
                         "example": "Inscripción de Nuevos Estudiantes"
                     },
                     "code": {
-                        "description": "Código del proceso",
+                        "description": "Código único del proceso",
                         "type": "string",
                         "example": "INSCRIPCION",
                         "nullable": true
                     },
                     "order": {
-                        "description": "Orden del proceso dentro de la categoría",
+                        "description": "Orden relativo dentro de la categoría",
                         "type": "integer",
-                        "example": 1
+                        "example": 1,
+                        "nullable": true
+                    },
+                    "createdAt": {
+                        "description": "Fecha de creación",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-01-15T10:30:00Z"
+                    },
+                    "updatedAt": {
+                        "description": "Fecha de última actualización",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-01-20T14:45:00Z"
+                    },
+                    "createdBy": {
+                        "description": "Usuario que creó el proceso",
+                        "type": "string",
+                        "example": "system",
+                        "nullable": true
+                    },
+                    "updatedBy": {
+                        "description": "Usuario que actualizó el proceso",
+                        "type": "string",
+                        "example": "admin",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "ProcessDetailed": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/Process"
+                    },
+                    {
+                        "properties": {
+                            "processCategory": {
+                                "oneOf": [
+                                    {
+                                        "$ref": "#/components/schemas/ProcessCategory"
+                                    }
+                                ],
+                                "nullable": true,
+                                "description": "Categoría a la que pertenece el proceso"
+                            },
+                            "parent": {
+                                "oneOf": [
+                                    {
+                                        "$ref": "#/components/schemas/Process"
+                                    }
+                                ],
+                                "nullable": true,
+                                "description": "Proceso padre si aplica"
+                            },
+                            "children": {
+                                "description": "Procesos hijos",
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/Process"
+                                }
+                            },
+                            "requiredDocuments": {
+                                "description": "Documentos requeridos asociados",
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/RequiredDocument"
+                                }
+                            },
+                            "meta": {
+                                "properties": {
+                                    "resourceType": {
+                                        "type": "string",
+                                        "example": "process"
+                                    },
+                                    "generatedAt": {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    "context": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "ProcessCreateRequest": {
+                "title": "Create Process Request",
+                "required": [
+                    "processCategoryId",
+                    "name"
+                ],
+                "properties": {
+                    "processCategoryId": {
+                        "description": "ID de la categoría de proceso",
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "550e8400-e29b-41d4-a716-446655440010"
+                    },
+                    "parentId": {
+                        "description": "Proceso padre si aplica",
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "550e8400-e29b-41d4-a716-446655440099",
+                        "nullable": true
+                    },
+                    "name": {
+                        "description": "Nombre del proceso",
+                        "type": "string",
+                        "maxLength": 255,
+                        "example": "Inscripción de Nuevos Estudiantes"
+                    },
+                    "code": {
+                        "description": "Código único del proceso",
+                        "type": "string",
+                        "maxLength": 255,
+                        "example": "INSCRIPCION",
+                        "nullable": true
+                    },
+                    "order": {
+                        "description": "Orden dentro de la categoría",
+                        "type": "integer",
+                        "example": 1,
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "ProcessUpdateRequest": {
+                "title": "Update Process Request",
+                "properties": {
+                    "processCategoryId": {
+                        "description": "ID de la categoría de proceso",
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "550e8400-e29b-41d4-a716-446655440010",
+                        "nullable": true
+                    },
+                    "parentId": {
+                        "description": "Proceso padre",
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "550e8400-e29b-41d4-a716-446655440099",
+                        "nullable": true
+                    },
+                    "name": {
+                        "description": "Nombre del proceso",
+                        "type": "string",
+                        "maxLength": 255,
+                        "example": "Inscripción de Nuevos Estudiantes",
+                        "nullable": true
+                    },
+                    "code": {
+                        "description": "Código único del proceso",
+                        "type": "string",
+                        "maxLength": 255,
+                        "example": "INSCRIPCION",
+                        "nullable": true
+                    },
+                    "order": {
+                        "description": "Orden dentro de la categoría",
+                        "type": "integer",
+                        "example": 1,
+                        "nullable": true
                     }
                 },
                 "type": "object"
@@ -8026,6 +9996,10 @@
         {
             "name": "Process Categories",
             "description": "Process Categories"
+        },
+        {
+            "name": "Processes",
+            "description": "Processes"
         },
         {
             "name": "RequiredDocuments",

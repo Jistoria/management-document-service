@@ -18,6 +18,9 @@ class UpdateRequiredDocumentRequest extends BaseFormRequest
             'documentTypeId' => ['sometimes', 'uuid', 'exists:document_types,id'],
             'academicRoleId' => ['sometimes', 'nullable', 'uuid', 'exists:academic_roles,id'],
             'metadataSchemaId' => ['sometimes', 'nullable', 'uuid', 'exists:metadata_schemas,id', 'required_without:processId'],
+            'codeDefault' => ['sometimes', 'nullable', 'string'],
+            'urlResource' => ['sometimes', 'nullable', 'string'],
+            'isPublic' => ['sometimes', 'boolean'],
             'order' => ['sometimes', 'integer', 'min:0'],
             'mandatory' => ['sometimes', 'boolean'],
             'externalUserId' => ['sometimes', 'nullable', 'string', 'max:255'],
@@ -42,6 +45,12 @@ class UpdateRequiredDocumentRequest extends BaseFormRequest
             'metadataSchemaId.exists' => 'El esquema de metadatos seleccionado no existe',
             'metadataSchemaId.required_without' => 'El esquema de metadatos es requerido cuando no se proporciona un proceso',
 
+            'codeDefault.string' => 'El código predeterminado debe ser una cadena de texto',
+
+            'urlResource.string' => 'La URL del recurso debe ser una cadena de texto',
+
+            'isPublic.boolean' => 'El campo de visibilidad pública debe ser verdadero o falso',
+
             'order.integer' => 'El orden debe ser un número entero',
             'order.min' => 'El orden no puede ser negativo',
 
@@ -62,6 +71,9 @@ class UpdateRequiredDocumentRequest extends BaseFormRequest
             'documentTypeId' => 'tipo de documento',
             'academicRoleId' => 'rol académico',
             'metadataSchemaId' => 'esquema de metadatos',
+            'codeDefault' => 'código predeterminado',
+            'urlResource' => 'URL del recurso',
+            'isPublic' => 'visibilidad pública',
             'order' => 'orden',
             'mandatory' => 'obligatorio',
             'externalUserId' => 'ID de usuario externo',
@@ -74,6 +86,9 @@ class UpdateRequiredDocumentRequest extends BaseFormRequest
         $data = [];
         if ($this->has('mandatory')) {
             $data['mandatory'] = filter_var($this->mandatory, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        }
+        if ($this->has('isPublic')) {
+            $data['isPublic'] = filter_var($this->isPublic, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
         }
         if ($this->has('order')) {
             $data['order'] = (int) $this->order;

@@ -18,6 +18,9 @@ class RequiredDocumentResource extends BaseResource
             'processId' => $this->process_id,
             'documentTypeId' => $this->document_type_id,
             'metadataSchemaId' => $this->metadata_schema_id,
+            'codeDefault' => $this->code_default,
+            'urlResource' => $this->url_resource,
+            'isPublic' => (bool) $this->is_public,
             'order' => $this->order,
             'createdAt' => $this->created_at?->toISOString(),
             'updatedAt' => $this->updated_at?->toISOString(),
@@ -27,6 +30,7 @@ class RequiredDocumentResource extends BaseResource
             'documentType' => new DocumentTypeResource($this->whenLoaded('documentType')),
             'process' => new ProcessResource($this->whenLoaded('process')),
             'metadataSchema' => new MetadataSchemaResource($this->whenLoaded('metadataSchema')),
+            'academicRole' => $this->whenLoaded('academicRole'),
         ];
     }
 
@@ -42,6 +46,12 @@ class RequiredDocumentResource extends BaseResource
         if ($this->relationLoaded('process')) {
             $context[] = 'process';
         }
+        if ($this->relationLoaded('metadataSchema')) {
+            $context[] = 'metadataSchema';
+        }
+        if ($this->relationLoaded('academicRole')) {
+            $context[] = 'academicRole';
+        }
         if (isset($this->statistics)) {
             $context[] = 'statistics';
         }
@@ -56,6 +66,8 @@ class RequiredDocumentResource extends BaseResource
             'processId' => $this->process_id,
             'order' => $this->order,
             'mandatory' => $this->mandatory,
+            'codeDefault' => $this->code_default,
+            'isPublic' => (bool) $this->is_public,
         ];
     }
 

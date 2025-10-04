@@ -37,6 +37,9 @@ class RequiredDocumentController extends Controller
      *     @OA\Parameter(name="academicRoleId", in="query", description="Filtrar por ID de rol académico", required=false, @OA\Schema(type="string", format="uuid")),
      *     @OA\Parameter(name="metadataSchemaId", in="query", description="Filtrar por ID de esquema de metadatos", required=false, @OA\Schema(type="string", format="uuid")),
      *     @OA\Parameter(name="mandatory", in="query", description="Filtrar por obligatoriedad", required=false, @OA\Schema(type="boolean")),
+     *     @OA\Parameter(name="isPublic", in="query", description="Filtrar por visibilidad pública", required=false, @OA\Schema(type="boolean")),
+     *     @OA\Parameter(name="externalUserId", in="query", description="Filtrar por usuario externo asociado", required=false, @OA\Schema(type="string")),
+     *     @OA\Parameter(name="externalOrganizationId", in="query", description="Filtrar por organización externa asociada", required=false, @OA\Schema(type="string")),
      *     @OA\Parameter(name="include", in="query", description="Relaciones a incluir (documentType,process,metadataSchema)", required=false, @OA\Schema(type="string")),
      *     @OA\Parameter(name="perPage", in="query", description="Elementos por página", required=false, @OA\Schema(type="integer")),
      *     @OA\Parameter(name="format", in="query", description="Formato de respuesta (collection, paginate, minimal, dropdown, pluck)", required=false, @OA\Schema(type="string", enum={"collection","paginate","minimal","dropdown","pluck"})),
@@ -74,7 +77,14 @@ class RequiredDocumentController extends Controller
                     RequiredDocumentResource::class,
                     $request,
                     ApiIndexBuilder::extractFilters($request, [
-                        'process_id', 'document_type_id', 'academic_role_id', 'metadata_schema_id', 'mandatory'
+                        'process_id',
+                        'document_type_id',
+                        'academic_role_id',
+                        'metadata_schema_id',
+                        'mandatory',
+                        'is_public',
+                        'external_user_id',
+                        'external_organization_id'
                     ])
                 );
             },

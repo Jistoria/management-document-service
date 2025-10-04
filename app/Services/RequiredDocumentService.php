@@ -65,9 +65,12 @@ class RequiredDocumentService
     {
         $data = RequiredDocument::convertToSnakeCase($data);
 
+        $shouldGenerateDefaultCode = (bool) ($data['generate_default_code'] ?? false);
+        unset($data['generate_default_code']);
+
         $requiredDocument = new RequiredDocument($data);
 
-        if ($data['generateDefaultCode']){
+        if ($shouldGenerateDefaultCode) {
             $code = $this->generateDefaultCode($requiredDocument);
             $requiredDocument->code_default = $code;
         }

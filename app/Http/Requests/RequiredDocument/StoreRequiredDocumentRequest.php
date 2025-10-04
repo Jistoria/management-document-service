@@ -18,7 +18,13 @@ class StoreRequiredDocumentRequest extends BaseFormRequest
             'documentTypeId' => ['required', 'uuid', 'exists:document_types,id'],
             'academicRoleId' => ['nullable', 'uuid', 'exists:academic_roles,id'],
             'metadataSchemaId' => ['nullable', 'uuid', 'exists:metadata_schemas,id', 'required_without:processId'],
+            'codeDefault' => ['nullable', 'string'],
+            'urlResource' => ['nullable', 'string'],
+            'isPublic' => ['nullable', 'boolean'],
             'order' => ['nullable', 'integer', 'min:0'],
+            'mandatory' => ['nullable', 'boolean'],
+            'externalUserId' => ['nullable', 'string', 'max:255'],
+            'externalOrganizationId' => ['nullable', 'string', 'max:255'],
             'generateDefaultCode' => ['nullable', 'boolean'],
         ];
     }
@@ -41,8 +47,22 @@ class StoreRequiredDocumentRequest extends BaseFormRequest
             'metadataSchemaId.exists' => 'El esquema de metadatos seleccionado no existe',
             'metadataSchemaId.required_without' => 'El esquema de metadatos es requerido cuando no se proporciona un proceso',
 
+            'codeDefault.string' => 'El código predeterminado debe ser una cadena de texto',
+
+            'urlResource.string' => 'La URL del recurso debe ser una cadena de texto',
+
+            'isPublic.boolean' => 'El campo de visibilidad pública debe ser verdadero o falso',
+
             'order.integer' => 'El orden debe ser un número entero',
             'order.min' => 'El orden no puede ser negativo',
+
+            'mandatory.boolean' => 'El campo obligatorio debe ser verdadero o falso',
+
+            'externalUserId.string' => 'El ID de usuario externo debe ser una cadena de texto',
+            'externalUserId.max' => 'El ID de usuario externo no puede exceder 255 caracteres',
+
+            'externalOrganizationId.string' => 'El ID de organización externa debe ser una cadena de texto',
+            'externalOrganizationId.max' => 'El ID de organización externa no puede exceder 255 caracteres',
         ];
     }
 
@@ -53,8 +73,14 @@ class StoreRequiredDocumentRequest extends BaseFormRequest
             'documentTypeId' => 'tipo de documento',
             'academicRoleId' => 'rol académico',
             'metadataSchemaId' => 'esquema de metadatos',
+            'codeDefault' => 'código predeterminado',
+            'urlResource' => 'URL del recurso',
+            'isPublic' => 'visibilidad pública',
             'order' => 'orden',
-            'mandatory' => 'obligatorio'
+            'mandatory' => 'obligatorio',
+            'externalUserId' => 'ID de usuario externo',
+            'externalOrganizationId' => 'ID de organización externa',
+            'generateDefaultCode' => 'generar código por defecto'
         ];
     }
 
@@ -63,6 +89,12 @@ class StoreRequiredDocumentRequest extends BaseFormRequest
         $data = [];
         if ($this->has('mandatory')) {
             $data['mandatory'] = filter_var($this->mandatory, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        }
+        if ($this->has('isPublic')) {
+            $data['isPublic'] = filter_var($this->isPublic, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        }
+        if ($this->has('generateDefaultCode')) {
+            $data['generateDefaultCode'] = filter_var($this->generateDefaultCode, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
         }
         if ($this->has('order')) {
             $data['order'] = (int) $this->order;

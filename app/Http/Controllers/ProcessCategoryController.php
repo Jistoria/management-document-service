@@ -344,56 +344,6 @@ class ProcessCategoryController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/process-categories/dropdown",
-     *     summary="Obtener categorías para dropdown",
-     *     description="Obtiene una lista simplificada de categorías de proceso para usar en dropdowns",
-     *     operationId="getProcessCategoriesDropdown",
-     *     tags={"Process Categories"},
-     *     @OA\Parameter(
-     *         name="subsystem_id",
-     *         in="query",
-     *         description="Filtra las categorías por subsistema específico",
-     *         required=false,
-     *         @OA\Schema(type="string", format="uuid")
-     *     ),
-     *     @OA\Parameter(
-     *         name="search",
-     *         in="query",
-     *         description="Buscar categorías por nombre o código",
-     *         required=false,
-     *         @OA\Schema(type="string", maxLength=255)
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Lista de categorías para dropdown obtenida exitosamente",
-     *         @OA\JsonContent(
-     *             allOf={
-     *                 @OA\Schema(ref="#/components/schemas/SuccessResponse"),
-     *                 @OA\Schema(
-     *                     @OA\Property(property="data", ref="#/components/schemas/ProcessCategoryDropdownResponse")
-     *                 )
-     *             }
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Error interno del servidor",
-     *         @OA\JsonContent(ref="#/components/schemas/Error")
-     *     )
-     * )
-     */
-    public function dropdown(FiltersProcessCategoryRequest $request): JsonResponse
-    {
-        return catchSync(function () use ($request) {
-            $filters = $request->validated();
-            $categories = $this->processCategoryService->getForDropdown($filters);
-
-            return ProcessCategoryResource::forDropdown($categories);
-        });
-    }
-
-    /**
-     * @OA\Get(
      *     path="/process-categories/{categoryId}/processes",
      *     summary="Obtener procesos de una categoría",
      *     description="Obtiene todos los procesos asociados a una categoría específica",

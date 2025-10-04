@@ -65,17 +65,17 @@ class RequiredDocumentService
     {
         $data = RequiredDocument::convertToSnakeCase($data);
 
-        $shouldGenerateDefaultCode = (bool) ($data['generate_default_code'] ?? false);
+        $shouldGenerate = (bool)($data['generate_default_code'] ?? false);
         unset($data['generate_default_code']);
 
-        $requiredDocument = new RequiredDocument($data);
+        $hasProvidedCode = array_key_exists('code_default', $data) && $data['code_default'] !== null && $data['code_default'] !== '';
 
-        if ($shouldGenerateDefaultCode) {
-            $code = $this->generateDefaultCode($requiredDocument);
-            $requiredDocument->code_default = $code;
+        if (!$hasProvidedCode && $shouldGenerate) {
+            $tmp = new RequiredDocument($data);
+            $data['code_default'] = $this->generateDefaultCode($tmp);
         }
 
-        $requiredDocument->save();
+        $requiredDocument = RequiredDocument::create($data);
 
         return $requiredDocument;
     }
@@ -141,7 +141,7 @@ class RequiredDocumentService
     {
         $validIds = [];
         foreach ($ids as $id) {
-            if ($this->isValidUuid($id)) {
+            if ($this->validateUuid($id)) {
                 $validIds[] = $id;
             }
         }

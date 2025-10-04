@@ -122,7 +122,7 @@ namespace App\Http\Controllers;
  *                 @OA\Property(property="context", type="array", @OA\Items(type="string"))
  *             )
  *         )
- *     } 
+ *     }
  * )
 
  * @OA\Schema(
@@ -139,9 +139,6 @@ namespace App\Http\Controllers;
  *     @OA\Property(property="urlResource", type="string", nullable=true, example="https://example.com/templates/doc.pdf", description="URL del recurso de referencia"),
  *     @OA\Property(property="isPublic", type="boolean", example=false, description="Indica si el documento es visible públicamente"),
  *     @OA\Property(property="order", type="integer", example=1, description="Orden de presentación"),
- *     @OA\Property(property="mandatory", type="boolean", example=true, description="Marca si el documento es obligatorio"),
- *     @OA\Property(property="externalUserId", type="string", nullable=true, example="usr-873", description="Identificador externo del usuario que creó el registro"),
- *     @OA\Property(property="externalOrganizationId", type="string", nullable=true, example="org-221", description="Identificador externo de la organización"),
  *     @OA\Property(property="createdBy", type="string", nullable=true, example="system", description="Usuario que creó el documento"),
  *     @OA\Property(property="updatedBy", type="string", nullable=true, example="admin", description="Usuario que actualizó el documento"),
  *     @OA\Property(property="createdAt", type="string", format="date-time", example="2024-05-01T12:00:00Z", description="Fecha de creación"),
@@ -157,7 +154,6 @@ namespace App\Http\Controllers;
  *            @OA\Property(property="process", type="object", description="Proceso asociado (incluido condicionalmente)"),
  *            @OA\Property(property="metadataSchema", type="object", description="Esquema de metadatos relacionado (incluido condicionalmente)"),
  *            @OA\Property(property="academicRole", type="object", description="Rol académico relacionado (incluido condicionalmente)"),
- *            @OA\Property(property="statistics", ref="#/components/schemas/RequiredDocumentStatistics", description="Estadísticas calculadas (incluido condicionalmente)"),
  *            @OA\Property(property="meta", type="object",
  *                @OA\Property(property="resourceType", type="string", example="required_document"),
  *                @OA\Property(property="generatedAt", type="string", format="date-time"),
@@ -180,9 +176,6 @@ namespace App\Http\Controllers;
  *     @OA\Property(property="urlResource", type="string", nullable=true, description="URL del recurso de referencia"),
  *     @OA\Property(property="isPublic", type="boolean", nullable=true, description="Visibilidad pública del documento"),
  *     @OA\Property(property="order", type="integer", minimum=0, nullable=true, description="Orden en el que se solicita el documento"),
- *     @OA\Property(property="mandatory", type="boolean", nullable=true, description="Indica si el documento es obligatorio"),
- *     @OA\Property(property="externalUserId", type="string", nullable=true, description="Identificador externo del usuario"),
- *     @OA\Property(property="externalOrganizationId", type="string", nullable=true, description="Identificador externo de la organización"),
  *     @OA\Property(property="generateDefaultCode", type="boolean", nullable=true, description="Genera automáticamente el código por defecto usando el patrón del servicio")
  * )
  *
@@ -198,9 +191,6 @@ namespace App\Http\Controllers;
  *     @OA\Property(property="urlResource", type="string", nullable=true, description="URL del recurso de referencia"),
  *     @OA\Property(property="isPublic", type="boolean", nullable=true, description="Visibilidad pública del documento"),
  *     @OA\Property(property="order", type="integer", minimum=0, nullable=true, description="Orden en el que se solicita el documento"),
- *     @OA\Property(property="mandatory", type="boolean", nullable=true, description="Indica si el documento es obligatorio"),
- *     @OA\Property(property="externalUserId", type="string", nullable=true, description="Identificador externo de usuario"),
- *     @OA\Property(property="externalOrganizationId", type="string", nullable=true, description="Identificador externo de organización")
  * )
  *
  * @OA\Schema(

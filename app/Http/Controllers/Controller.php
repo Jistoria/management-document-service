@@ -33,7 +33,9 @@ namespace App\Http\Controllers;
  *     scheme="bearer",
  *     bearerFormat="JWT"
  * )
- *
+ * @OA\OpenApi(
+ *     security={{"bearerAuth":{}}}
+ * )
  *
  *
  */

@@ -36,16 +36,6 @@ class ProcessService
     {
         $data = Process::convertToSnakeCase($data);
 
-        if(!$this->parentExists($data['parent_id'])){
-            throw new \InvalidArgumentException("Parent ID does not exist");
-        }
-        if ($this->codeExists($data['code'])) {
-            throw new \InvalidArgumentException("Code already exists");
-        }
-        if($this->nameExists($data['name'])){
-            throw new \InvalidArgumentException("Name already exists");
-        }
-
         return Process::create($data);
     }
 

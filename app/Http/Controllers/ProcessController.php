@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Constants\HttpStatus;
 use App\Helpers\ApiIndexBuilder;
+use App\Http\Requests\Process\FiltersProcessRequest;
+use App\Http\Requests\Process\StoreProcessRequest;
+use App\Http\Requests\Process\UpdateProcessRequest;
 use App\Http\Resources\ProcessResource;
 use App\Services\ProcessService;
 use Illuminate\Http\JsonResponse;
@@ -57,7 +60,7 @@ class ProcessController extends Controller
      *     @OA\Response(response=500, description="Error interno del servidor", @OA\JsonContent(ref="#/components/schemas/Error"))
      * )
      */
-    public function index(Request $request): JsonResponse
+    public function index(FiltersProcessRequest $request): JsonResponse
     {
         return catchSync(function () use ($request) {
             return ApiIndexBuilder::build(
@@ -91,10 +94,10 @@ class ProcessController extends Controller
      *     @OA\Response(response=500, description="Error interno del servidor", @OA\JsonContent(ref="#/components/schemas/Error"))
      * )
      */
-    public function store(Request $request) : JsonResponse
+    public function store(StoreProcessRequest $request) : JsonResponse
     {
         return catchSync(function () use ($request) {
-            $process = $this->processService->create($request->all());
+            $process = $this->processService->create($request->validated());
 
             return new ProcessResource($process);
         }, 'Proceso creado exitosamente', HttpStatus::CREATED);
@@ -159,10 +162,10 @@ class ProcessController extends Controller
      *     @OA\Response(response=500, description="Error interno del servidor", @OA\JsonContent(ref="#/components/schemas/Error"))
      * )
      */
-    public function update(Request $request, $id) : JsonResponse
+    public function update(UpdateProcessRequest $request, $id) : JsonResponse
     {
         return catchSync(function () use ($request, $id) {
-            $process = $this->processService->update($request->all(), $id);
+            $process = $this->processService->update($request->validated(), $id);
 
             return new ProcessResource($process);
         }, 'Proceso actualizado exitosamente');

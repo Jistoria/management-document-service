@@ -644,32 +644,57 @@ namespace App\Http\Controllers;
  *     type="object",
  *     title="Process",
  *     description="Entidad de proceso",
- *     @OA\Property(
- *         property="id",
- *         type="string",
- *         format="uuid",
- *         description="Identificador único del proceso",
- *         example="550e8400-e29b-41d4-a716-446655440002"
- *     ),
- *     @OA\Property(
- *         property="name",
- *         type="string",
- *         description="Nombre del proceso",
- *         example="Inscripción de Nuevos Estudiantes"
- *     ),
- *     @OA\Property(
- *         property="code",
- *         type="string",
- *         description="Código del proceso",
- *         example="INSCRIPCION",
- *         nullable=true
- *     ),
- *     @OA\Property(
- *         property="order",
- *         type="integer",
- *         description="Orden del proceso dentro de la categoría",
- *         example=1
- *     )
+ *     @OA\Property(property="id", type="string", format="uuid", description="Identificador único del proceso", example="550e8400-e29b-41d4-a716-446655440002"),
+ *     @OA\Property(property="processCategoryId", type="string", format="uuid", description="ID de la categoría a la que pertenece", example="550e8400-e29b-41d4-a716-446655440010"),
+ *     @OA\Property(property="parentId", type="string", format="uuid", nullable=true, description="Proceso padre en caso de jerarquías", example="550e8400-e29b-41d4-a716-446655440099"),
+ *     @OA\Property(property="name", type="string", description="Nombre del proceso", example="Inscripción de Nuevos Estudiantes"),
+ *     @OA\Property(property="code", type="string", nullable=true, description="Código único del proceso", example="INSCRIPCION"),
+ *     @OA\Property(property="order", type="integer", nullable=true, description="Orden relativo dentro de la categoría", example=1),
+ *     @OA\Property(property="createdAt", type="string", format="date-time", description="Fecha de creación", example="2025-01-15T10:30:00Z"),
+ *     @OA\Property(property="updatedAt", type="string", format="date-time", description="Fecha de última actualización", example="2025-01-20T14:45:00Z"),
+ *     @OA\Property(property="createdBy", type="string", nullable=true, description="Usuario que creó el proceso", example="system"),
+ *     @OA\Property(property="updatedBy", type="string", nullable=true, description="Usuario que actualizó el proceso", example="admin")
+ * )
+ *
+ * @OA\Schema(
+ *     schema="ProcessDetailed",
+ *     allOf={
+ *         @OA\Schema(ref="#/components/schemas/Process"),
+ *         @OA\Schema(
+ *             @OA\Property(property="processCategory", ref="#/components/schemas/ProcessCategory", nullable=true, description="Categoría a la que pertenece el proceso"),
+ *             @OA\Property(property="parent", ref="#/components/schemas/Process", nullable=true, description="Proceso padre si aplica"),
+ *             @OA\Property(property="children", type="array", description="Procesos hijos", @OA\Items(ref="#/components/schemas/Process")),
+ *             @OA\Property(property="requiredDocuments", type="array", description="Documentos requeridos asociados", @OA\Items(ref="#/components/schemas/RequiredDocument")),
+ *             @OA\Property(property="meta", type="object",
+ *                 @OA\Property(property="resourceType", type="string", example="process"),
+ *                 @OA\Property(property="generatedAt", type="string", format="date-time"),
+ *                 @OA\Property(property="context", type="array", @OA\Items(type="string"))
+ *             )
+ *         )
+ *     }
+ * )
+ *
+ * @OA\Schema(
+ *     schema="ProcessCreateRequest",
+ *     type="object",
+ *     title="Create Process Request",
+ *     required={"processCategoryId","name"},
+ *     @OA\Property(property="processCategoryId", type="string", format="uuid", description="ID de la categoría de proceso", example="550e8400-e29b-41d4-a716-446655440010"),
+ *     @OA\Property(property="parentId", type="string", format="uuid", nullable=true, description="Proceso padre si aplica", example="550e8400-e29b-41d4-a716-446655440099"),
+ *     @OA\Property(property="name", type="string", maxLength=255, description="Nombre del proceso", example="Inscripción de Nuevos Estudiantes"),
+ *     @OA\Property(property="code", type="string", maxLength=255, nullable=true, description="Código único del proceso", example="INSCRIPCION"),
+ *     @OA\Property(property="order", type="integer", nullable=true, description="Orden dentro de la categoría", example=1)
+ * )
+ *
+ * @OA\Schema(
+ *     schema="ProcessUpdateRequest",
+ *     type="object",
+ *     title="Update Process Request",
+ *     @OA\Property(property="processCategoryId", type="string", format="uuid", nullable=true, description="ID de la categoría de proceso", example="550e8400-e29b-41d4-a716-446655440010"),
+ *     @OA\Property(property="parentId", type="string", format="uuid", nullable=true, description="Proceso padre", example="550e8400-e29b-41d4-a716-446655440099"),
+ *     @OA\Property(property="name", type="string", maxLength=255, nullable=true, description="Nombre del proceso", example="Inscripción de Nuevos Estudiantes"),
+ *     @OA\Property(property="code", type="string", maxLength=255, nullable=true, description="Código único del proceso", example="INSCRIPCION"),
+ *     @OA\Property(property="order", type="integer", nullable=true, description="Orden dentro de la categoría", example=1)
  * )
  *
  * @OA\Schema(

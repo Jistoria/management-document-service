@@ -161,6 +161,164 @@ namespace App\Http\Controllers;
  * )
  *
  * @OA\Schema(
+ *     schema="RequiredDocumentCreateRequest",
+ *     type="object",
+ *     title="Create Required Document Request",
+ *     required={"documentTypeId"},
+ *     @OA\Property(property="processId", type="string", format="uuid", nullable=true, description="ID del proceso asociado"),
+ *     @OA\Property(property="documentTypeId", type="string", format="uuid", description="ID del tipo de documento requerido"),
+ *     @OA\Property(property="academicRoleId", type="string", format="uuid", nullable=true, description="ID del rol académico"),
+ *     @OA\Property(property="metadataSchemaId", type="string", format="uuid", nullable=true, description="ID del esquema de metadatos"),
+ *     @OA\Property(property="order", type="integer", minimum=0, nullable=true, description="Orden en el que se solicita el documento"),
+ *     @OA\Property(property="generateDefaultCode", type="boolean", nullable=true, description="Si se debe generar un código por defecto"),
+ *     @OA\Property(property="mandatory", type="boolean", nullable=true, description="Indica si el documento es obligatorio"),
+ *     @OA\Property(property="externalUserId", type="string", nullable=true, description="Identificador externo de usuario"),
+ *     @OA\Property(property="externalOrganizationId", type="string", nullable=true, description="Identificador externo de organización")
+ * )
+ *
+ * @OA\Schema(
+ *     schema="RequiredDocumentUpdateRequest",
+ *     type="object",
+ *     title="Update Required Document Request",
+ *     @OA\Property(property="processId", type="string", format="uuid", nullable=true, description="ID del proceso asociado"),
+ *     @OA\Property(property="documentTypeId", type="string", format="uuid", nullable=true, description="ID del tipo de documento requerido"),
+ *     @OA\Property(property="academicRoleId", type="string", format="uuid", nullable=true, description="ID del rol académico"),
+ *     @OA\Property(property="metadataSchemaId", type="string", format="uuid", nullable=true, description="ID del esquema de metadatos"),
+ *     @OA\Property(property="order", type="integer", minimum=0, nullable=true, description="Orden en el que se solicita el documento"),
+ *     @OA\Property(property="mandatory", type="boolean", nullable=true, description="Indica si el documento es obligatorio"),
+ *     @OA\Property(property="externalUserId", type="string", nullable=true, description="Identificador externo de usuario"),
+ *     @OA\Property(property="externalOrganizationId", type="string", nullable=true, description="Identificador externo de organización")
+ * )
+ *
+ * @OA\Schema(
+ *     schema="RequiredDocumentStatistics",
+ *     type="object",
+ *     title="Required Document Statistics",
+ *     description="Estadísticas asociadas a un documento requerido",
+ *     @OA\Property(property="total_documents_for_process", type="integer", example=5, description="Total de documentos del proceso"),
+ *     @OA\Property(property="mandatory_documents_for_process", type="integer", example=3, description="Documentos obligatorios del proceso")
+ * )
+ *
+ * @OA\Schema(
+ *     schema="RequiredDocumentBulkDeleteRequest",
+ *     type="object",
+ *     title="Bulk Delete Required Documents Request",
+ *     required={"ids"},
+ *     @OA\Property(
+ *         property="ids",
+ *         type="array",
+ *         description="Listado de IDs a eliminar",
+ *         @OA\Items(type="string", format="uuid")
+ *     )
+ * )
+ *
+ * @OA\Schema(
+ *     schema="StorageUnitType",
+ *     type="object",
+ *     title="Storage Unit Type",
+ *     description="Tipo de unidad de almacenamiento",
+ *     @OA\Property(property="id", type="string", format="uuid", example="0197d795-7572-7331-903b-3aeed9fb34c2"),
+ *     @OA\Property(property="name", type="string", example="Edificio"),
+ *     @OA\Property(property="code", type="string", example="BUILDING"),
+ *     @OA\Property(property="level", type="integer", example=0),
+ *     @OA\Property(property="createdAt", type="string", format="date-time"),
+ *     @OA\Property(property="updatedAt", type="string", format="date-time"),
+ *     @OA\Property(property="createdBy", type="string", nullable=true, example="system"),
+ *     @OA\Property(property="updatedBy", type="string", nullable=true, example="system"),
+ *     @OA\Property(property="version", type="integer", example=1),
+ *     @OA\Property(property="storageUnitsCount", type="integer", example=4, nullable=true)
+ * )
+ *
+ * @OA\Schema(
+ *     schema="StorageUnitTypeDetailed",
+ *     allOf={
+ *         @OA\Schema(ref="#/components/schemas/StorageUnitType"),
+ *         @OA\Schema(
+ *             @OA\Property(
+ *                 property="storageUnits",
+ *                 type="array",
+ *                 description="Unidades asociadas (incluidas condicionalmente)",
+ *                 @OA\Items(ref="#/components/schemas/StorageUnit")
+ *             )
+ *         )
+ *     }
+ * )
+ *
+ * @OA\Schema(
+ *     schema="StorageUnitTypeCreateRequest",
+ *     type="object",
+ *     title="Create Storage Unit Type Request",
+ *     required={"name","code","level"},
+ *     @OA\Property(property="name", type="string", example="Edificio"),
+ *     @OA\Property(property="code", type="string", example="BUILDING"),
+ *     @OA\Property(property="level", type="integer", minimum=0, example=0)
+ * )
+ *
+ * @OA\Schema(
+ *     schema="StorageUnitTypeUpdateRequest",
+ *     type="object",
+ *     title="Update Storage Unit Type Request",
+ *     @OA\Property(property="name", type="string", example="Edificio"),
+ *     @OA\Property(property="code", type="string", example="BUILDING"),
+ *     @OA\Property(property="level", type="integer", minimum=0, example=1)
+ * )
+ *
+ * @OA\Schema(
+ *     schema="StorageUnit",
+ *     type="object",
+ *     title="Storage Unit",
+ *     description="Unidad de almacenamiento",
+ *     @OA\Property(property="id", type="string", format="uuid", example="0197d795-7572-7331-903b-3aeed9fb34c2"),
+ *     @OA\Property(property="storageUnitTypeId", type="string", format="uuid", example="0197d795-7572-7331-903b-3aeed9fb34c2"),
+ *     @OA\Property(property="parentId", type="string", format="uuid", nullable=true),
+ *     @OA\Property(property="label", type="string", example="Archivo Central"),
+ *     @OA\Property(property="code", type="string", nullable=true, example="ARCH-001"),
+ *     @OA\Property(property="createdAt", type="string", format="date-time"),
+ *     @OA\Property(property="updatedAt", type="string", format="date-time"),
+ *     @OA\Property(property="createdBy", type="string", nullable=true, example="system"),
+ *     @OA\Property(property="updatedBy", type="string", nullable=true, example="system"),
+ *     @OA\Property(property="version", type="integer", example=1),
+ *     @OA\Property(property="childrenCount", type="integer", nullable=true, example=2)
+ * )
+ *
+ * @OA\Schema(
+ *     schema="StorageUnitDetailed",
+ *     allOf={
+ *         @OA\Schema(ref="#/components/schemas/StorageUnit"),
+ *         @OA\Schema(
+ *             @OA\Property(property="storageUnitType", ref="#/components/schemas/StorageUnitType", description="Tipo de unidad (incluido condicionalmente)"),
+ *             @OA\Property(property="parent", ref="#/components/schemas/StorageUnit", description="Unidad padre (incluida condicionalmente)", nullable=true),
+ *             @OA\Property(property="children", type="array", description="Subunidades (incluidas condicionalmente)", @OA\Items(ref="#/components/schemas/StorageUnit"))
+ *         )
+ *     }
+ * )
+ *
+ * @OA\Schema(
+ *     schema="StorageUnitCreateRequest",
+ *     type="object",
+ *     title="Create Storage Unit Request",
+ *     required={"storageUnitTypeId","label"},
+ *     @OA\Property(property="storageUnitTypeId", type="string", format="uuid", description="ID del tipo de unidad"),
+ *     @OA\Property(property="parentId", type="string", format="uuid", nullable=true, description="ID de la unidad padre"),
+ *     @OA\Property(property="label", type="string", description="Etiqueta de la unidad"),
+ *     @OA\Property(property="code", type="string", nullable=true, description="Código de la unidad"),
+ *     @OA\Property(property="createdBy", type="string", nullable=true, description="Usuario creador"),
+ *     @OA\Property(property="updatedBy", type="string", nullable=true, description="Usuario actualizador")
+ * )
+ *
+ * @OA\Schema(
+ *     schema="StorageUnitUpdateRequest",
+ *     type="object",
+ *     title="Update Storage Unit Request",
+ *     @OA\Property(property="storageUnitTypeId", type="string", format="uuid", description="ID del tipo de unidad"),
+ *     @OA\Property(property="parentId", type="string", format="uuid", nullable=true, description="ID de la unidad padre"),
+ *     @OA\Property(property="label", type="string", description="Etiqueta de la unidad"),
+ *     @OA\Property(property="code", type="string", nullable=true, description="Código de la unidad"),
+ *     @OA\Property(property="createdBy", type="string", nullable=true, description="Usuario creador"),
+ *     @OA\Property(property="updatedBy", type="string", nullable=true, description="Usuario actualizador")
+ * )
+ *
+ * @OA\Schema(
  *     schema="MetadataSchema",
  *     type="object",
  *     title="Metadata Schema",

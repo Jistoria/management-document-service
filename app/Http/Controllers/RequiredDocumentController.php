@@ -29,12 +29,40 @@ class RequiredDocumentController extends Controller
      *     path="/required-documents",
      *     operationId="getRequiredDocuments",
      *     tags={"RequiredDocuments"},
-     *     summary="List required documents",
-     *     description="Returns a list of required documents with support for pagination and collection formats",
+     *     summary="Listar documentos requeridos",
+     *     description="Obtiene el listado de documentos requeridos con soporte para filtros, paginación y diferentes formatos de respuesta",
+     *     @OA\Parameter(name="search", in="query", description="Buscar por código u otros campos", required=false, @OA\Schema(type="string")),
+     *     @OA\Parameter(name="processId", in="query", description="Filtrar por ID de proceso", required=false, @OA\Schema(type="string", format="uuid")),
+     *     @OA\Parameter(name="documentTypeId", in="query", description="Filtrar por ID de tipo de documento", required=false, @OA\Schema(type="string", format="uuid")),
+     *     @OA\Parameter(name="academicRoleId", in="query", description="Filtrar por ID de rol académico", required=false, @OA\Schema(type="string", format="uuid")),
+     *     @OA\Parameter(name="metadataSchemaId", in="query", description="Filtrar por ID de esquema de metadatos", required=false, @OA\Schema(type="string", format="uuid")),
+     *     @OA\Parameter(name="mandatory", in="query", description="Filtrar por obligatoriedad", required=false, @OA\Schema(type="boolean")),
+     *     @OA\Parameter(name="include", in="query", description="Relaciones a incluir (documentType,process,metadataSchema)", required=false, @OA\Schema(type="string")),
+     *     @OA\Parameter(name="perPage", in="query", description="Elementos por página", required=false, @OA\Schema(type="integer")),
+     *     @OA\Parameter(name="format", in="query", description="Formato de respuesta (collection, paginate, minimal, dropdown, pluck)", required=false, @OA\Schema(type="string", enum={"collection","paginate","minimal","dropdown","pluck"})),
      *     @OA\Response(
      *         response=200,
-     *         description="Required documents retrieved successfully"
-     *     )
+     *         description="Documentos requeridos obtenidos exitosamente",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Required documents retrieved successfully"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 oneOf={
+     *                     @OA\Schema(
+     *                         @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/RequiredDocument")),
+     *                         @OA\Property(property="count", type="integer", example=5)
+     *                     ),
+     *                     @OA\Schema(
+     *                         @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/RequiredDocument")),
+     *                         @OA\Property(property="pagination", ref="#/components/schemas/Pagination")
+     *                     )
+     *                 }
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(response=422, description="Error de validación", @OA\JsonContent(ref="#/components/schemas/ValidationError")),
+     *     @OA\Response(response=500, description="Error interno del servidor", @OA\JsonContent(ref="#/components/schemas/Error"))
      * )
      */
     public function index(FiltersRequiredDocumentRequest $request): JsonResponse
@@ -59,12 +87,23 @@ class RequiredDocumentController extends Controller
      *     path="/required-documents",
      *     operationId="storeRequiredDocument",
      *     tags={"RequiredDocuments"},
-     *     summary="Create required document",
-     *     description="Creates a new required document",
+     *     summary="Crear documento requerido",
+     *     description="Crea un nuevo documento requerido",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(ref="#/components/schemas/RequiredDocumentCreateRequest")
+     *     ),
      *     @OA\Response(
      *         response=201,
-     *         description="Required document created successfully"
-     *     )
+     *         description="Documento requerido creado exitosamente",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Required document created successfully"),
+     *             @OA\Property(property="data", ref="#/components/schemas/RequiredDocumentDetailed")
+     *         )
+     *     ),
+     *     @OA\Response(response=422, description="Error de validación", @OA\JsonContent(ref="#/components/schemas/ValidationError")),
+     *     @OA\Response(response=500, description="Error interno del servidor", @OA\JsonContent(ref="#/components/schemas/Error"))
      * )
      */
     public function store(StoreRequiredDocumentRequest $request): JsonResponse
@@ -84,18 +123,21 @@ class RequiredDocumentController extends Controller
      *     path="/required-documents/{id}",
      *     operationId="showRequiredDocument",
      *     tags={"RequiredDocuments"},
-     *     summary="Show required document",
-     *     description="Returns the details of a required document",
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         required=true,
-     *         @OA\Schema(type="string", format="uuid")
-     *     ),
+     *     summary="Obtener documento requerido",
+     *     description="Retorna el detalle de un documento requerido",
+     *     @OA\Parameter(name="id", in="path", required=true, description="ID del documento requerido", @OA\Schema(type="string", format="uuid")),
+     *     @OA\Parameter(name="include", in="query", required=false, description="Relaciones a incluir (documentType,process,metadataSchema)", @OA\Schema(type="string")),
      *     @OA\Response(
      *         response=200,
-     *         description="Required document retrieved successfully"
-     *     )
+     *         description="Documento requerido obtenido exitosamente",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Required document retrieved successfully"),
+     *             @OA\Property(property="data", ref="#/components/schemas/RequiredDocumentDetailed")
+     *         )
+     *     ),
+     *     @OA\Response(response=404, description="Documento requerido no encontrado", @OA\JsonContent(ref="#/components/schemas/Error")),
+     *     @OA\Response(response=500, description="Error interno del servidor", @OA\JsonContent(ref="#/components/schemas/Error"))
      * )
      */
     public function show(Request $request, string $id): JsonResponse
@@ -120,18 +162,25 @@ class RequiredDocumentController extends Controller
      *     path="/required-documents/{id}",
      *     operationId="updateRequiredDocument",
      *     tags={"RequiredDocuments"},
-     *     summary="Update required document",
-     *     description="Updates an existing required document",
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
+     *     summary="Actualizar documento requerido",
+     *     description="Actualiza un documento requerido existente",
+     *     @OA\Parameter(name="id", in="path", required=true, description="ID del documento requerido", @OA\Schema(type="string", format="uuid")),
+     *     @OA\RequestBody(
      *         required=true,
-     *         @OA\Schema(type="string", format="uuid")
+     *         @OA\JsonContent(ref="#/components/schemas/RequiredDocumentUpdateRequest")
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Required document updated successfully"
-     *     )
+     *         description="Documento requerido actualizado exitosamente",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Required document updated successfully"),
+     *             @OA\Property(property="data", ref="#/components/schemas/RequiredDocumentDetailed")
+     *         )
+     *     ),
+     *     @OA\Response(response=404, description="Documento requerido no encontrado", @OA\JsonContent(ref="#/components/schemas/Error")),
+     *     @OA\Response(response=422, description="Error de validación", @OA\JsonContent(ref="#/components/schemas/ValidationError")),
+     *     @OA\Response(response=500, description="Error interno del servidor", @OA\JsonContent(ref="#/components/schemas/Error"))
      * )
      */
     public function update(UpdateRequiredDocumentRequest $request, string $id): JsonResponse
@@ -150,18 +199,20 @@ class RequiredDocumentController extends Controller
      *     path="/required-documents/{id}",
      *     operationId="destroyRequiredDocument",
      *     tags={"RequiredDocuments"},
-     *     summary="Delete required document",
-     *     description="Soft deletes a required document",
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         required=true,
-     *         @OA\Schema(type="string", format="uuid")
-     *     ),
+     *     summary="Eliminar documento requerido",
+     *     description="Elimina lógicamente un documento requerido",
+     *     @OA\Parameter(name="id", in="path", required=true, description="ID del documento requerido", @OA\Schema(type="string", format="uuid")),
      *     @OA\Response(
      *         response=200,
-     *         description="Required document deleted successfully"
-     *     )
+     *         description="Documento requerido eliminado exitosamente",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Required document deleted successfully"),
+     *             @OA\Property(property="data", type="object", @OA\Property(property="deleted", type="boolean", example=true))
+     *         )
+     *     ),
+     *     @OA\Response(response=404, description="Documento requerido no encontrado", @OA\JsonContent(ref="#/components/schemas/Error")),
+     *     @OA\Response(response=500, description="Error interno del servidor", @OA\JsonContent(ref="#/components/schemas/Error"))
      * )
      */
     public function destroy(string $id): JsonResponse
@@ -180,18 +231,20 @@ class RequiredDocumentController extends Controller
      *     path="/required-documents/{id}/restore",
      *     operationId="restoreRequiredDocument",
      *     tags={"RequiredDocuments"},
-     *     summary="Restore required document",
-     *     description="Restores a previously deleted required document",
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         required=true,
-     *         @OA\Schema(type="string", format="uuid")
-     *     ),
+     *     summary="Restaurar documento requerido",
+     *     description="Restaura un documento requerido eliminado previamente",
+     *     @OA\Parameter(name="id", in="path", required=true, description="ID del documento requerido", @OA\Schema(type="string", format="uuid")),
      *     @OA\Response(
      *         response=200,
-     *         description="Required document restored successfully"
-     *     )
+     *         description="Documento requerido restaurado exitosamente",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Required document restored successfully"),
+     *             @OA\Property(property="data", ref="#/components/schemas/RequiredDocumentDetailed")
+     *         )
+     *     ),
+     *     @OA\Response(response=404, description="Documento requerido no encontrado", @OA\JsonContent(ref="#/components/schemas/Error")),
+     *     @OA\Response(response=500, description="Error interno del servidor", @OA\JsonContent(ref="#/components/schemas/Error"))
      * )
      */
     public function restore(string $id): JsonResponse
@@ -210,18 +263,20 @@ class RequiredDocumentController extends Controller
      *     path="/required-documents/{id}/statistics",
      *     operationId="statisticsRequiredDocument",
      *     tags={"RequiredDocuments"},
-     *     summary="Required document statistics",
-     *     description="Returns statistics for a required document",
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         required=true,
-     *         @OA\Schema(type="string", format="uuid")
-     *     ),
+     *     summary="Estadísticas de documento requerido",
+     *     description="Obtiene estadísticas asociadas a un documento requerido",
+     *     @OA\Parameter(name="id", in="path", required=true, description="ID del documento requerido", @OA\Schema(type="string", format="uuid")),
      *     @OA\Response(
      *         response=200,
-     *         description="Statistics retrieved successfully"
-     *     )
+     *         description="Estadísticas obtenidas exitosamente",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Required document statistics retrieved successfully"),
+     *             @OA\Property(property="data", ref="#/components/schemas/RequiredDocumentStatistics")
+     *         )
+     *     ),
+     *     @OA\Response(response=404, description="Documento requerido no encontrado", @OA\JsonContent(ref="#/components/schemas/Error")),
+     *     @OA\Response(response=500, description="Error interno del servidor", @OA\JsonContent(ref="#/components/schemas/Error"))
      * )
      */
     public function statistics(string $id): JsonResponse
@@ -239,19 +294,20 @@ class RequiredDocumentController extends Controller
      *     path="/required-documents/bulk-delete",
      *     operationId="bulkDeleteRequiredDocuments",
      *     tags={"RequiredDocuments"},
-     *     summary="Bulk delete required documents",
-     *     description="Deletes multiple required documents in a single operation",
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *             required={"ids"},
-     *             @OA\Property(property="ids", type="array", @OA\Items(type="string", format="uuid"))
-     *         )
-     *     ),
+     *     summary="Eliminación masiva de documentos requeridos",
+     *     description="Elimina múltiples documentos requeridos en una sola operación",
+     *     @OA\RequestBody(required=true, @OA\JsonContent(ref="#/components/schemas/RequiredDocumentBulkDeleteRequest")),
      *     @OA\Response(
      *         response=200,
-     *         description="Bulk deletion performed successfully"
-     *     )
+     *         description="Documentos requeridos eliminados exitosamente",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Required documents deleted successfully"),
+     *             @OA\Property(property="data", type="object", @OA\Property(property="deleted_count", type="integer", example=3))
+     *         )
+     *     ),
+     *     @OA\Response(response=422, description="Error de validación", @OA\JsonContent(ref="#/components/schemas/ValidationError")),
+     *     @OA\Response(response=500, description="Error interno del servidor", @OA\JsonContent(ref="#/components/schemas/Error"))
      * )
      */
     public function bulkDelete(Request $request): JsonResponse

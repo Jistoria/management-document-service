@@ -91,19 +91,13 @@ class MetadataFieldController extends Controller
      *         required=true,
      *         @OA\JsonContent(
      *             required={"schema_id","name","data_type"},
-     *             @OA\Property(property="schema_id", type="string", format="uuid"),
+     *             @OA\Property(property="schemaId", type="string", format="uuid"),
      *             @OA\Property(property="name", type="string"),
-     *             @OA\Property(property="data_type", type="string"),
-     *             @OA\Property(property="is_required", type="boolean"),
-     *             @OA\Property(property="default_value", type="string", nullable=true),
-     *             @OA\Property(property="validation_regex", type="string", nullable=true),
-     *             @OA\Property(property="field_order", type="integer", nullable=true),
-     *             @OA\Property(property="lookup_keywords", type="array", @OA\Items(type="string"), nullable=true),
-     *             @OA\Property(property="ocr_hint", type="string", nullable=true),
-     *             @OA\Property(property="ignore_in_similarity", type="boolean"),
-     *             @OA\Property(property="is_reference", type="boolean"),
-     *             @OA\Property(property="reference_entity", type="string", nullable=true),
-     *             @OA\Property(property="reference_column", type="string", nullable=true)
+     *             @OA\Property(property="dataType", type="string"),
+     *             @OA\Property(property="isRequired", type="boolean"),
+     *             @OA\Property(property="defaultValue", type="string", nullable=true),
+     *             @OA\Property(property="validationRegex", type="string", nullable=true),
+     *             @OA\Property(property="fieldOrder", type="integer", nullable=true),
      *         )
      *     ),
      *     @OA\Response(
@@ -134,19 +128,13 @@ class MetadataFieldController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             @OA\Property(property="schema_id", type="string", format="uuid"),
+     *             @OA\Property(property="schemaId", type="string", format="uuid"),
      *             @OA\Property(property="name", type="string"),
-     *             @OA\Property(property="data_type", type="string"),
-     *             @OA\Property(property="is_required", type="boolean"),
-     *             @OA\Property(property="default_value", type="string", nullable=true),
-     *             @OA\Property(property="validation_regex", type="string", nullable=true),
-     *             @OA\Property(property="field_order", type="integer", nullable=true),
-     *             @OA\Property(property="lookup_keywords", type="array", @OA\Items(type="string"), nullable=true),
-     *             @OA\Property(property="ocr_hint", type="string", nullable=true),
-     *             @OA\Property(property="ignore_in_similarity", type="boolean"),
-     *             @OA\Property(property="is_reference", type="boolean"),
-     *             @OA\Property(property="reference_entity", type="string", nullable=true),
-     *             @OA\Property(property="reference_column", type="string", nullable=true)
+     *             @OA\Property(property="dataType", type="string"),
+     *             @OA\Property(property="isRequired", type="boolean"),
+     *             @OA\Property(property="defaultValue", type="string", nullable=true),
+     *             @OA\Property(property="validationRegex", type="string", nullable=true),
+     *             @OA\Property(property="fieldOrder", type="integer", nullable=true)
      *         )
      *     ),
      *     @OA\Response(

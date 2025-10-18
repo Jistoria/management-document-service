@@ -26,39 +26,26 @@ class StoreMetadataFieldRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'schema_id' => ['required', 'uuid', 'exists:metadata_schemas,id'],
+            'schemaId' => ['required', 'uuid', 'exists:metadata_schemas,id'],
             'name' => ['required', 'string', 'max:255'],
-            'data_type' => ['required', 'string', Rule::in(MetadataFieldDataType::ALL)],
-            'is_required' => ['boolean'],
-            'default_value' => ['nullable', 'string'],
-            'validation_regex' => ['nullable', 'string'],
-            'field_order' => ['nullable', 'integer', 'min:1'],
-            'lookup_keywords' => ['nullable', 'array'],
-            'lookup_keywords.*' => ['string'],
-            'ocr_hint' => ['nullable', 'string'],
-            'ignore_in_similarity' => ['boolean'],
-            'is_reference' => ['boolean'],
-            'reference_entity' => ['nullable', 'string', Rule::in(MetadataFieldEntityMap::keys())],
-            'reference_column' => ['nullable', 'string'],
+            'dataType' => ['required', 'string', Rule::in(MetadataFieldDataType::ALL)],
+            'isRequired' => ['boolean'],
+            'defaultValue' => ['nullable', 'string'],
+            'validationRegex' => ['nullable', 'string'],
+            'fieldOrder' => ['nullable', 'integer', 'min:1'],
         ];
     }
 
     public function attributes(): array
     {
         return [
-            'schema_id' => 'esquema',
+            'schemaId' => 'esquema',
             'name' => 'nombre',
-            'data_type' => 'tipo de dato',
-            'is_required' => 'es requerido',
-            'default_value' => 'valor por defecto',
-            'validation_regex' => 'expresión regular',
-            'field_order' => 'orden',
-            'lookup_keywords' => 'palabras clave',
-            'ocr_hint' => 'pista OCR',
-            'ignore_in_similarity' => 'ignorar en similitud',
-            'is_reference' => 'es referencia',
-            'reference_entity' => 'entidad de referencia',
-            'reference_column' => 'columna de referencia',
+            'dataType' => 'tipo de dato',
+            'isRequired' => 'es requerido',
+            'defaultValue' => 'valor por defecto',
+            'validationRegex' => 'expresión regular',
+            'fieldOrder' => 'orden',
         ];
     }
 
@@ -69,27 +56,12 @@ class StoreMetadataFieldRequest extends BaseFormRequest
     {
         $data = [];
 
-        if ($this->has('data_type')) {
-            $data['data_type'] = MetadataFieldDataType::normalize($this->data_type);
+        if ($this->has('dataType')) {
+            $data['dataType'] = MetadataFieldDataType::normalize($this->dataType);
         }
 
-        if ($this->boolean('is_required')) {
-            $data['is_required'] = $this->boolean('is_required');
-        }
-        if ($this->boolean('ignore_in_similarity')) {
-            $data['ignore_in_similarity'] = $this->boolean('ignore_in_similarity');
-        }
-        if ($this->boolean('is_reference')) {
-            $data['is_reference'] = $this->boolean('is_reference');
-        }
-
-        if ($this->has('reference_entity')) {
-            $entity = MetadataFieldEntityMap::isValidKey($this->reference_entity)
-                ? $this->reference_entity
-                : null;
-            if ($entity && !$this->has('reference_column')) {
-                $data['reference_column'] = MetadataFieldEntityMap::getColumn($entity);
-            }
+        if ($this->boolean('isRequired')) {
+            $data['isRequired'] = $this->boolean('isRequired');
         }
 
         if (!empty($data)) {

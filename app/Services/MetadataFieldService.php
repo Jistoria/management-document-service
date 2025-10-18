@@ -49,6 +49,7 @@ class MetadataFieldService
      */
     public function create(array $data): MetadataField
     {
+        $data = MetadataField::convertToSnakeCase($data);
         return MetadataField::create($data);
     }
 
@@ -59,6 +60,9 @@ class MetadataFieldService
     {
         $this->validateUuid($id);
         $field = $this->findById($id);
+
+        $data = MetadataField::convertToSnakeCase($data);
+
         $field->update($data);
         return $field;
     }

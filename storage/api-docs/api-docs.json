@@ -3342,54 +3342,29 @@
                                     "data_type"
                                 ],
                                 "properties": {
-                                    "schema_id": {
+                                    "schemaId": {
                                         "type": "string",
                                         "format": "uuid"
                                     },
                                     "name": {
                                         "type": "string"
                                     },
-                                    "data_type": {
+                                    "dataType": {
                                         "type": "string"
                                     },
-                                    "is_required": {
+                                    "isRequired": {
                                         "type": "boolean"
                                     },
-                                    "default_value": {
+                                    "defaultValue": {
                                         "type": "string",
                                         "nullable": true
                                     },
-                                    "validation_regex": {
+                                    "validationRegex": {
                                         "type": "string",
                                         "nullable": true
                                     },
-                                    "field_order": {
+                                    "fieldOrder": {
                                         "type": "integer",
-                                        "nullable": true
-                                    },
-                                    "lookup_keywords": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string"
-                                        },
-                                        "nullable": true
-                                    },
-                                    "ocr_hint": {
-                                        "type": "string",
-                                        "nullable": true
-                                    },
-                                    "ignore_in_similarity": {
-                                        "type": "boolean"
-                                    },
-                                    "is_reference": {
-                                        "type": "boolean"
-                                    },
-                                    "reference_entity": {
-                                        "type": "string",
-                                        "nullable": true
-                                    },
-                                    "reference_column": {
-                                        "type": "string",
                                         "nullable": true
                                     }
                                 },
@@ -3494,54 +3469,29 @@
                         "application/json": {
                             "schema": {
                                 "properties": {
-                                    "schema_id": {
+                                    "schemaId": {
                                         "type": "string",
                                         "format": "uuid"
                                     },
                                     "name": {
                                         "type": "string"
                                     },
-                                    "data_type": {
+                                    "dataType": {
                                         "type": "string"
                                     },
-                                    "is_required": {
+                                    "isRequired": {
                                         "type": "boolean"
                                     },
-                                    "default_value": {
+                                    "defaultValue": {
                                         "type": "string",
                                         "nullable": true
                                     },
-                                    "validation_regex": {
+                                    "validationRegex": {
                                         "type": "string",
                                         "nullable": true
                                     },
-                                    "field_order": {
+                                    "fieldOrder": {
                                         "type": "integer",
-                                        "nullable": true
-                                    },
-                                    "lookup_keywords": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string"
-                                        },
-                                        "nullable": true
-                                    },
-                                    "ocr_hint": {
-                                        "type": "string",
-                                        "nullable": true
-                                    },
-                                    "ignore_in_similarity": {
-                                        "type": "boolean"
-                                    },
-                                    "is_reference": {
-                                        "type": "boolean"
-                                    },
-                                    "reference_entity": {
-                                        "type": "string",
-                                        "nullable": true
-                                    },
-                                    "reference_column": {
-                                        "type": "string",
                                         "nullable": true
                                     }
                                 },
@@ -3782,25 +3732,13 @@
                                         "type": "string",
                                         "nullable": true
                                     },
-                                    "parent_schema_id": {
+                                    "parentSchemaId": {
                                         "type": "string",
                                         "format": "uuid",
                                         "nullable": true
                                     },
-                                    "is_canonical": {
+                                    "isCanonical": {
                                         "type": "boolean"
-                                    },
-                                    "external_system_id": {
-                                        "type": "string",
-                                        "nullable": true
-                                    },
-                                    "api_endpoint": {
-                                        "type": "string",
-                                        "nullable": true
-                                    },
-                                    "cache_ttl": {
-                                        "type": "integer",
-                                        "nullable": true
                                     }
                                 },
                                 "type": "object"
@@ -3912,25 +3850,13 @@
                                         "type": "string",
                                         "nullable": true
                                     },
-                                    "parent_schema_id": {
+                                    "parentSchemaId": {
                                         "type": "string",
                                         "format": "uuid",
                                         "nullable": true
                                     },
-                                    "is_canonical": {
+                                    "isCanonical": {
                                         "type": "boolean",
-                                        "nullable": true
-                                    },
-                                    "external_system_id": {
-                                        "type": "string",
-                                        "nullable": true
-                                    },
-                                    "api_endpoint": {
-                                        "type": "string",
-                                        "nullable": true
-                                    },
-                                    "cache_ttl": {
-                                        "type": "integer",
                                         "nullable": true
                                     }
                                 },

@@ -92,11 +92,8 @@ class MetadataSchemaController extends Controller
      *             required={"name"},
      *             @OA\Property(property="name", type="string"),
      *             @OA\Property(property="description", type="string", nullable=true),
-     *             @OA\Property(property="parent_schema_id", type="string", format="uuid", nullable=true),
-     *             @OA\Property(property="is_canonical", type="boolean"),
-     *             @OA\Property(property="external_system_id", type="string", nullable=true),
-     *             @OA\Property(property="api_endpoint", type="string", nullable=true),
-     *             @OA\Property(property="cache_ttl", type="integer", nullable=true)
+     *             @OA\Property(property="parentSchemaId", type="string", format="uuid", nullable=true),
+     *             @OA\Property(property="isCanonical", type="boolean"),
      *         )
      *     ),
      *     @OA\Response(
@@ -129,11 +126,8 @@ class MetadataSchemaController extends Controller
      *         @OA\JsonContent(
      *             @OA\Property(property="name", type="string", nullable=true),
      *             @OA\Property(property="description", type="string", nullable=true),
-     *             @OA\Property(property="parent_schema_id", type="string", format="uuid", nullable=true),
-     *             @OA\Property(property="is_canonical", type="boolean", nullable=true),
-     *             @OA\Property(property="external_system_id", type="string", nullable=true),
-     *             @OA\Property(property="api_endpoint", type="string", nullable=true),
-     *             @OA\Property(property="cache_ttl", type="integer", nullable=true)
+     *             @OA\Property(property="parentSchemaId", type="string", format="uuid", nullable=true),
+     *             @OA\Property(property="isCanonical", type="boolean", nullable=true),
      *         )
      *     ),
      *     @OA\Response(

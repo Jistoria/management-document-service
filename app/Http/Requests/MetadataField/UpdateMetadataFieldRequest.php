@@ -23,20 +23,13 @@ class UpdateMetadataFieldRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'schema_id' => ['sometimes', 'uuid', 'exists:metadata_schemas,id'],
+            'schemaId' => ['sometimes', 'uuid', 'exists:metadata_schemas,id'],
             'name' => ['sometimes', 'string', 'max:255'],
-            'data_type' => ['sometimes', 'string', Rule::in(MetadataFieldDataType::ALL)],
-            'is_required' => ['sometimes', 'boolean'],
-            'default_value' => ['nullable', 'string'],
-            'validation_regex' => ['nullable', 'string'],
-            'field_order' => ['nullable', 'integer', 'min:1'],
-            'lookup_keywords' => ['nullable', 'array'],
-            'lookup_keywords.*' => ['string'],
-            'ocr_hint' => ['nullable', 'string'],
-            'ignore_in_similarity' => ['sometimes', 'boolean'],
-            'is_reference' => ['sometimes', 'boolean'],
-            'reference_entity' => ['nullable', 'string', Rule::in(MetadataFieldEntityMap::keys())],
-            'reference_column' => ['nullable', 'string'],
+            'dataType' => ['sometimes', 'string', Rule::in(MetadataFieldDataType::ALL)],
+            'isRequired' => ['sometimes', 'boolean'],
+            'defaultValue' => ['nullable', 'string'],
+            'validationRegex' => ['nullable', 'string'],
+            'fieldOrder' => ['nullable', 'integer', 'min:1'],
         ];
     }
 
@@ -46,16 +39,8 @@ class UpdateMetadataFieldRequest extends BaseFormRequest
     protected function prepareForValidation(): void
     {
         $data = [];
-        if ($this->has('data_type')) {
-            $data['data_type'] = MetadataFieldDataType::normalize($this->data_type);
-        }
-        if ($this->has('reference_entity')) {
-            $entity = MetadataFieldEntityMap::isValidKey($this->reference_entity)
-                ? $this->reference_entity
-                : null;
-            if ($entity && !$this->has('reference_column')) {
-                $data['reference_column'] = MetadataFieldEntityMap::getColumn($entity);
-            }
+        if ($this->has('dataType')) {
+            $data['dataType'] = MetadataFieldDataType::normalize($this->dataType);
         }
         if (!empty($data)) {
             $this->merge($data);

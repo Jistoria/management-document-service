@@ -20,12 +20,6 @@ class MetadataFieldResource extends BaseResource
             'defaultValue' => $this->getFormattedDefaultValue(),
             'validationRegex' => $this->validation_regex,
             'fieldOrder' => $this->field_order,
-            'lookupKeywords' => $this->lookup_keywords,
-            'ocrHint' => $this->ocr_hint,
-            'ignoreInSimilarity' => $this->ignore_in_similarity,
-            'isReference' => $this->is_reference,
-            'referenceEntity' => $this->reference_entity,
-            'referenceColumn' => $this->reference_column,
             'createdAt' => $this->created_at?->toISOString(),
             'updatedAt' => $this->updated_at?->toISOString(),
         ];

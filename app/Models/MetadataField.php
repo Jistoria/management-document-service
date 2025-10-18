@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\Auditable; // 👈 Agregar trait de auditoría
+use App\Traits\HasCamelCaseAttributes;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -34,7 +35,7 @@ use App\Constants\MetadataFieldDataType;
  */
 class MetadataField extends Model
 {
-    use HasFactory, HasUuids, Auditable;
+    use HasFactory, HasUuids, Auditable, HasCamelCaseAttributes;
 
     /**
      * The table associated with the model.

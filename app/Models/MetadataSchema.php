@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Traits\HasAuditFields;
 use App\Traits\Auditable; // 👈 Agregar trait de auditoría
+use App\Traits\HasCamelCaseAttributes;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -34,7 +35,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class MetadataSchema extends Model
 {
-    use HasFactory, HasUuids, SoftDeletes, HasAuditFields, Auditable {
+    use HasFactory, HasUuids, SoftDeletes, HasAuditFields, HasCamelCaseAttributes, Auditable {
         Auditable::getCurrentExternalUserId insteadof HasAuditFields;
     }
 

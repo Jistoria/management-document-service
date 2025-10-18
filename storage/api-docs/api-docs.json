@@ -8458,8 +8458,7 @@
                     },
                     "codeDefault": {
                         "description": "Código personalizado para el documento",
-                        "type": "string",
-                        "nullable": true
+                        "type": "string"
                     },
                     "urlResource": {
                         "description": "URL del recurso de referencia",
@@ -8475,11 +8474,6 @@
                         "description": "Orden en el que se solicita el documento",
                         "type": "integer",
                         "minimum": 0,
-                        "nullable": true
-                    },
-                    "generateDefaultCode": {
-                        "description": "Genera automáticamente el código por defecto usando el patrón del servicio",
-                        "type": "boolean",
                         "nullable": true
                     }
                 },

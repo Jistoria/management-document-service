@@ -22,9 +22,6 @@ class UpdateRequiredDocumentRequest extends BaseFormRequest
             'urlResource' => ['sometimes', 'nullable', 'string'],
             'isPublic' => ['sometimes', 'boolean'],
             'order' => ['sometimes', 'integer', 'min:0'],
-            'mandatory' => ['sometimes', 'boolean'],
-            'externalUserId' => ['sometimes', 'nullable', 'string', 'max:255'],
-            'externalOrganizationId' => ['sometimes', 'nullable', 'string', 'max:255'],
         ];
     }
 
@@ -54,13 +51,6 @@ class UpdateRequiredDocumentRequest extends BaseFormRequest
             'order.integer' => 'El orden debe ser un número entero',
             'order.min' => 'El orden no puede ser negativo',
 
-            'mandatory.boolean' => 'El campo obligatorio debe ser verdadero o falso',
-
-            'externalUserId.string' => 'El ID de usuario externo debe ser una cadena de texto',
-            'externalUserId.max' => 'El ID de usuario externo no puede exceder 255 caracteres',
-
-            'externalOrganizationId.string' => 'El ID de organización externa debe ser una cadena de texto',
-            'externalOrganizationId.max' => 'El ID de organización externa no puede exceder 255 caracteres',
         ];
     }
 
@@ -75,18 +65,12 @@ class UpdateRequiredDocumentRequest extends BaseFormRequest
             'urlResource' => 'URL del recurso',
             'isPublic' => 'visibilidad pública',
             'order' => 'orden',
-            'mandatory' => 'obligatorio',
-            'externalUserId' => 'ID de usuario externo',
-            'externalOrganizationId' => 'ID de organización externa',
         ];
     }
 
     protected function prepareForValidation(): void
     {
         $data = [];
-        if ($this->has('mandatory')) {
-            $data['mandatory'] = filter_var($this->mandatory, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-        }
         if ($this->has('isPublic')) {
             $data['isPublic'] = filter_var($this->isPublic, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
         }

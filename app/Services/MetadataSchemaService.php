@@ -34,6 +34,7 @@ class MetadataSchemaService
 
     public function create(array $data): MetadataSchema
     {
+        $data = MetadataSchema::convertToSnakeCase($data);
         return MetadataSchema::create($data);
     }
 
@@ -41,6 +42,9 @@ class MetadataSchemaService
     {
         $this->validateUuid($id);
         $schema = $this->findById($id);
+
+        $data = MetadataSchema::convertToSnakeCase($data);
+
         $schema->update($data);
         return $schema;
     }

@@ -227,9 +227,6 @@ CREATE TABLE public.metadata_schemas (
     created_at timestamp(0) without time zone,
     updated_at timestamp(0) without time zone,
     deleted_at timestamp(0) without time zone,
-    external_system_id character varying(255),
-    api_endpoint character varying(500),
-    cache_ttl integer DEFAULT 3600,
     created_by character varying(255),
     updated_by character varying(255),
     CONSTRAINT metadata_schemas_pkey PRIMARY KEY (id),
@@ -771,10 +768,6 @@ COMMENT ON COLUMN public.required_documents.metadata_schema_id IS 'ID del esquem
 COMMENT ON COLUMN public.document_types.created_by IS 'ID usuario externo que creó el registro';
 COMMENT ON COLUMN public.document_types.updated_by IS 'ID usuario externo que actualizó el registro';
 COMMENT ON COLUMN public.document_types.version IS 'Versión del documento para control de cambios';
-
-COMMENT ON COLUMN public.metadata_schemas.external_system_id IS 'ID del sistema externo para integración';
-COMMENT ON COLUMN public.metadata_schemas.api_endpoint IS 'Endpoint para obtener datos dinámicos';
-COMMENT ON COLUMN public.metadata_schemas.cache_ttl IS 'TTL en segundos para cache de metadatos';
 
 COMMENT ON COLUMN public.metadata_schema_events.correlation_id IS 'ID para tracing distribuido entre microservicios';
 COMMENT ON COLUMN public.metadata_schema_events.external_user_id IS 'Usuario desde microservicio externo';

@@ -17,11 +17,10 @@ class StoreRequiredDocumentRequest extends BaseFormRequest
             'processId' => ['nullable', 'uuid', 'exists:processes,id', 'required_without:metadataSchemaId'],
             'documentTypeId' => ['required', 'uuid', 'exists:document_types,id'],
             'metadataSchemaId' => ['nullable', 'uuid', 'exists:metadata_schemas,id', 'required_without:processId'],
-            'codeDefault' => ['nullable', 'string'],
+            'codeDefault' => ['required', 'string'],
             'urlResource' => ['nullable', 'string'],
             'isPublic' => ['nullable', 'boolean'],
             'order' => ['nullable', 'integer', 'min:0'],
-            'generateDefaultCode' => ['nullable', 'boolean'],
         ];
     }
 
@@ -62,7 +61,6 @@ class StoreRequiredDocumentRequest extends BaseFormRequest
             'urlResource' => 'URL del recurso',
             'isPublic' => 'visibilidad pública',
             'order' => 'orden',
-            'generateDefaultCode' => 'generar código por defecto'
         ];
     }
 

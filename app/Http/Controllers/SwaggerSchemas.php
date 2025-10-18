@@ -172,11 +172,10 @@ namespace App\Http\Controllers;
  *     @OA\Property(property="documentTypeId", type="string", format="uuid", description="Tipo de documento requerido"),
  *     @OA\Property(property="academicRoleId", type="string", format="uuid", nullable=true, description="Rol académico específico"),
  *     @OA\Property(property="metadataSchemaId", type="string", format="uuid", nullable=true, description="Esquema de metadatos alternativo (requerido si no se envía processId)"),
- *     @OA\Property(property="codeDefault", type="string", nullable=true, description="Código personalizado para el documento"),
+ *     @OA\Property(property="codeDefault", type="string", description="Código personalizado para el documento"),
  *     @OA\Property(property="urlResource", type="string", nullable=true, description="URL del recurso de referencia"),
  *     @OA\Property(property="isPublic", type="boolean", nullable=true, description="Visibilidad pública del documento"),
  *     @OA\Property(property="order", type="integer", minimum=0, nullable=true, description="Orden en el que se solicita el documento"),
- *     @OA\Property(property="generateDefaultCode", type="boolean", nullable=true, description="Genera automáticamente el código por defecto usando el patrón del servicio")
  * )
  *
  * @OA\Schema(

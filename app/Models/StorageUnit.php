@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\Auditable; // 👈 Agregar trait de auditoría
+use App\Traits\HasCamelCaseAttributes;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -21,13 +22,14 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string|null $parent_id
  * @property string $label
  * @property string|null $code
+ * @property boolean $can_have_children
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  * @property \Carbon\Carbon|null $deleted_at
  */
 class StorageUnit extends Model
 {
-    use HasFactory, HasUuids, SoftDeletes, Auditable;
+    use HasFactory, HasUuids, SoftDeletes, Auditable, HasCamelCaseAttributes;
 
     /**
      * The table associated with the model.
@@ -41,7 +43,8 @@ class StorageUnit extends Model
         'storage_unit_type_id',
         'parent_id',
         'label',
-        'code'
+        'code',
+        'can_have_children',
     ];
 
     /**

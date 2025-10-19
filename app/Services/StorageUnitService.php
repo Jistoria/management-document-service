@@ -34,6 +34,7 @@ class StorageUnitService
 
     public function create(array $data): StorageUnit
     {
+        $data = StorageUnit::convertToSnakeCase($data);
         return StorageUnit::create($data);
     }
 
@@ -41,6 +42,9 @@ class StorageUnitService
     {
         $this->validateUuid($id);
         $unit = $this->findById($id);
+
+        $data = StorageUnit::convertToSnakeCase($data);
+
         $unit->update($data);
         return $unit->fresh(['storageUnitType', 'parent', 'children']);
     }

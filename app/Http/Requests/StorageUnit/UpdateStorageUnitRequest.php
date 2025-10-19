@@ -28,6 +28,7 @@ class UpdateStorageUnitRequest extends BaseFormRequest
                 'regex:/^[A-Z0-9_-]+$/',
                 Rule::unique('storage_units', 'code')->ignore($unitId)->whereNull('deleted_at'),
             ],
+            'canHaveChildren' => ['sometimes', 'boolean'],
         ];
     }
 
@@ -47,6 +48,8 @@ class UpdateStorageUnitRequest extends BaseFormRequest
             'code.max' => 'El código no puede exceder 50 caracteres',
             'code.regex' => 'El código solo puede contener letras mayúsculas, números, guiones y guiones bajos',
             'code.unique' => 'Ya existe una unidad con este código',
+
+            'canHaveChildren.boolean' => 'El campo de capacidad para tener hijos debe ser verdadero o falso',
         ];
     }
 
@@ -57,6 +60,7 @@ class UpdateStorageUnitRequest extends BaseFormRequest
             'parentId' => 'unidad padre',
             'label' => 'etiqueta',
             'code' => 'código',
+            'canHaveChildren' => 'capacidad para tener hijos',
         ];
     }
 

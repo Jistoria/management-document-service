@@ -30,11 +30,6 @@ class UpdateStorageUnitTypeRequest extends BaseFormRequest
                 'regex:/^[A-Z0-9_-]+$/',
                 Rule::unique('storage_unit_types', 'code')->ignore($typeId)->whereNull('deleted_at'),
             ],
-            'level' => [
-                'sometimes',
-                'integer',
-                'min:0',
-            ],
         ];
     }
 
@@ -49,9 +44,6 @@ class UpdateStorageUnitTypeRequest extends BaseFormRequest
             'code.max' => 'El código no puede exceder 50 caracteres',
             'code.regex' => 'El código solo puede contener letras mayúsculas, números, guiones y guiones bajos',
             'code.unique' => 'Ya existe un tipo de unidad con este código',
-
-            'level.integer' => 'El nivel debe ser un número entero',
-            'level.min' => 'El nivel debe ser mayor o igual a 0',
         ];
     }
 
@@ -60,7 +52,6 @@ class UpdateStorageUnitTypeRequest extends BaseFormRequest
         return [
             'name' => 'nombre',
             'code' => 'código',
-            'level' => 'nivel',
         ];
     }
 

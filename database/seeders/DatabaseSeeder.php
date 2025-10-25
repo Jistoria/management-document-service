@@ -21,7 +21,6 @@ class DatabaseSeeder extends Seeder
             // Datos base para producción
             $this->call([
                 ProductionSeeder::class,
-                UleamCoreSeeder::class,
             ]);
         } else {
             // Datos de prueba para desarrollo/testing
@@ -31,7 +30,6 @@ class DatabaseSeeder extends Seeder
             // Por defecto, usar el seeder de producción para tener datos base
             $this->call([
                 ProductionSeeder::class,
-                UleamCoreSeeder::class,
             ]);
         }
     }

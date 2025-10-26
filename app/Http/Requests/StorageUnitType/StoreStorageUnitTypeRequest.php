@@ -27,7 +27,7 @@ class StoreStorageUnitTypeRequest extends BaseFormRequest
                 'max:50',
                 'regex:/^[A-Z0-9_-]+$/',
                 Rule::unique('storage_unit_types', 'code')->whereNull('deleted_at'),
-            ]
+            ],
         ];
     }
 

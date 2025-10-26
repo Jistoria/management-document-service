@@ -44,6 +44,7 @@ class UpdateStorageUnitTypeRequest extends BaseFormRequest
             'code.max' => 'El código no puede exceder 50 caracteres',
             'code.regex' => 'El código solo puede contener letras mayúsculas, números, guiones y guiones bajos',
             'code.unique' => 'Ya existe un tipo de unidad con este código',
+
         ];
     }
 

@@ -63,17 +63,4 @@ class UpdateStorageUnitRequest extends BaseFormRequest
             'canHaveChildren' => 'capacidad para tener hijos',
         ];
     }
-
-    protected function prepareForValidation(): void
-    {
-        if ($this->has('storageUnitTypeId') && !$this->has('storage_unit_type_id')) {
-            $this->merge(['storage_unit_type_id' => $this->input('storageUnitTypeId')]);
-        }
-        if ($this->has('parentId') && !$this->has('parent_id')) {
-            $this->merge(['parent_id' => $this->input('parentId')]);
-        }
-        if ($this->has('code') && $this->code !== null) {
-            $this->merge(['code' => strtoupper(trim($this->code))]);
-        }
-    }
 }

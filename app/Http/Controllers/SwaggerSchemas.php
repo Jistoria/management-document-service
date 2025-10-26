@@ -124,7 +124,6 @@ namespace App\Http\Controllers;
  *         )
  *     }
  * )
-
  * @OA\Schema(
  *     schema="RequiredDocument",
  *     type="object",
@@ -184,7 +183,6 @@ namespace App\Http\Controllers;
  *     title="Update Required Document Request",
  *     @OA\Property(property="processId", type="string", format="uuid", nullable=true, description="Proceso asociado"),
  *     @OA\Property(property="documentTypeId", type="string", format="uuid", nullable=true, description="Tipo de documento requerido"),
- *     @OA\Property(property="academicRoleId", type="string", format="uuid", nullable=true, description="Rol académico asociado"),
  *     @OA\Property(property="metadataSchemaId", type="string", format="uuid", nullable=true, description="Esquema de metadatos alternativo"),
  *     @OA\Property(property="codeDefault", type="string", nullable=true, description="Código personalizado del documento"),
  *     @OA\Property(property="urlResource", type="string", nullable=true, description="URL del recurso de referencia"),
@@ -222,7 +220,6 @@ namespace App\Http\Controllers;
  *     @OA\Property(property="id", type="string", format="uuid", example="0197d795-7572-7331-903b-3aeed9fb34c2"),
  *     @OA\Property(property="name", type="string", example="Edificio"),
  *     @OA\Property(property="code", type="string", example="BUILDING"),
- *     @OA\Property(property="level", type="integer", example=0),
  *     @OA\Property(property="createdAt", type="string", format="date-time"),
  *     @OA\Property(property="updatedAt", type="string", format="date-time"),
  *     @OA\Property(property="createdBy", type="string", nullable=true, example="system"),
@@ -250,10 +247,9 @@ namespace App\Http\Controllers;
  *     schema="StorageUnitTypeCreateRequest",
  *     type="object",
  *     title="Create Storage Unit Type Request",
- *     required={"name","code","level"},
+ *     required={"name","code"},
  *     @OA\Property(property="name", type="string", example="Edificio"),
  *     @OA\Property(property="code", type="string", example="BUILDING"),
- *     @OA\Property(property="level", type="integer", minimum=0, example=0)
  * )
  *
  * @OA\Schema(
@@ -262,7 +258,6 @@ namespace App\Http\Controllers;
  *     title="Update Storage Unit Type Request",
  *     @OA\Property(property="name", type="string", example="Edificio"),
  *     @OA\Property(property="code", type="string", example="BUILDING"),
- *     @OA\Property(property="level", type="integer", minimum=0, example=1)
  * )
  *
  * @OA\Schema(
@@ -271,10 +266,12 @@ namespace App\Http\Controllers;
  *     title="Storage Unit",
  *     description="Unidad de almacenamiento",
  *     @OA\Property(property="id", type="string", format="uuid", example="0197d795-7572-7331-903b-3aeed9fb34c2"),
+ *     @OA\Property(property="departmentId", type="string", format="uuid", nullable=false, description="Departamento asociado"),
  *     @OA\Property(property="storageUnitTypeId", type="string", format="uuid", example="0197d795-7572-7331-903b-3aeed9fb34c2"),
  *     @OA\Property(property="parentId", type="string", format="uuid", nullable=true),
  *     @OA\Property(property="label", type="string", example="Archivo Central"),
  *     @OA\Property(property="code", type="string", nullable=true, example="ARCH-001"),
+ *     @OA\Property(property="canHaveChildren", type="boolean", example=true),
  *     @OA\Property(property="createdAt", type="string", format="date-time"),
  *     @OA\Property(property="updatedAt", type="string", format="date-time"),
  *     @OA\Property(property="createdBy", type="string", nullable=true, example="system"),
@@ -301,6 +298,8 @@ namespace App\Http\Controllers;
  *     title="Create Storage Unit Request",
  *     required={"storageUnitTypeId","label"},
  *     @OA\Property(property="storageUnitTypeId", type="string", format="uuid", description="ID del tipo de unidad"),
+ *     @OA\Property(property="canHaveChildren", type="boolean", example=true),
+ *     @OA\Property(property="departmentId", type="string", format="uuid", nullable=false, description="Departamento asociado"),
  *     @OA\Property(property="parentId", type="string", format="uuid", nullable=true, description="ID de la unidad padre"),
  *     @OA\Property(property="label", type="string", description="Etiqueta de la unidad"),
  *     @OA\Property(property="code", type="string", nullable=true, description="Código de la unidad"),
@@ -313,9 +312,11 @@ namespace App\Http\Controllers;
  *     type="object",
  *     title="Update Storage Unit Request",
  *     @OA\Property(property="storageUnitTypeId", type="string", format="uuid", description="ID del tipo de unidad"),
+ *     @OA\Property(property="departmentId", type="string", format="uuid", nullable=false, description="Departamento asociado"),
  *     @OA\Property(property="parentId", type="string", format="uuid", nullable=true, description="ID de la unidad padre"),
  *     @OA\Property(property="label", type="string", description="Etiqueta de la unidad"),
  *     @OA\Property(property="code", type="string", nullable=true, description="Código de la unidad"),
+ *     @OA\Property(property="canHaveChildren", type="boolean", example=true),
  *     @OA\Property(property="createdBy", type="string", nullable=true, description="Usuario creador"),
  *     @OA\Property(property="updatedBy", type="string", nullable=true, description="Usuario actualizador")
  * )

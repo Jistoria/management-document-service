@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $storage_unit_type_id
  * @property string|null $parent_id
  * @property string $label
+ * @property string $department_id
  * @property string|null $code
  * @property boolean $can_have_children
  * @property \Carbon\Carbon $created_at
@@ -41,6 +42,7 @@ class StorageUnit extends Model
      */
     protected $fillable = [
         'storage_unit_type_id',
+        'department_id',
         'parent_id',
         'label',
         'code',
@@ -53,7 +55,8 @@ class StorageUnit extends Model
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
-        'deleted_at' => 'datetime'
+        'deleted_at' => 'datetime',
+        'can_have_children' => 'boolean',
     ];
 
     /**

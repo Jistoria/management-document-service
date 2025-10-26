@@ -8494,12 +8494,6 @@
                         "format": "uuid",
                         "nullable": true
                     },
-                    "academicRoleId": {
-                        "description": "Rol académico asociado",
-                        "type": "string",
-                        "format": "uuid",
-                        "nullable": true
-                    },
                     "metadataSchemaId": {
                         "description": "Esquema de metadatos alternativo",
                         "type": "string",
@@ -8581,10 +8575,6 @@
                         "type": "string",
                         "example": "BUILDING"
                     },
-                    "level": {
-                        "type": "integer",
-                        "example": 0
-                    },
                     "createdAt": {
                         "type": "string",
                         "format": "date-time"
@@ -8638,8 +8628,7 @@
                 "title": "Create Storage Unit Type Request",
                 "required": [
                     "name",
-                    "code",
-                    "level"
+                    "code"
                 ],
                 "properties": {
                     "name": {
@@ -8649,11 +8638,6 @@
                     "code": {
                         "type": "string",
                         "example": "BUILDING"
-                    },
-                    "level": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "example": 0
                     }
                 },
                 "type": "object"
@@ -8668,11 +8652,6 @@
                     "code": {
                         "type": "string",
                         "example": "BUILDING"
-                    },
-                    "level": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "example": 1
                     }
                 },
                 "type": "object"
@@ -8685,6 +8664,12 @@
                         "type": "string",
                         "format": "uuid",
                         "example": "0197d795-7572-7331-903b-3aeed9fb34c2"
+                    },
+                    "departmentId": {
+                        "description": "Departamento asociado",
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": false
                     },
                     "storageUnitTypeId": {
                         "type": "string",
@@ -8704,6 +8689,10 @@
                         "type": "string",
                         "example": "ARCH-001",
                         "nullable": true
+                    },
+                    "canHaveChildren": {
+                        "type": "boolean",
+                        "example": true
                     },
                     "createdAt": {
                         "type": "string",
@@ -8778,6 +8767,16 @@
                         "type": "string",
                         "format": "uuid"
                     },
+                    "canHaveChildren": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "departmentId": {
+                        "description": "Departamento asociado",
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": false
+                    },
                     "parentId": {
                         "description": "ID de la unidad padre",
                         "type": "string",
@@ -8814,6 +8813,12 @@
                         "type": "string",
                         "format": "uuid"
                     },
+                    "departmentId": {
+                        "description": "Departamento asociado",
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": false
+                    },
                     "parentId": {
                         "description": "ID de la unidad padre",
                         "type": "string",
@@ -8828,6 +8833,10 @@
                         "description": "Código de la unidad",
                         "type": "string",
                         "nullable": true
+                    },
+                    "canHaveChildren": {
+                        "type": "boolean",
+                        "example": true
                     },
                     "createdBy": {
                         "description": "Usuario creador",

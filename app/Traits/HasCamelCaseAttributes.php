@@ -15,6 +15,9 @@ trait HasCamelCaseAttributes
     protected array $camelCaseMap = [
         'headOfficeId' => 'head_office_id',
         'departmentId' => 'department_id',
+        'storageUnitTypeId' => 'storage_unit_type_id',
+        'parentId' => 'parent_id',
+        'canHaveChildren' => 'can_have_children',
         'createdBy' => 'created_by',
         'updatedBy' => 'updated_by',
         'deletedAt' => 'deleted_at',

@@ -14,6 +14,7 @@ class StorageUnitResource extends BaseResource
             'parentId' => $this->parent_id,
             'label' => $this->label,
             'code' => $this->code,
+            'canHaveChildren' => $this->can_have_children,
             'createdAt' => $this->created_at?->toISOString(),
             'updatedAt' => $this->updated_at?->toISOString(),
             'createdBy' => $this->created_by,

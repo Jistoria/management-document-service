@@ -477,32 +477,26 @@ class ProductionSeeder extends Seeder
             [
                 'name' => 'Archivo Central',
                 'code' => 'ARCHIVO_CENTRAL',
-                'can_have_children' => true,
             ],
             [
                 'name' => 'Sección',
                 'code' => 'SECCION',
-                'can_have_children' => true,
             ],
             [
                 'name' => 'Serie',
                 'code' => 'SERIE',
-                'can_have_children' => true,
             ],
             [
                 'name' => 'Subserie',
                 'code' => 'SUBSERIE',
-                'can_have_children' => true,
             ],
             [
                 'name' => 'Caja',
                 'code' => 'CAJA',
-                'can_have_children' => true, // puede contener carpetas
             ],
             [
                 'name' => 'Carpeta',
                 'code' => 'CARPETA',
-                'can_have_children' => false, // nivel final
             ],
         ];
 

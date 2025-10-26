@@ -6,7 +6,9 @@ use App\Models\StorageUnit;
 use App\Traits\ValidatesUuid;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Log\Logger;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Log;
 
 class StorageUnitService
 {
@@ -35,6 +37,9 @@ class StorageUnitService
     public function create(array $data): StorageUnit
     {
         $data = StorageUnit::convertToSnakeCase($data);
+
+        Log::info($data);
+
         return StorageUnit::create($data);
     }
 

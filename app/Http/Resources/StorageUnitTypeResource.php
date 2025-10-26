@@ -12,7 +12,6 @@ class StorageUnitTypeResource extends BaseResource
             'id' => $this->id,
             'name' => $this->name,
             'code' => $this->code,
-            'level' => $this->level,
             'createdAt' => $this->created_at?->toISOString(),
             'updatedAt' => $this->updated_at?->toISOString(),
             'createdBy' => $this->created_by,

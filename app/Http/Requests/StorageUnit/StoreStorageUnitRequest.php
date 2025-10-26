@@ -16,10 +16,11 @@ class StoreStorageUnitRequest extends BaseFormRequest
     {
         return [
             'storageUnitTypeId' => ['required', 'uuid', 'exists:storage_unit_types,id'],
-            'parentId' => ['nullable', 'uuid', 'exists:storage_units,id'],
+            'parentId' => ['nullable', 'uuid', Rule::exists('storage_units', 'id')->whereNull('deleted_at')],
+            'departmentId' => ['required', 'uuid', Rule::exists('departments', 'id')->whereNull('deleted_at')],
             'label' => ['required', 'string', 'max:255'],
             'code' => ['nullable', 'string', 'max:50', 'regex:/^[A-Z0-9_-]+$/', Rule::unique('storage_units', 'code')->whereNull('deleted_at')],
-            'canHaveChildren' => ['nullable', 'boolean'],
+            'canHaveChildren' => ['sometimes', 'boolean'],
         ];
     }
 
@@ -42,7 +43,7 @@ class StoreStorageUnitRequest extends BaseFormRequest
             'code.regex' => 'El código solo puede contener letras mayúsculas, números, guiones y guiones bajos',
             'code.unique' => 'Ya existe una unidad con este código',
 
-            'canHaveChildren.boolean' => 'El campo de capacidad para tener hijos debe ser verdadero o falso',
+            'canHaveChildren' => 'El campo de capacidad para tener hijos debe ser verdadero o falso',
         ];
     }
 
@@ -57,16 +58,4 @@ class StoreStorageUnitRequest extends BaseFormRequest
         ];
     }
 
-    protected function prepareForValidation(): void
-    {
-        if ($this->has('storageUnitTypeId') && !$this->has('storage_unit_type_id')) {
-            $this->merge(['storage_unit_type_id' => $this->input('storageUnitTypeId')]);
-        }
-        if ($this->has('parentId') && !$this->has('parent_id')) {
-            $this->merge(['parent_id' => $this->input('parentId')]);
-        }
-        if ($this->has('code') && $this->code !== null) {
-            $this->merge(['code' => strtoupper(trim($this->code))]);
-        }
-    }
 }

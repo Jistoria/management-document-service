@@ -44,7 +44,7 @@ class RequiredDocumentService
      */
     public function getPaginated(int $perPage = 15, array $filters = []): LengthAwarePaginator
     {
-        $query = RequiredDocument::query()->with(['documentType', 'process', 'academicRole', 'metadataSchema']);
+        $query = RequiredDocument::query();
         $this->applyFilters($filters, $query);
         return $query->paginate($perPage);
     }
@@ -55,7 +55,7 @@ class RequiredDocumentService
     public function findById(string $id): RequiredDocument
     {
         $this->validateUuid($id);
-        return RequiredDocument::with(['documentType', 'process', 'academicRole', 'metadataSchema'])->findOrFail($id);
+        return RequiredDocument::with(['documentType', 'process', 'metadataSchema.metadataFields'])->findOrFail($id);
     }
 
     /**

@@ -8,7 +8,7 @@ class MetadataSchemaResource extends BaseResource
 {
     public function toArray(Request $request): array
     {
-        return [
+        return array(
             'id' => $this->id,
             'name' => $this->name,
             'description' => $this->description,
@@ -17,8 +17,8 @@ class MetadataSchemaResource extends BaseResource
             'version' => $this->version,
             'createdAt' => $this->created_at?->toISOString(),
             'updatedAt' => $this->updated_at?->toISOString(),
-            'metadataFields' => new MetadataFieldResource($this->whenLoaded('metadataFields')),
-        ];
+            'metadataFields' => MetadataFieldResource::collection($this->whenLoaded('metadataFields')),
+        );
     }
 
     protected function getMinimalFields(): array

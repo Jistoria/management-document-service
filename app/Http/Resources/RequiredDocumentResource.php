@@ -21,7 +21,6 @@ class RequiredDocumentResource extends BaseResource
             'codeDefault' => $this->code_default,
             'urlResource' => $this->url_resource,
             'isPublic' => (bool) $this->is_public,
-            'order' => $this->order,
             'createdAt' => $this->created_at?->toISOString(),
             'updatedAt' => $this->updated_at?->toISOString(),
             'createdBy' => $this->createdBy,
@@ -30,7 +29,6 @@ class RequiredDocumentResource extends BaseResource
             'documentType' => new DocumentTypeResource($this->whenLoaded('documentType')),
             'process' => new ProcessResource($this->whenLoaded('process')),
             'metadataSchema' => new MetadataSchemaResource($this->whenLoaded('metadataSchema')),
-            'academicRole' => $this->whenLoaded('academicRole'),
         ];
     }
 

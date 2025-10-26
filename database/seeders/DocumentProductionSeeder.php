@@ -154,13 +154,15 @@ class DocumentProductionSeeder extends Seeder
                         'process_id' => $process->id,
                         'document_type_id' => $docType->id,
                         'metadata_schema_id' => $schema->id,
-                        'order' => $req['order'],
+                        'code_default' => $req['process_code'] . ' - ' . $req['doc_code']. 'V1',
+                        'name' => $req['process_code'] . ' - ' . $req['doc_code']. 'V1',
                     ],
                     [
                         'process_id' => $process->id,
                         'document_type_id' => $docType->id,
                         'metadata_schema_id' => $schema->id,
-                        'order' => $req['order'],
+                        'code_default' => $req['process_code'] . ' - ' . $req['doc_code'].'V2',
+                        'name' => $req['process_code'] . ' - ' . $req['doc_code'].'V2',
                     ]
                 );
             }

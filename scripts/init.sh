@@ -22,6 +22,16 @@ fi
 # Detectar entorno para decidir caches
 APP_ENV_VALUE="${APP_ENV:-local}"
 
+# -----------------------------
+# DEPENDENCIAS
+# -----------------------------
+if [ ! -f "vendor/autoload.php" ]; then
+  echo "=== 📦 Instalando dependencias de Composer ==="
+  composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-ansi
+else
+  echo "ℹ️  Dependencias ya instaladas, se omite Composer install."
+fi
+
 # --- Espera de dependencias ---
 wait_for_service() {
   local host=$1 port=$2 service_name=$3

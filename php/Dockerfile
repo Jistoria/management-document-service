@@ -26,9 +26,6 @@ COPY . .
 # Hacer ejecutables los scripts
 RUN chmod +x scripts/init.sh
 
-# Instalar dependencias de Composer
-RUN composer install --no-dev --optimize-autoloader
-
 # Configurar permisos de storage
 RUN mkdir -p storage/logs storage/framework/cache storage/framework/sessions storage/framework/views \
     && chmod -R 775 storage bootstrap/cache \

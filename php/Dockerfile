@@ -2,7 +2,11 @@ FROM php:8.3-fpm
 
 # Instalar dependencias del sistema y extensiones requeridas
 RUN apt-get update && apt-get install -y \
-    libpq-dev zip unzip curl git libzip-dev \
+    build-essential \
+    libpq-dev \
+    libssl-dev \
+    libzstd-dev \
+    zip unzip curl git libzip-dev \
     librdkafka-dev libsodium-dev netcat-openbsd \
     && docker-php-ext-install pdo pdo_pgsql zip sodium \
     && pecl install rdkafka \

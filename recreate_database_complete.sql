@@ -20,17 +20,6 @@ CREATE EXTENSION IF NOT EXISTS "plpgsql";
 CREATE SCHEMA IF NOT EXISTS public;
 
 -- =====================================================================================
--- SECUENCIAS
--- =====================================================================================
-
-CREATE SEQUENCE public.migrations_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    MINVALUE 1
-    MAXVALUE 2147483647
-    NO CYCLE;
-
--- =====================================================================================
 -- TABLAS PRINCIPALES DEL DOMINIO ADMINISTRATIVO
 -- =====================================================================================
 

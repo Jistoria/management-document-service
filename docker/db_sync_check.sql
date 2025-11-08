@@ -38,7 +38,7 @@ WITH expected_tables AS (
         'process_categories', 'processes', 'document_types', 'academic_roles',
         'required_documents', 'storage_unit_types', 'storage_units',
         'metadata_schemas', 'metadata_fields', 'metadata_schema_events',
-        'audit_logs', 'audit_metrics', 'external_apis', 'migrations'
+        'audit_logs', 'audit_metrics'
     ]) as table_name
 ),
 existing_tables AS (

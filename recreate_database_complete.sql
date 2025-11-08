@@ -20,6 +20,11 @@ CREATE EXTENSION IF NOT EXISTS "plpgsql";
 CREATE SCHEMA IF NOT EXISTS public;
 
 -- =====================================================================================
+-- SECUENCIAS
+-- =====================================================================================
+
+
+-- =====================================================================================
 -- TABLAS PRINCIPALES DEL DOMINIO ADMINISTRATIVO
 -- =====================================================================================
 
@@ -458,14 +463,6 @@ CREATE TABLE public.external_apis (
     CONSTRAINT external_apis_auth_method_check CHECK (auth_method::text = ANY (ARRAY['bearer'::character varying, 'basic'::character varying, 'api_key'::character varying, 'oauth2'::character varying]::text[])),
     CONSTRAINT external_apis_timeout_seconds_check CHECK (timeout_seconds > 0),
     CONSTRAINT external_apis_retry_attempts_check CHECK (retry_attempts >= 0)
-);
-
--- Tabla: Migraciones de Laravel
-CREATE TABLE public.migrations (
-    id integer DEFAULT nextval('migrations_id_seq'::regclass) NOT NULL,
-    migration character varying(255) NOT NULL,
-    batch integer NOT NULL,
-    CONSTRAINT migrations_pkey PRIMARY KEY (id)
 );
 
 -- =====================================================================================

@@ -1,0 +1,2 @@
+php artisan tinker
+exit

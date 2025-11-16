@@ -284,7 +284,7 @@ CREATE TABLE public.metadata_schema_events (
 CREATE TABLE public.required_documents (
     id uuid NOT NULL,
     process_id uuid,
-    document_type_id uuid NOT NULL,
+    document_type_id uuid,
     code_default text DEFAULT 'S/C' NOT NULL,
     name text DEFAULT 'S/N' NOT NULL,
     "order" integer DEFAULT 0 NOT NULL,

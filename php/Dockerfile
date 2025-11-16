@@ -1,5 +1,12 @@
 FROM php:8.3-fpm
 
+ARG UID=1000
+ARG GID=1000
+
+RUN echo "Cambiando UID/GID de www-data a $UID/$GID"
+RUN groupmod -o -g $GID www-data
+RUN usermod -o -u $UID -g $GID www-data
+
 # Instalar dependencias del sistema y extensiones requeridas
 RUN apt-get update && apt-get install -y \
     build-essential \

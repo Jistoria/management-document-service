@@ -21,6 +21,7 @@ class AuthenticateService
         $hash = hash('sha256', $token);
         $session = null;
 
+        Log::debug('[AuthenticateService] Retrieving session for token hash: ' . $hash);
         $data = Redis::get("laravel_database_session:{$hash}");
         if ($data) {
             $session = json_decode($data, true);

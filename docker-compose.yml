@@ -3,7 +3,7 @@ services:
         build:
             context: .
             dockerfile: php/Dockerfile
-        image: management-app  # <--- CORREGIDO (antes 'auth-app')
+        image: management-app
         container_name: management-init
         volumes:
             - .:/var/www
@@ -71,7 +71,11 @@ services:
         build:
             context: .
             dockerfile: php/Dockerfile
+            args:
+                UID: ${UID:-1000}
+                GID: ${GID:-1000}
         image: management-app
+        user: "${UID:-1000}:${GID:-1000}" # <--- AÑADE ESTO
         container_name: management-app
         volumes:
             - .:/var/www
@@ -125,7 +129,14 @@ services:
     #           - management-net
 
     consumer-auth:
+        build:
+            context: .
+            dockerfile: php/Dockerfile
+            args:
+                UID: ${UID:-1000}
+                GID: ${GID:-1000}
         image: management-app
+        user: "${UID:-1000}:${GID:-1000}"
         container_name: management-consumer-auth
         command: php artisan auth-sync:consume
         volumes:

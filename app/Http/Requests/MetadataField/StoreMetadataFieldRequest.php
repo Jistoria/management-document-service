@@ -26,26 +26,28 @@ class StoreMetadataFieldRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'schemaId' => ['required', 'uuid', 'exists:metadata_schemas,id'],
-            'name' => ['required', 'string', 'max:255'],
+            'fieldKey' => ['required', 'string', 'max:255', Rule::unique('metadata_fields', 'field_key')],
+            'label' => ['required', 'string', 'max:255'],
+            'entityTypeId' => ['nullable', 'uuid'],
+            'typeInputId' => ['required', 'string', 'max:255'],
             'dataType' => ['required', 'string', Rule::in(MetadataFieldDataType::ALL)],
-            'isRequired' => ['boolean'],
-            'defaultValue' => ['nullable', 'string'],
-            'validationRegex' => ['nullable', 'string'],
-            'fieldOrder' => ['nullable', 'integer', 'min:1'],
+            'isReference' => ['boolean'],
+            'referenceEntity' => ['nullable', 'string', 'max:255'],
+            'referenceColumn' => ['nullable', 'string', 'max:255'],
         ];
     }
 
     public function attributes(): array
     {
         return [
-            'schemaId' => 'esquema',
-            'name' => 'nombre',
+            'fieldKey' => 'clave del campo',
+            'label' => 'etiqueta',
+            'entityTypeId' => 'entidad',
+            'typeInputId' => 'tipo de entrada',
             'dataType' => 'tipo de dato',
-            'isRequired' => 'es requerido',
-            'defaultValue' => 'valor por defecto',
-            'validationRegex' => 'expresión regular',
-            'fieldOrder' => 'orden',
+            'isReference' => 'es referencia',
+            'referenceEntity' => 'entidad de referencia',
+            'referenceColumn' => 'columna de referencia',
         ];
     }
 
@@ -60,8 +62,8 @@ class StoreMetadataFieldRequest extends BaseFormRequest
             $data['dataType'] = MetadataFieldDataType::normalize($this->dataType);
         }
 
-        if ($this->boolean('isRequired')) {
-            $data['isRequired'] = $this->boolean('isRequired');
+        if ($this->has('isReference')) {
+            $data['isReference'] = $this->boolean('isReference');
         }
 
         if (!empty($data)) {

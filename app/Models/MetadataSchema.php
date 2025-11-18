@@ -8,7 +8,7 @@ use App\Traits\HasCamelCaseAttributes;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -21,7 +21,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $id
  * @property string $name
  * @property string|null $description
- * @property string|null $parent_schema_id
  * @property bool $is_canonical
  * @property int $version
  * @property \Carbon\Carbon $created_at
@@ -50,7 +49,6 @@ class MetadataSchema extends Model
     protected $fillable = [
         'name',
         'description',
-        'parent_schema_id',
         'is_canonical',
         'version',
         'created_by',
@@ -77,35 +75,15 @@ class MetadataSchema extends Model
     ];
 
     /**
-     * Get the parent schema (for inheritance).
+     * Relationship: fields composed by this schema.
      */
-    public function parentSchema(): BelongsTo
+    public function metadataFields(): BelongsToMany
     {
-        return $this->belongsTo(MetadataSchema::class, 'parent_schema_id');
-    }
-
-    /**
-     * Get the child schemas that inherit from this schema.
-     */
-    public function childSchemas(): HasMany
-    {
-        return $this->hasMany(MetadataSchema::class, 'parent_schema_id');
-    }
-
-    /**
-     * Get the metadata fields for this schema.
-     */
-    public function metadataFields(): HasMany
-    {
-        return $this->hasMany(MetadataField::class, 'schema_id');
-    }
-
-    /**
-     * Get active metadata fields for this schema ordered by field_order.
-     */
-    public function activeMetadataFields(): HasMany
-    {
-        return $this->metadataFields()->orderBy('field_order');
+        return $this->belongsToMany(MetadataField::class, 'metadata_schema_fields', 'metadata_schema_id', 'metadata_field_id')
+            ->using(MetadataSchemaField::class)
+            ->withPivot(['id', 'is_required', 'sort_order', 'default_value'])
+            ->withTimestamps()
+            ->orderBy('metadata_schema_fields.sort_order');
     }
 
     /**
@@ -146,31 +124,6 @@ class MetadataSchema extends Model
     public function scopeActive($query)
     {
         return $query->whereNull('deleted_at');
-    }
-
-    /**
-     * Get all inherited fields from parent schemas.
-     */
-    public function getInheritedFields()
-    {
-        $fields = collect();
-
-        if ($this->parentSchema) {
-            $fields = $fields->merge($this->parentSchema->getInheritedFields());
-            $fields = $fields->merge($this->parentSchema->activeMetadataFields);
-        }
-
-        return $fields;
-    }
-
-    /**
-     * Get all fields including inherited ones.
-     */
-    public function getAllFields()
-    {
-        return $this->getInheritedFields()
-            ->merge($this->activeMetadataFields)
-            ->sortBy('field_order');
     }
 
     /**

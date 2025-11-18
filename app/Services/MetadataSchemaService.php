@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\MetadataSchema;
+use App\Models\MetadataSchemaField;
 use App\Traits\ValidatesUuid;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -15,6 +16,7 @@ class MetadataSchemaService
     public function getAll(array $filters = []): Collection
     {
         $query = MetadataSchema::query();
+        $query->with('metadataFields');
         $this->applyFilters($query, $filters);
         return $query->get();
     }
@@ -22,6 +24,7 @@ class MetadataSchemaService
     public function getPaginated(int $perPage = 15, array $filters = []): LengthAwarePaginator
     {
         $query = MetadataSchema::query();
+        $query->with('metadataFields');
         $this->applyFilters($query, $filters);
         return $query->paginate($perPage);
     }
@@ -29,13 +32,19 @@ class MetadataSchemaService
     public function findById(string $id): MetadataSchema
     {
         $this->validateUuid($id);
-        return MetadataSchema::findOrFail($id);
+        return MetadataSchema::with('metadataFields')->findOrFail($id);
     }
 
     public function create(array $data): MetadataSchema
     {
         $data = MetadataSchema::convertToSnakeCase($data);
-        return MetadataSchema::create($data);
+        $schema = MetadataSchema::create($data);
+
+        if (!empty($data['fields'])) {
+            $this->syncFields($schema, $data['fields']);
+        }
+
+        return $schema->load('metadataFields');
     }
 
     public function update(string $id, array $data): MetadataSchema
@@ -46,7 +55,12 @@ class MetadataSchemaService
         $data = MetadataSchema::convertToSnakeCase($data);
 
         $schema->update($data);
-        return $schema;
+
+        if (!empty($data['fields'])) {
+            $this->syncFields($schema, $data['fields']);
+        }
+
+        return $schema->load('metadataFields');
     }
 
     public function delete(string $id): bool
@@ -82,9 +96,6 @@ class MetadataSchemaService
                   ->orWhere('description', 'LIKE', "%{$search}%");
             });
         }
-        if (!empty($filters['parent_schema_id'])) {
-            $query->where('parent_schema_id', $filters['parent_schema_id']);
-        }
         if (isset($filters['is_canonical'])) {
             $query->where('is_canonical', filter_var($filters['is_canonical'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE));
         }
@@ -96,6 +107,30 @@ class MetadataSchemaService
     public function resolveIncludes(array $requestedIncludes, MetadataSchema $schema): void
     {
         // No dynamic includes for now
+    }
+
+    private function syncFields(MetadataSchema $schema, array $fields): void
+    {
+        $pivotData = [];
+
+        foreach ($fields as $field) {
+            $fieldData = MetadataSchemaField::convertToSnakeCase($field);
+            $fieldId = $fieldData['metadata_field_id'] ?? null;
+
+            if (!$fieldId) {
+                continue;
+            }
+
+            $pivotData[$fieldId] = [
+                'is_required' => $fieldData['is_required'] ?? false,
+                'sort_order' => $fieldData['sort_order'] ?? null,
+                'default_value' => $fieldData['default_value'] ?? null,
+            ];
+        }
+
+        if (!empty($pivotData)) {
+            $schema->metadataFields()->sync($pivotData);
+        }
     }
 }
 

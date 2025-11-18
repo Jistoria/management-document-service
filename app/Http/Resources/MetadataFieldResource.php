@@ -13,13 +13,18 @@ class MetadataFieldResource extends BaseResource
     {
         return [
             'id' => $this->id,
-            'schemaId' => $this->schema_id,
-            'name' => $this->name,
+            'fieldKey' => $this->field_key,
+            'label' => $this->label,
+            'entityTypeId' => $this->entity_type_id,
+            'typeInputId' => $this->type_input_id,
             'dataType' => $this->data_type,
-            'isRequired' => $this->is_required,
-            'defaultValue' => $this->getFormattedDefaultValue(),
-            'validationRegex' => $this->validation_regex,
-            'fieldOrder' => $this->field_order,
+            'isReference' => $this->is_reference,
+            'referenceEntity' => $this->reference_entity,
+            'referenceColumn' => $this->reference_column,
+            'schemaFieldId' => $this->pivot?->id,
+            'isRequired' => $this->pivot?->is_required,
+            'sortOrder' => $this->pivot?->sort_order,
+            'defaultValue' => $this->pivot?->default_value,
             'createdAt' => $this->created_at?->toISOString(),
             'updatedAt' => $this->updated_at?->toISOString(),
         ];
@@ -29,7 +34,8 @@ class MetadataFieldResource extends BaseResource
     {
         return [
             'id' => $this->id,
-            'name' => $this->name,
+            'fieldKey' => $this->field_key,
+            'label' => $this->label,
             'dataType' => $this->data_type,
         ];
     }

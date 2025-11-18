@@ -98,16 +98,22 @@ class MetadataFieldService
     {
         if (!empty($filters['search'])) {
             $search = $filters['search'];
-            $query->where('name', 'LIKE', "%{$search}%");
-        }
-        if (!empty($filters['schema_id'])) {
-            $query->where('schema_id', $filters['schema_id']);
+            $query->where(function ($q) use ($search) {
+                $q->where('field_key', 'LIKE', "%{$search}%")
+                    ->orWhere('label', 'LIKE', "%{$search}%");
+            });
         }
         if (!empty($filters['data_type'])) {
             $query->where('data_type', $filters['data_type']);
         }
-        if (isset($filters['is_required'])) {
-            $query->where('is_required', filter_var($filters['is_required'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE));
+        if (!empty($filters['field_key'])) {
+            $query->where('field_key', 'LIKE', "%{$filters['field_key']}%");
+        }
+        if (!empty($filters['type_input_id'])) {
+            $query->where('type_input_id', $filters['type_input_id']);
+        }
+        if (!empty($filters['entity_type_id'])) {
+            $query->where('entity_type_id', $filters['entity_type_id']);
         }
         if (isset($filters['is_reference'])) {
             $query->where('is_reference', filter_var($filters['is_reference'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE));

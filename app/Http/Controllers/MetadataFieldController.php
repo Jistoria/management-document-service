@@ -52,7 +52,7 @@ class MetadataFieldController extends Controller
                 $this->metadataFieldService,
                 MetadataFieldResource::class,
                 $request,
-                ApiIndexBuilder::extractFilters($request, ['schema_id', 'data_type', 'is_required', 'is_reference'])
+                ApiIndexBuilder::extractFilters($request, ['field_key', 'data_type', 'type_input_id', 'entity_type_id', 'is_reference'])
             );
         }, 'Metadata fields retrieved successfully');
     }
@@ -90,14 +90,15 @@ class MetadataFieldController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"schema_id","name","data_type"},
-     *             @OA\Property(property="schemaId", type="string", format="uuid"),
-     *             @OA\Property(property="name", type="string"),
+     *             required={"fieldKey","label","typeInputId","dataType"},
+     *             @OA\Property(property="fieldKey", type="string"),
+     *             @OA\Property(property="label", type="string"),
+     *             @OA\Property(property="entityTypeId", type="string", format="uuid", nullable=true),
+     *             @OA\Property(property="typeInputId", type="string"),
      *             @OA\Property(property="dataType", type="string"),
-     *             @OA\Property(property="isRequired", type="boolean"),
-     *             @OA\Property(property="defaultValue", type="string", nullable=true),
-     *             @OA\Property(property="validationRegex", type="string", nullable=true),
-     *             @OA\Property(property="fieldOrder", type="integer", nullable=true),
+     *             @OA\Property(property="isReference", type="boolean"),
+     *             @OA\Property(property="referenceEntity", type="string", nullable=true),
+     *             @OA\Property(property="referenceColumn", type="string", nullable=true),
      *         )
      *     ),
      *     @OA\Response(
@@ -128,13 +129,14 @@ class MetadataFieldController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             @OA\Property(property="schemaId", type="string", format="uuid"),
-     *             @OA\Property(property="name", type="string"),
+     *             @OA\Property(property="fieldKey", type="string"),
+     *             @OA\Property(property="label", type="string"),
+     *             @OA\Property(property="entityTypeId", type="string", format="uuid", nullable=true),
+     *             @OA\Property(property="typeInputId", type="string"),
      *             @OA\Property(property="dataType", type="string"),
-     *             @OA\Property(property="isRequired", type="boolean"),
-     *             @OA\Property(property="defaultValue", type="string", nullable=true),
-     *             @OA\Property(property="validationRegex", type="string", nullable=true),
-     *             @OA\Property(property="fieldOrder", type="integer", nullable=true)
+     *             @OA\Property(property="isReference", type="boolean"),
+     *             @OA\Property(property="referenceEntity", type="string", nullable=true),
+     *             @OA\Property(property="referenceColumn", type="string", nullable=true)
      *         )
      *     ),
      *     @OA\Response(

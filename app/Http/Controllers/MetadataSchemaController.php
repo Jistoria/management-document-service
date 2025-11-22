@@ -30,7 +30,6 @@ class MetadataSchemaController extends Controller
      *     summary="List metadata schemas",
      *     tags={"Metadata Schemas"},
      *     @OA\Parameter(name="search", in="query", description="Search by name", @OA\Schema(type="string")),
-     *     @OA\Parameter(name="parent_schema_id", in="query", description="Filter by parent schema ID", @OA\Schema(type="string", format="uuid")),
      *     @OA\Parameter(name="is_canonical", in="query", description="Filter by canonical flag", @OA\Schema(type="boolean")),
      *     @OA\Parameter(name="external_system_id", in="query", description="Filter by external system ID", @OA\Schema(type="string")),
      *     @OA\Response(
@@ -51,7 +50,7 @@ class MetadataSchemaController extends Controller
                 $this->metadataSchemaService,
                 MetadataSchemaResource::class,
                 $request,
-                ApiIndexBuilder::extractFilters($request, ['parent_schema_id', 'is_canonical', 'external_system_id'])
+                ApiIndexBuilder::extractFilters($request, ['is_canonical', 'external_system_id'])
             );
         }, 'Metadata schemas retrieved successfully');
     }
@@ -92,8 +91,18 @@ class MetadataSchemaController extends Controller
      *             required={"name"},
      *             @OA\Property(property="name", type="string"),
      *             @OA\Property(property="description", type="string", nullable=true),
-     *             @OA\Property(property="parentSchemaId", type="string", format="uuid", nullable=true),
      *             @OA\Property(property="isCanonical", type="boolean"),
+     *             @OA\Property(
+     *                 property="fields",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     required={"metadataFieldId"},
+     *                     @OA\Property(property="metadataFieldId", type="string", format="uuid"),
+     *                     @OA\Property(property="isRequired", type="boolean"),
+     *                     @OA\Property(property="sortOrder", type="integer", nullable=true),
+     *                     @OA\Property(property="defaultValue", type="string", nullable=true)
+     *                 )
+     *             ),
      *         )
      *     ),
      *     @OA\Response(
@@ -126,8 +135,17 @@ class MetadataSchemaController extends Controller
      *         @OA\JsonContent(
      *             @OA\Property(property="name", type="string", nullable=true),
      *             @OA\Property(property="description", type="string", nullable=true),
-     *             @OA\Property(property="parentSchemaId", type="string", format="uuid", nullable=true),
      *             @OA\Property(property="isCanonical", type="boolean", nullable=true),
+     *             @OA\Property(
+     *                 property="fields",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     @OA\Property(property="metadataFieldId", type="string", format="uuid"),
+     *                     @OA\Property(property="isRequired", type="boolean"),
+     *                     @OA\Property(property="sortOrder", type="integer", nullable=true),
+     *                     @OA\Property(property="defaultValue", type="string", nullable=true)
+     *                 )
+     *             ),
      *         )
      *     ),
      *     @OA\Response(

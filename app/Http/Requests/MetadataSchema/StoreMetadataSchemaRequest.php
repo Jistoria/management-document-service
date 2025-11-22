@@ -17,9 +17,13 @@ class StoreMetadataSchemaRequest extends BaseFormRequest
         return [
             'name' => ['required', 'string', 'max:255', Rule::unique('metadata_schemas', 'name')],
             'description' => ['nullable', 'string'],
-            'parentSchemaId' => ['nullable', 'uuid', 'exists:metadata_schemas,id'],
             'isCanonical' => ['boolean'],
-            'version' => ['nullable', 'integer', 'min:1']
+            'version' => ['nullable', 'integer', 'min:1'],
+            'fields' => ['array'],
+            'fields.*.metadataFieldId' => ['required_with:fields', 'uuid', 'exists:metadata_fields,id'],
+            'fields.*.isRequired' => ['boolean'],
+            'fields.*.sortOrder' => ['nullable', 'integer', 'min:1'],
+            'fields.*.defaultValue' => ['nullable', 'string'],
         ];
     }
 
@@ -28,9 +32,13 @@ class StoreMetadataSchemaRequest extends BaseFormRequest
         return [
             'name' => 'nombre',
             'description' => 'descripción',
-            'parentSchemaId' => 'esquema padre',
             'isCanonical' => 'es canónico',
             'version' => 'versión',
+            'fields' => 'campos del esquema',
+            'fields.*.metadataFieldId' => 'campo de metadato',
+            'fields.*.isRequired' => 'campo requerido',
+            'fields.*.sortOrder' => 'orden',
+            'fields.*.defaultValue' => 'valor por defecto',
         ];
     }
 
@@ -42,6 +50,17 @@ class StoreMetadataSchemaRequest extends BaseFormRequest
         }
         if ($this->has('version')) {
             $data['version'] = (int) $this->version;
+        }
+        if ($this->has('fields')) {
+            $fields = collect($this->input('fields', []))
+                ->map(function ($field) {
+                    if (array_key_exists('isRequired', $field)) {
+                        $field['isRequired'] = filter_var($field['isRequired'], FILTER_VALIDATE_BOOLEAN);
+                    }
+                    return $field;
+                })
+                ->toArray();
+            $data['fields'] = $fields;
         }
         if (!empty($data)) {
             $this->merge($data);

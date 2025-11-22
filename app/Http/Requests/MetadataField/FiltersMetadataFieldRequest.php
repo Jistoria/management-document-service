@@ -20,9 +20,10 @@ class FiltersMetadataFieldRequest extends DefaultFiltersRequest
     public function rules(): array
     {
         return array_merge(parent::rules(), [
-            'schema_id' => ['nullable', 'uuid'],
+            'field_key' => ['nullable', 'string'],
             'data_type' => ['nullable', 'string', Rule::in(MetadataFieldDataType::ALL)],
-            'is_required' => ['nullable', 'boolean'],
+            'type_input_id' => ['nullable', 'string'],
+            'entity_type_id' => ['nullable', 'uuid'],
             'is_reference' => ['nullable', 'boolean'],
         ]);
     }

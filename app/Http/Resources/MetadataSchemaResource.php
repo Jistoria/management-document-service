@@ -12,7 +12,6 @@ class MetadataSchemaResource extends BaseResource
             'id' => $this->id,
             'name' => $this->name,
             'description' => $this->description,
-            'parentSchemaId' => $this->parent_schema_id,
             'isCanonical' => $this->is_canonical,
             'version' => $this->version,
             'createdAt' => $this->created_at?->toISOString(),

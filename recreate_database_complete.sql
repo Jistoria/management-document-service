@@ -218,45 +218,58 @@ CREATE TABLE public.academic_roles (
 -- SISTEMA DE METADATOS AVANZADO (ISO 16175-1)
 -- =====================================================================================
 
--- Tabla: Esquemas de metadatos con versionado y herencia
+-- Tabla: Esquemas de metadatos con versionado y composición (M-N)
 CREATE TABLE public.metadata_schemas (
     id uuid NOT NULL,
     name character varying(255) NOT NULL,
     description text,
-    parent_schema_id uuid,
     is_canonical boolean DEFAULT false NOT NULL,
     version integer DEFAULT 1 NOT NULL,
+    created_by character varying(255),
+    updated_by character varying(255),
     created_at timestamp(0) without time zone,
     updated_at timestamp(0) without time zone,
     deleted_at timestamp(0) without time zone,
-    created_by character varying(255),
-    updated_by character varying(255),
-    CONSTRAINT metadata_schemas_pkey PRIMARY KEY (id),
-    CONSTRAINT metadata_schemas_parent_schema_id_foreign FOREIGN KEY (parent_schema_id) REFERENCES metadata_schemas(id) ON DELETE SET NULL
+    CONSTRAINT metadata_schemas_pkey PRIMARY KEY (id)
 );
 
--- Tabla: Campos de metadatos con validación y soporte OCR
+-- Tabla: Diccionario de campos reutilizables
 CREATE TABLE public.metadata_fields (
     id uuid NOT NULL,
-    schema_id uuid NOT NULL,
-    name character varying(255) NOT NULL,
+    field_key character varying(255) NOT NULL,
+    label character varying(255) NOT NULL,
+    entity_type_id uuid,
+    type_input_id character varying(255) NOT NULL,
     data_type character varying(255) NOT NULL,
-    is_required boolean DEFAULT false NOT NULL,
-    default_value text,
-    validation_regex character varying(255),
-    field_order integer,
-    lookup_keywords jsonb,
-    ocr_hint character varying(255),
-    ignore_in_similarity boolean DEFAULT false NOT NULL,
     is_reference boolean DEFAULT false NOT NULL,
     reference_entity character varying(255),
     reference_column character varying(255) DEFAULT 'id'::character varying NOT NULL,
+    created_by character varying(255),
+    updated_by character varying(255),
     created_at timestamp(0) without time zone,
     updated_at timestamp(0) without time zone,
+    deleted_at timestamp(0) without time zone,
     CONSTRAINT metadata_fields_pkey PRIMARY KEY (id),
-    CONSTRAINT metadata_fields_schema_id_foreign FOREIGN KEY (schema_id) REFERENCES metadata_schemas(id) ON DELETE CASCADE,
-    CONSTRAINT chk_valid_data_type CHECK (data_type::text = ANY (ARRAY['string'::character varying, 'integer'::character varying, 'decimal'::character varying, 'date'::character varying, 'boolean'::character varying, 'json'::character varying, 'uuid'::character varying, 'text'::character varying, 'email'::character varying, 'url'::character varying]::text[])),
-    CONSTRAINT chk_field_order_positive CHECK (field_order > 0)
+    CONSTRAINT chk_metadata_fields_valid_data_type CHECK (data_type::text = ANY (ARRAY['string'::character varying, 'integer'::character varying, 'decimal'::character varying, 'date'::character varying, 'boolean'::character varying, 'json'::character varying, 'uuid'::character varying, 'text'::character varying, 'email'::character varying, 'url'::character varying]::text[]))
+);
+
+-- Tabla: Relación M-N entre esquemas y campos con reglas específicas
+CREATE TABLE public.metadata_schema_fields (
+    id uuid NOT NULL,
+    metadata_schema_id uuid NOT NULL,
+    metadata_field_id uuid NOT NULL,
+    is_required boolean DEFAULT false NOT NULL,
+    sort_order integer,
+    default_value text,
+    created_by character varying(255),
+    updated_by character varying(255),
+    created_at timestamp(0) without time zone,
+    updated_at timestamp(0) without time zone,
+    CONSTRAINT metadata_schema_fields_pkey PRIMARY KEY (id),
+    CONSTRAINT metadata_schema_fields_schema_id_foreign FOREIGN KEY (metadata_schema_id) REFERENCES metadata_schemas(id) ON DELETE CASCADE,
+    CONSTRAINT metadata_schema_fields_field_id_foreign FOREIGN KEY (metadata_field_id) REFERENCES metadata_fields(id) ON DELETE CASCADE,
+    CONSTRAINT metadata_schema_fields_unique_schema_field UNIQUE (metadata_schema_id, metadata_field_id),
+    CONSTRAINT chk_metadata_schema_fields_sort_order_positive CHECK (sort_order IS NULL OR sort_order > 0)
 );
 
 -- Tabla: Eventos del sistema de metadatos para auditoría
@@ -677,7 +690,11 @@ CREATE UNIQUE INDEX storage_unit_types_pkey ON public.storage_unit_types USING b
 CREATE UNIQUE INDEX storage_unit_types_code_unique ON public.storage_unit_types USING btree (code);
 CREATE UNIQUE INDEX storage_units_pkey ON public.storage_units USING btree (id);
 CREATE UNIQUE INDEX metadata_schemas_pkey ON public.metadata_schemas USING btree (id);
+CREATE UNIQUE INDEX metadata_schemas_name_unique ON public.metadata_schemas USING btree (name);
 CREATE UNIQUE INDEX metadata_fields_pkey ON public.metadata_fields USING btree (id);
+CREATE UNIQUE INDEX metadata_fields_field_key_unique ON public.metadata_fields USING btree (field_key);
+CREATE UNIQUE INDEX metadata_schema_fields_pkey ON public.metadata_schema_fields USING btree (id);
+CREATE UNIQUE INDEX metadata_schema_fields_schema_field_unique ON public.metadata_schema_fields USING btree (metadata_schema_id, metadata_field_id);
 CREATE UNIQUE INDEX metadata_schema_events_pkey ON public.metadata_schema_events USING btree (id);
 CREATE UNIQUE INDEX external_apis_pkey ON public.external_apis USING btree (id);
 CREATE UNIQUE INDEX audit_logs_pkey ON public.audit_logs USING btree (id);
@@ -689,7 +706,7 @@ CREATE INDEX idx_processes_category_order ON public.processes USING btree (proce
 CREATE INDEX idx_required_documents_process_order ON public.required_documents USING btree (process_id, "order") WHERE (deleted_at IS NULL);
 
 -- Índices para sistema de metadatos
-CREATE INDEX idx_metadata_fields_schema_order ON public.metadata_fields USING btree (schema_id, field_order);
+CREATE INDEX idx_metadata_schema_fields_schema_order ON public.metadata_schema_fields USING btree (metadata_schema_id, sort_order);
 CREATE INDEX idx_metadata_schema_events_correlation ON public.metadata_schema_events USING btree (correlation_id);
 CREATE INDEX idx_metadata_schema_events_external_user ON public.metadata_schema_events USING btree (external_user_id);
 

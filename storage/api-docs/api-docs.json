@@ -3337,34 +3337,38 @@
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "schema_id",
-                                    "name",
-                                    "data_type"
+                                    "fieldKey",
+                                    "label",
+                                    "typeInputId",
+                                    "dataType"
                                 ],
                                 "properties": {
-                                    "schemaId": {
-                                        "type": "string",
-                                        "format": "uuid"
+                                    "fieldKey": {
+                                        "type": "string"
                                     },
-                                    "name": {
+                                    "label": {
+                                        "type": "string"
+                                    },
+                                    "entityTypeId": {
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "nullable": true
+                                    },
+                                    "typeInputId": {
                                         "type": "string"
                                     },
                                     "dataType": {
                                         "type": "string"
                                     },
-                                    "isRequired": {
+                                    "isReference": {
                                         "type": "boolean"
                                     },
-                                    "defaultValue": {
+                                    "referenceEntity": {
                                         "type": "string",
                                         "nullable": true
                                     },
-                                    "validationRegex": {
+                                    "referenceColumn": {
                                         "type": "string",
-                                        "nullable": true
-                                    },
-                                    "fieldOrder": {
-                                        "type": "integer",
                                         "nullable": true
                                     }
                                 },
@@ -3469,29 +3473,32 @@
                         "application/json": {
                             "schema": {
                                 "properties": {
-                                    "schemaId": {
-                                        "type": "string",
-                                        "format": "uuid"
+                                    "fieldKey": {
+                                        "type": "string"
                                     },
-                                    "name": {
+                                    "label": {
+                                        "type": "string"
+                                    },
+                                    "entityTypeId": {
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "nullable": true
+                                    },
+                                    "typeInputId": {
                                         "type": "string"
                                     },
                                     "dataType": {
                                         "type": "string"
                                     },
-                                    "isRequired": {
+                                    "isReference": {
                                         "type": "boolean"
                                     },
-                                    "defaultValue": {
+                                    "referenceEntity": {
                                         "type": "string",
                                         "nullable": true
                                     },
-                                    "validationRegex": {
+                                    "referenceColumn": {
                                         "type": "string",
-                                        "nullable": true
-                                    },
-                                    "fieldOrder": {
-                                        "type": "integer",
                                         "nullable": true
                                     }
                                 },
@@ -3656,15 +3663,6 @@
                         }
                     },
                     {
-                        "name": "parent_schema_id",
-                        "in": "query",
-                        "description": "Filter by parent schema ID",
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    },
-                    {
                         "name": "is_canonical",
                         "in": "query",
                         "description": "Filter by canonical flag",
@@ -3732,13 +3730,34 @@
                                         "type": "string",
                                         "nullable": true
                                     },
-                                    "parentSchemaId": {
-                                        "type": "string",
-                                        "format": "uuid",
-                                        "nullable": true
-                                    },
                                     "isCanonical": {
                                         "type": "boolean"
+                                    },
+                                    "fields": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "metadataFieldId"
+                                            ],
+                                            "properties": {
+                                                "metadataFieldId": {
+                                                    "type": "string",
+                                                    "format": "uuid"
+                                                },
+                                                "isRequired": {
+                                                    "type": "boolean"
+                                                },
+                                                "sortOrder": {
+                                                    "type": "integer",
+                                                    "nullable": true
+                                                },
+                                                "defaultValue": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
                                     }
                                 },
                                 "type": "object"
@@ -3850,14 +3869,32 @@
                                         "type": "string",
                                         "nullable": true
                                     },
-                                    "parentSchemaId": {
-                                        "type": "string",
-                                        "format": "uuid",
-                                        "nullable": true
-                                    },
                                     "isCanonical": {
                                         "type": "boolean",
                                         "nullable": true
+                                    },
+                                    "fields": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "metadataFieldId": {
+                                                    "type": "string",
+                                                    "format": "uuid"
+                                                },
+                                                "isRequired": {
+                                                    "type": "boolean"
+                                                },
+                                                "sortOrder": {
+                                                    "type": "integer",
+                                                    "nullable": true
+                                                },
+                                                "defaultValue": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
                                     }
                                 },
                                 "type": "object"

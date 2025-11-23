@@ -675,19 +675,19 @@ CREATE UNIQUE INDEX head_offices_pkey ON public.head_offices USING btree (id);
 CREATE UNIQUE INDEX head_offices_code ON public.head_offices USING btree (code) WHERE (deleted_at IS NULL);
 CREATE UNIQUE INDEX departments_pkey ON public.departments USING btree (id);
 CREATE UNIQUE INDEX careers_pkey ON public.careers USING btree (id);
-CREATE UNIQUE INDEX careers_code ON public.careers USING btree (code) WHERE (deleted_at IS NULL);
+--CREATE UNIQUE INDEX careers_code ON public.careers USING btree (code) WHERE (deleted_at IS NULL);
 CREATE UNIQUE INDEX subsystems_pkey ON public.subsystems USING btree (id);
-CREATE UNIQUE INDEX subsystems_code ON public.subsystems USING btree (code) WHERE (deleted_at IS NULL);
+--CREATE UNIQUE INDEX subsystems_code ON public.subsystems USING btree (code) WHERE (deleted_at IS NULL);
 CREATE UNIQUE INDEX careers_subsystems_pkey ON public.careers_subsystems USING btree (career_id, subsystem_id);
 CREATE UNIQUE INDEX process_categories_pkey ON public.process_categories USING btree (id);
 CREATE UNIQUE INDEX processes_pkey ON public.processes USING btree (id);
 CREATE UNIQUE INDEX document_types_pkey ON public.document_types USING btree (id);
 CREATE UNIQUE INDEX document_types_code_unique ON public.document_types USING btree (code);
 CREATE UNIQUE INDEX academic_roles_pkey ON public.academic_roles USING btree (id);
-CREATE UNIQUE INDEX academic_roles_code_unique ON public.academic_roles USING btree (code);
+--CREATE UNIQUE INDEX academic_roles_code_unique ON public.academic_roles USING btree (code);
 CREATE UNIQUE INDEX required_documents_pkey ON public.required_documents USING btree (id);
 CREATE UNIQUE INDEX storage_unit_types_pkey ON public.storage_unit_types USING btree (id);
-CREATE UNIQUE INDEX storage_unit_types_code_unique ON public.storage_unit_types USING btree (code);
+--CREATE UNIQUE INDEX storage_unit_types_code_unique ON public.storage_unit_types USING btree (code);
 CREATE UNIQUE INDEX storage_units_pkey ON public.storage_units USING btree (id);
 CREATE UNIQUE INDEX metadata_schemas_pkey ON public.metadata_schemas USING btree (id);
 CREATE UNIQUE INDEX metadata_schemas_name_unique ON public.metadata_schemas USING btree (name);
@@ -840,7 +840,6 @@ CARACTERÍSTICAS IMPLEMENTADAS:
 ✅ Vistas de consulta para auditoría
 ✅ Funciones de mantenimiento
 ✅ Constraints de integridad completos
-✅ Datos iniciales del sistema
 ✅ Comentarios descriptivos
 */
 

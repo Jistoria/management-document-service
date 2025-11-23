@@ -48,7 +48,7 @@ class AdmissionMatriculaDocumentsSeeder extends Seeder
                 'code'           => 'FCVT',
                 'code_numeric'   => '213',
                 'created_at'     => $now, 'updated_at' => $now,
-                'version'        => 1, 'created_by' => 'system', 'updated_by' => 'system',
+                'created_by' => 'system', 'updated_by' => 'system',
             ]
         );
 
@@ -63,76 +63,61 @@ class AdmissionMatriculaDocumentsSeeder extends Seeder
                 'name'       => 'Docencia',
                 'code'       => 'A',
                 'created_at' => $now, 'updated_at' => $now,
-                'version'    => 1, 'created_by' => 'system', 'updated_by' => 'system',
+                'created_by' => 'system', 'updated_by' => 'system',
             ]
         );
 
         // ------------------------------------------------------------------------------
         // 2) Category: ADMISIÓN (code = 'A')  → base "PA?"
         // ------------------------------------------------------------------------------
-        $categoryId = DB::table('process_categories')
-            ->where('subsystem_id', $subsystemId)
-            ->where('code', self::CAT_CODE)
-            ->value('id') ?: (string) Str::uuid7();
+        $categoryId = (string) Str::uuid7();
 
-        DB::table('process_categories')->updateOrInsert(
-            ['id' => $categoryId],
-            [
-                'id'           => $categoryId,
-                'subsystem_id' => $subsystemId,
-                'name'         => 'ADMISIÓN',
-                'code'         => self::CAT_CODE, // 'A'
-                'created_at'   => $now, 'updated_at' => $now,
-                'version'      => 1, 'created_by' => 'system', 'updated_by' => 'system',
-            ]
-        );
+        DB::table('process_categories')->insert([
+            'id'           => $categoryId,
+            'subsystem_id' => $subsystemId,
+            'name'         => 'ADMISIÓN',
+            'code'         => self::CAT_CODE,
+            'created_at'   => $now,
+            'updated_at'   => $now,
+            'created_by'   => 'system',
+            'updated_by'   => 'system',
+        ]);
 
         // ------------------------------------------------------------------------------
         // 3) Process: MATRÍCULA (code = 'M') → raíz "PAM"
         // ------------------------------------------------------------------------------
-        $processId = DB::table('processes')
-            ->where('process_category_id', $categoryId)
-            ->whereNull('parent_id')
-            ->where('code', self::PROC_CODE)
-            ->value('id') ?: (string) Str::uuid7();
+        $processId = (string) Str::uuid7();
 
-        DB::table('processes')->updateOrInsert(
-            ['id' => $processId],
-            [
-                'id'                  => $processId,
-                'process_category_id' => $categoryId,
-                'parent_id'           => null,
-                'name'                => 'MATRÍCULA',
-                'code'                => self::PROC_CODE, // 'M'
-                'created_at'          => $now, 'updated_at' => $now,
-                'version'             => 1, 'created_by' => 'system', 'updated_by' => 'system',
-            ]
-        );
+        DB::table('processes')->insert([
+            'id'                  => $processId,
+            'process_category_id' => $categoryId,
+            'parent_id'           => null,
+            'name'                => 'MATRÍCULA',
+            'code'                => self::PROC_CODE, // 'M'
+            'created_at'          => $now,
+            'updated_at'          => $now,
+            'created_by'          => 'system',
+            'updated_by'          => 'system',
+        ]);
 
         // ------------------------------------------------------------------------------
         // 4) Subproceso contenedor: PAM-04  (MATRÍCULAS ORDINARIAS Y EXTRAORDINARIAS)
         // ------------------------------------------------------------------------------
         $base3 = self::PREFIX . self::CAT_CODE . self::PROC_CODE; // "PAM"
         $subprocCode = $base3 . '-04';
+        $subprocId = (string) Str::uuid7();
 
-        $subprocId = DB::table('processes')
-            ->where('process_category_id', $categoryId)
-            ->where('parent_id', $processId)
-            ->where('code', $subprocCode)
-            ->value('id') ?: (string) Str::uuid7();
-
-        DB::table('processes')->updateOrInsert(
-            ['id' => $subprocId],
-            [
-                'id'                  => $subprocId,
-                'process_category_id' => $categoryId,
-                'parent_id'           => $processId,
-                'name'                => 'MATRÍCULAS ORDINARIAS Y EXTRAORDINARIAS',
-                'code'                => $subprocCode, // PAM-04
-                'created_at'          => $now, 'updated_at' => $now,
-                'version'             => 1, 'created_by' => 'system', 'updated_by' => 'system',
-            ]
-        );
+        DB::table('processes')->insert([
+            'id'                  => $subprocId,
+            'process_category_id' => $categoryId,
+            'parent_id'           => $processId,
+            'name'                => 'MATRÍCULAS ORDINARIAS Y EXTRAORDINARIAS',
+            'code'                => $subprocCode, // PAM-04
+            'created_at'          => $now,
+            'updated_at'          => $now,
+            'created_by'          => 'system',
+            'updated_by'          => 'system',
+        ]);
 
         // ------------------------------------------------------------------------------
         // 5) DOCUMENTOS (exactamente los 7 que enviaste)
@@ -150,18 +135,16 @@ class AdmissionMatriculaDocumentsSeeder extends Seeder
 
         foreach ($docs as $i => $d) {
             $codeDefault = sprintf('%s-%03d', $subprocCode, $d['n']); // PAM-04-001, ...
-            DB::table('required_documents')->updateOrInsert(
-                ['process_id' => $subprocId, 'code_default' => $codeDefault],
-                [
-                    'id'           => (string) Str::uuid7(),
-                    'process_id'   => $subprocId,
-                    'name'         => $d['name'],
-                    'code_default' => $codeDefault,
-                    'created_at'   => $now, 'updated_at' => $now,
-                    //'version'      => 1,
-                    'created_by' => 'system', 'updated_by' => 'system',
-                ]
-            );
+            DB::table('required_documents')->insert([
+                'id'           => (string) Str::uuid7(),
+                'process_id'   => $subprocId,
+                'name'         => $d['name'],
+                'code_default' => $codeDefault,
+                'created_at'   => $now,
+                'updated_at'   => $now,
+                'created_by'   => 'system',
+                'updated_by'   => 'system',
+            ]);
         }
     }
 }

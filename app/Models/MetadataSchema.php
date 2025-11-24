@@ -21,14 +21,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $id
  * @property string $name
  * @property string|null $description
- * @property bool $is_canonical
  * @property int $version
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  * @property \Carbon\Carbon|null $deleted_at
- * @property string|null $external_system_id
- * @property string|null $api_endpoint
- * @property int $cache_ttl
  * @property string|null $created_by
  * @property string|null $updated_by
  */
@@ -49,7 +45,6 @@ class MetadataSchema extends Model
     protected $fillable = [
         'name',
         'description',
-        'is_canonical',
         'version',
         'created_by',
         'updated_by'
@@ -62,9 +57,7 @@ class MetadataSchema extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
-        'is_canonical' => 'boolean',
-        'version' => 'integer',
-        'cache_ttl' => 'integer'
+        'version' => 'integer'
     ];
 
     /**
@@ -103,42 +96,10 @@ class MetadataSchema extends Model
     }
 
     /**
-     * Scope to get canonical schemas.
-     */
-    public function scopeCanonical($query)
-    {
-        return $query->where('is_canonical', true);
-    }
-
-    /**
-     * Scope to get schemas for a specific external system.
-     */
-    public function scopeByExternalSystem($query, string $externalSystemId)
-    {
-        return $query->where('external_system_id', $externalSystemId);
-    }
-
-    /**
      * Scope to get active schemas.
      */
     public function scopeActive($query)
     {
         return $query->whereNull('deleted_at');
-    }
-
-    /**
-     * Check if schema has external API integration.
-     */
-    public function hasApiIntegration(): bool
-    {
-        return !empty($this->api_endpoint);
-    }
-
-    /**
-     * Get cache TTL in seconds.
-     */
-    public function getCacheTtl(): int
-    {
-        return $this->cache_ttl ?? 3600; // Default 1 hour
     }
 }

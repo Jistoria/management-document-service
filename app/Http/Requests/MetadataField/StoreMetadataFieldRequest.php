@@ -28,12 +28,9 @@ class StoreMetadataFieldRequest extends BaseFormRequest
         return [
             'fieldKey' => ['required', 'string', 'max:255', Rule::unique('metadata_fields', 'field_key')],
             'label' => ['required', 'string', 'max:255'],
-            'entityTypeId' => ['nullable', 'uuid'],
-            'typeInputId' => ['required', 'string', 'max:255'],
+            'entityTypeId' => ['nullable', 'integer'],
+            'typeInputId' => ['nullable', 'integer'],
             'dataType' => ['required', 'string', Rule::in(MetadataFieldDataType::ALL)],
-            'isReference' => ['boolean'],
-            'referenceEntity' => ['nullable', 'string', 'max:255'],
-            'referenceColumn' => ['nullable', 'string', 'max:255'],
         ];
     }
 
@@ -42,12 +39,9 @@ class StoreMetadataFieldRequest extends BaseFormRequest
         return [
             'fieldKey' => 'clave del campo',
             'label' => 'etiqueta',
-            'entityTypeId' => 'entidad',
+            'entityTypeId' => 'tipo de entidad',
             'typeInputId' => 'tipo de entrada',
             'dataType' => 'tipo de dato',
-            'isReference' => 'es referencia',
-            'referenceEntity' => 'entidad de referencia',
-            'referenceColumn' => 'columna de referencia',
         ];
     }
 
@@ -62,8 +56,12 @@ class StoreMetadataFieldRequest extends BaseFormRequest
             $data['dataType'] = MetadataFieldDataType::normalize($this->dataType);
         }
 
-        if ($this->has('isReference')) {
-            $data['isReference'] = $this->boolean('isReference');
+        if ($this->has('entityTypeId')) {
+            $data['entityTypeId'] = (int) $this->entityTypeId;
+        }
+
+        if ($this->has('typeInputId')) {
+            $data['typeInputId'] = (int) $this->typeInputId;
         }
 
         if (!empty($data)) {

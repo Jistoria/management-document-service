@@ -20,14 +20,14 @@ use App\Constants\MetadataFieldDataType;
  * @property string $id
  * @property string $field_key
  * @property string $label
- * @property string|null $entity_type_id
- * @property string $type_input_id
+ * @property int|null $entity_type_id
+ * @property int|null $type_input_id
  * @property string $data_type
- * @property bool $is_reference
- * @property string|null $reference_entity
- * @property string $reference_column
+ * @property string|null $created_by
+ * @property string|null $updated_by
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
+ * @property \Carbon\Carbon|null $deleted_at
  */
 class MetadataField extends Model
 {
@@ -47,9 +47,6 @@ class MetadataField extends Model
         'entity_type_id',
         'type_input_id',
         'data_type',
-        'is_reference',
-        'reference_entity',
-        'reference_column',
         'created_by',
         'updated_by'
     ];
@@ -60,7 +57,9 @@ class MetadataField extends Model
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
-        'is_reference' => 'boolean'
+        'deleted_at' => 'datetime',
+        'entity_type_id' => 'integer',
+        'type_input_id' => 'integer'
     ];
 
     /**
@@ -88,19 +87,19 @@ class MetadataField extends Model
     }
 
     /**
-     * Scope to get reference fields.
+     * Scope to filter by entity type.
      */
-    public function scopeReference($query)
+    public function scopeByEntityType($query, int $entityTypeId)
     {
-        return $query->where('is_reference', true);
+        return $query->where('entity_type_id', $entityTypeId);
     }
 
     /**
-     * Scope to get non-reference fields.
+     * Scope to filter by type input.
      */
-    public function scopeNonReference($query)
+    public function scopeByTypeInput($query, int $typeInputId)
     {
-        return $query->where('is_reference', false);
+        return $query->where('type_input_id', $typeInputId);
     }
 
     /**

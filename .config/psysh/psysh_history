@@ -18,3 +18,10 @@ Redis::keys('*')
 Redis::keys('*')
 Redis::keys('*')
 exit
+\DB::statement('SET session_replication_role = replica;'); // Desactiva restricciones FK (Postgres)
+foreach (\DB::select('SELECT tablename FROM pg_tables WHERE schemaname = \'public\'') as $table) {
+    \DB::table($table->tablename)->truncate();
+}
+\DB::statement('SET session_replication_role = DEFAULT;'); // Reactiva FK
+Artisan::call('db:seed', ['--force' => true]);
+

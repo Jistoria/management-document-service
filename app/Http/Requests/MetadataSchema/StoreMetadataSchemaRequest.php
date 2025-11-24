@@ -17,7 +17,6 @@ class StoreMetadataSchemaRequest extends BaseFormRequest
         return [
             'name' => ['required', 'string', 'max:255', Rule::unique('metadata_schemas', 'name')],
             'description' => ['nullable', 'string'],
-            'isCanonical' => ['boolean'],
             'version' => ['nullable', 'integer', 'min:1'],
             'fields' => ['array'],
             'fields.*.metadataFieldId' => ['required_with:fields', 'uuid', 'exists:metadata_fields,id'],
@@ -32,7 +31,6 @@ class StoreMetadataSchemaRequest extends BaseFormRequest
         return [
             'name' => 'nombre',
             'description' => 'descripción',
-            'isCanonical' => 'es canónico',
             'version' => 'versión',
             'fields' => 'campos del esquema',
             'fields.*.metadataFieldId' => 'campo de metadato',
@@ -45,9 +43,6 @@ class StoreMetadataSchemaRequest extends BaseFormRequest
     protected function prepareForValidation(): void
     {
         $data = [];
-        if ($this->has('isCanonical')) {
-            $data['isCanonical'] = $this->boolean('isCanonical');
-        }
         if ($this->has('version')) {
             $data['version'] = (int) $this->version;
         }

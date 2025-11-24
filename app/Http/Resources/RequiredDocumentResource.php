@@ -16,6 +16,8 @@ class RequiredDocumentResource extends BaseResource
         return [
             'id' => $this->id,
             'processId' => $this->process_id,
+            'name' => $this->name,
+            'description' => $this->description,
             'documentTypeId' => $this->document_type_id,
             'metadataSchemaId' => $this->metadata_schema_id,
             'codeDefault' => $this->code_default,

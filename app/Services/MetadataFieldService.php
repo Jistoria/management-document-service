@@ -110,13 +110,10 @@ class MetadataFieldService
             $query->where('field_key', 'LIKE', "%{$filters['field_key']}%");
         }
         if (!empty($filters['type_input_id'])) {
-            $query->where('type_input_id', $filters['type_input_id']);
+            $query->where('type_input_id', (int) $filters['type_input_id']);
         }
         if (!empty($filters['entity_type_id'])) {
-            $query->where('entity_type_id', $filters['entity_type_id']);
-        }
-        if (isset($filters['is_reference'])) {
-            $query->where('is_reference', filter_var($filters['is_reference'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE));
+            $query->where('entity_type_id', (int) $filters['entity_type_id']);
         }
     }
 

@@ -223,7 +223,6 @@ CREATE TABLE public.metadata_schemas (
     id uuid NOT NULL,
     name character varying(255) NOT NULL,
     description text,
-    is_canonical boolean DEFAULT false NOT NULL,
     version integer DEFAULT 1 NOT NULL,
     created_by character varying(255),
     updated_by character varying(255),
@@ -238,12 +237,9 @@ CREATE TABLE public.metadata_fields (
     id uuid NOT NULL,
     field_key character varying(255) NOT NULL,
     label character varying(255) NOT NULL,
-    entity_type_id uuid,
-    type_input_id character varying(255) NOT NULL,
-    data_type character varying(255) NOT NULL,
-    is_reference boolean DEFAULT false NOT NULL,
-    reference_entity character varying(255),
-    reference_column character varying(255) DEFAULT 'id'::character varying NOT NULL,
+    entity_type_id integer, -- referencia a tipo de entidad si aplica (user, faculty, career, etc.)
+    type_input_id integer, -- referencia a tipo de input (persona, documental, entidad)
+    data_type character varying(255) NOT NULL,  -- referencia a tipo de input (text, number, date, select, etc.)
     created_by character varying(255),
     updated_by character varying(255),
     created_at timestamp(0) without time zone,

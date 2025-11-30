@@ -96,11 +96,8 @@ class MetadataSchemaService
                   ->orWhere('description', 'LIKE', "%{$search}%");
             });
         }
-        if (isset($filters['is_canonical'])) {
-            $query->where('is_canonical', filter_var($filters['is_canonical'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE));
-        }
-        if (!empty($filters['external_system_id'])) {
-            $query->where('external_system_id', $filters['external_system_id']);
+        if (isset($filters['version'])) {
+            $query->where('version', (int) $filters['version']);
         }
     }
 

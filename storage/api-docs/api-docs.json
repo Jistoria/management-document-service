@@ -3257,18 +3257,9 @@
                     {
                         "name": "search",
                         "in": "query",
-                        "description": "Search by name",
+                        "description": "Search by field_key or label",
                         "schema": {
                             "type": "string"
-                        }
-                    },
-                    {
-                        "name": "schema_id",
-                        "in": "query",
-                        "description": "Filter by schema ID",
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
                         }
                     },
                     {
@@ -3280,19 +3271,19 @@
                         }
                     },
                     {
-                        "name": "is_required",
+                        "name": "entity_type_id",
                         "in": "query",
-                        "description": "Filter by required flag",
+                        "description": "Filter by entity type ID",
                         "schema": {
-                            "type": "boolean"
+                            "type": "integer"
                         }
                     },
                     {
-                        "name": "is_reference",
+                        "name": "type_input_id",
                         "in": "query",
-                        "description": "Filter by reference flag",
+                        "description": "Filter by type input ID",
                         "schema": {
-                            "type": "boolean"
+                            "type": "integer"
                         }
                     }
                 ],
@@ -3339,37 +3330,42 @@
                                 "required": [
                                     "fieldKey",
                                     "label",
-                                    "typeInputId",
                                     "dataType"
                                 ],
                                 "properties": {
                                     "fieldKey": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "student_id"
                                     },
                                     "label": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "Student ID"
                                     },
                                     "entityTypeId": {
-                                        "type": "string",
-                                        "format": "uuid",
+                                        "type": "integer",
+                                        "example": 1,
                                         "nullable": true
                                     },
                                     "typeInputId": {
-                                        "type": "string"
+                                        "type": "integer",
+                                        "example": 1,
+                                        "nullable": true
                                     },
                                     "dataType": {
-                                        "type": "string"
-                                    },
-                                    "isReference": {
-                                        "type": "boolean"
-                                    },
-                                    "referenceEntity": {
                                         "type": "string",
-                                        "nullable": true
-                                    },
-                                    "referenceColumn": {
-                                        "type": "string",
-                                        "nullable": true
+                                        "enum": [
+                                            "string",
+                                            "integer",
+                                            "decimal",
+                                            "date",
+                                            "boolean",
+                                            "json",
+                                            "uuid",
+                                            "text",
+                                            "email",
+                                            "url"
+                                        ],
+                                        "example": "string"
                                     }
                                 },
                                 "type": "object"
@@ -3480,26 +3476,27 @@
                                         "type": "string"
                                     },
                                     "entityTypeId": {
-                                        "type": "string",
-                                        "format": "uuid",
+                                        "type": "integer",
                                         "nullable": true
                                     },
                                     "typeInputId": {
-                                        "type": "string"
+                                        "type": "integer",
+                                        "nullable": true
                                     },
                                     "dataType": {
-                                        "type": "string"
-                                    },
-                                    "isReference": {
-                                        "type": "boolean"
-                                    },
-                                    "referenceEntity": {
                                         "type": "string",
-                                        "nullable": true
-                                    },
-                                    "referenceColumn": {
-                                        "type": "string",
-                                        "nullable": true
+                                        "enum": [
+                                            "string",
+                                            "integer",
+                                            "decimal",
+                                            "date",
+                                            "boolean",
+                                            "json",
+                                            "uuid",
+                                            "text",
+                                            "email",
+                                            "url"
+                                        ]
                                     }
                                 },
                                 "type": "object"
@@ -3663,19 +3660,11 @@
                         }
                     },
                     {
-                        "name": "is_canonical",
+                        "name": "version",
                         "in": "query",
-                        "description": "Filter by canonical flag",
+                        "description": "Filter by version",
                         "schema": {
-                            "type": "boolean"
-                        }
-                    },
-                    {
-                        "name": "external_system_id",
-                        "in": "query",
-                        "description": "Filter by external system ID",
-                        "schema": {
-                            "type": "string"
+                            "type": "integer"
                         }
                     }
                 ],
@@ -3730,8 +3719,10 @@
                                         "type": "string",
                                         "nullable": true
                                     },
-                                    "isCanonical": {
-                                        "type": "boolean"
+                                    "version": {
+                                        "type": "integer",
+                                        "example": 1,
+                                        "nullable": true
                                     },
                                     "fields": {
                                         "type": "array",
@@ -3869,8 +3860,8 @@
                                         "type": "string",
                                         "nullable": true
                                     },
-                                    "isCanonical": {
-                                        "type": "boolean",
+                                    "version": {
+                                        "type": "integer",
                                         "nullable": true
                                     },
                                     "fields": {

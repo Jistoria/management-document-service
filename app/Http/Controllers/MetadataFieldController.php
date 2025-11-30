@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Constants\EntityType;
+use App\Constants\TypeInput;
 use App\Helpers\ApiIndexBuilder;
 use App\Http\Requests\MetadataField\FiltersMetadataFieldRequest;
 use App\Http\Requests\MetadataField\StoreMetadataFieldRequest;
@@ -29,11 +31,10 @@ class MetadataFieldController extends Controller
      *     path="/metadata-fields",
      *     summary="List metadata fields",
      *     tags={"Metadata Fields"},
-     *     @OA\Parameter(name="search", in="query", description="Search by name", @OA\Schema(type="string")),
-     *     @OA\Parameter(name="schema_id", in="query", description="Filter by schema ID", @OA\Schema(type="string", format="uuid")),
+     *     @OA\Parameter(name="search", in="query", description="Search by field_key or label", @OA\Schema(type="string")),
      *     @OA\Parameter(name="data_type", in="query", description="Filter by data type", @OA\Schema(type="string")),
-     *     @OA\Parameter(name="is_required", in="query", description="Filter by required flag", @OA\Schema(type="boolean")),
-     *     @OA\Parameter(name="is_reference", in="query", description="Filter by reference flag", @OA\Schema(type="boolean")),
+     *     @OA\Parameter(name="entity_type_id", in="query", description="Filter by entity type ID", @OA\Schema(type="integer")),
+     *     @OA\Parameter(name="type_input_id", in="query", description="Filter by type input ID", @OA\Schema(type="integer")),
      *     @OA\Response(
      *         response=200,
      *         description="Metadata fields retrieved successfully",
@@ -52,7 +53,7 @@ class MetadataFieldController extends Controller
                 $this->metadataFieldService,
                 MetadataFieldResource::class,
                 $request,
-                ApiIndexBuilder::extractFilters($request, ['field_key', 'data_type', 'type_input_id', 'entity_type_id', 'is_reference'])
+                ApiIndexBuilder::extractFilters($request, ['field_key', 'data_type', 'type_input_id', 'entity_type_id'])
             );
         }, 'Metadata fields retrieved successfully');
     }
@@ -90,15 +91,12 @@ class MetadataFieldController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"fieldKey","label","typeInputId","dataType"},
-     *             @OA\Property(property="fieldKey", type="string"),
-     *             @OA\Property(property="label", type="string"),
-     *             @OA\Property(property="entityTypeId", type="string", format="uuid", nullable=true),
-     *             @OA\Property(property="typeInputId", type="string"),
-     *             @OA\Property(property="dataType", type="string"),
-     *             @OA\Property(property="isReference", type="boolean"),
-     *             @OA\Property(property="referenceEntity", type="string", nullable=true),
-     *             @OA\Property(property="referenceColumn", type="string", nullable=true),
+     *             required={"fieldKey","label","dataType"},
+     *             @OA\Property(property="fieldKey", type="string", example="student_id"),
+     *             @OA\Property(property="label", type="string", example="Student ID"),
+     *             @OA\Property(property="entityTypeId", type="integer", nullable=true, example=1),
+     *             @OA\Property(property="typeInputId", type="integer", nullable=true, example=1),
+     *             @OA\Property(property="dataType", type="string", enum={"string", "integer", "decimal", "date", "boolean", "json", "uuid", "text", "email", "url"}, example="string"),
      *         )
      *     ),
      *     @OA\Response(
@@ -131,12 +129,9 @@ class MetadataFieldController extends Controller
      *         @OA\JsonContent(
      *             @OA\Property(property="fieldKey", type="string"),
      *             @OA\Property(property="label", type="string"),
-     *             @OA\Property(property="entityTypeId", type="string", format="uuid", nullable=true),
-     *             @OA\Property(property="typeInputId", type="string"),
-     *             @OA\Property(property="dataType", type="string"),
-     *             @OA\Property(property="isReference", type="boolean"),
-     *             @OA\Property(property="referenceEntity", type="string", nullable=true),
-     *             @OA\Property(property="referenceColumn", type="string", nullable=true)
+     *             @OA\Property(property="entityTypeId", type="integer", nullable=true),
+     *             @OA\Property(property="typeInputId", type="integer", nullable=true),
+     *             @OA\Property(property="dataType", type="string", enum={"string", "integer", "decimal", "date", "boolean", "json", "uuid", "text", "email", "url"})
      *         )
      *     ),
      *     @OA\Response(
@@ -217,5 +212,83 @@ class MetadataFieldController extends Controller
             $deleted = $this->metadataFieldService->bulkDelete($request->input('ids'));
             return ['deleted_count' => $deleted];
         }, 'Bulk deletion completed');
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/metadata-fields/catalogs/entity-types",
+     *     summary="Get entity types catalog",
+     *     tags={"Metadata Fields"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Entity types catalog retrieved successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Entity types catalog retrieved successfully"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="key", type="string", example="user"),
+     *                     @OA\Property(property="label", type="string", example="Usuario")
+     *                 )
+     *             )
+     *         )
+     *     )
+     * )
+     */
+    public function getEntityTypes(): JsonResponse
+    {
+        return catchSync(function () {
+            $entityTypes = [];
+            foreach (EntityType::all() as $id) {
+                $entityTypes[] = [
+                    'id' => $id,
+                    'key' => EntityType::getKey($id),
+                    'label' => EntityType::getLabel($id),
+                ];
+            }
+            return $entityTypes;
+        }, 'Entity types catalog retrieved successfully');
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/metadata-fields/catalogs/type-inputs",
+     *     summary="Get type inputs catalog",
+     *     tags={"Metadata Fields"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Type inputs catalog retrieved successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Type inputs catalog retrieved successfully"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="key", type="string", example="text"),
+     *                     @OA\Property(property="label", type="string", example="Texto")
+     *                 )
+     *             )
+     *         )
+     *     )
+     * )
+     */
+    public function getTypeInputs(): JsonResponse
+    {
+        return catchSync(function () {
+            $typeInputs = [];
+            foreach (TypeInput::all() as $id) {
+                $typeInputs[] = [
+                    'id' => $id,
+                    'key' => TypeInput::getKey($id),
+                    'label' => TypeInput::getLabel($id),
+                ];
+            }
+            return $typeInputs;
+        }, 'Type inputs catalog retrieved successfully');
     }
 }

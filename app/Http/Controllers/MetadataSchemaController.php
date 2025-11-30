@@ -30,8 +30,7 @@ class MetadataSchemaController extends Controller
      *     summary="List metadata schemas",
      *     tags={"Metadata Schemas"},
      *     @OA\Parameter(name="search", in="query", description="Search by name", @OA\Schema(type="string")),
-     *     @OA\Parameter(name="is_canonical", in="query", description="Filter by canonical flag", @OA\Schema(type="boolean")),
-     *     @OA\Parameter(name="external_system_id", in="query", description="Filter by external system ID", @OA\Schema(type="string")),
+     *     @OA\Parameter(name="version", in="query", description="Filter by version", @OA\Schema(type="integer")),
      *     @OA\Response(
      *         response=200,
      *         description="Metadata schemas retrieved successfully",
@@ -50,7 +49,7 @@ class MetadataSchemaController extends Controller
                 $this->metadataSchemaService,
                 MetadataSchemaResource::class,
                 $request,
-                ApiIndexBuilder::extractFilters($request, ['is_canonical', 'external_system_id'])
+                ApiIndexBuilder::extractFilters($request, ['version'])
             );
         }, 'Metadata schemas retrieved successfully');
     }
@@ -91,7 +90,7 @@ class MetadataSchemaController extends Controller
      *             required={"name"},
      *             @OA\Property(property="name", type="string"),
      *             @OA\Property(property="description", type="string", nullable=true),
-     *             @OA\Property(property="isCanonical", type="boolean"),
+     *             @OA\Property(property="version", type="integer", nullable=true, example=1),
      *             @OA\Property(
      *                 property="fields",
      *                 type="array",
@@ -135,7 +134,7 @@ class MetadataSchemaController extends Controller
      *         @OA\JsonContent(
      *             @OA\Property(property="name", type="string", nullable=true),
      *             @OA\Property(property="description", type="string", nullable=true),
-     *             @OA\Property(property="isCanonical", type="boolean", nullable=true),
+     *             @OA\Property(property="version", type="integer", nullable=true),
      *             @OA\Property(
      *                 property="fields",
      *                 type="array",

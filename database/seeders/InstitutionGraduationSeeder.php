@@ -67,18 +67,18 @@ class InstitutionGraduationSeeder extends Seeder
             ['name' => 'Alimentos',                      'code_numeric' => '213.17'],
         ];
         foreach ($careers as $c) {
-            DB::table('careers')->updateOrInsert(
-                ['department_id' => $deptId, 'code_numeric' => $c['code_numeric']],
-                [
-                    'id'            => (string) Str::uuid7(),
-                    'department_id' => $deptId,
-                    'name'          => $c['name'],
-                    'code'          => Str::of($c['name'])->upper()->slug('_'),
-                    'code_numeric'  => $c['code_numeric'],
-                    'created_at'    => $now, 'updated_at' => $now,
-                    'version'       => 1, 'created_by' => 'system', 'updated_by' => 'system',
-                ]
-            );
+            DB::table('careers')->insert([
+                'id'            => (string) Str::uuid7(),
+                'department_id' => $deptId,
+                'name'          => $c['name'],
+                'code'          => Str::of($c['name'])->upper()->slug('_'),
+                'code_numeric'  => $c['code_numeric'],
+                'created_at'    => $now,
+                'updated_at'    => $now,
+                'version'       => 1,
+                'created_by'    => 'system',
+                'updated_by'    => 'system',
+            ]);
         }
 
         // =========================================================================
@@ -99,41 +99,37 @@ class InstitutionGraduationSeeder extends Seeder
         );
 
         // Categoría: GRADUACIÓN (code = 'A' según tu regla)
-        $categoryId = DB::table('process_categories')
-            ->where('subsystem_id', $subsystemId)->where('code', 'A')->value('id') ?: (string) Str::uuid7();
+        $categoryId = (string) Str::uuid7();
 
-        DB::table('process_categories')->updateOrInsert(
-            ['id' => $categoryId],
-            [
-                'id'               => $categoryId,
-                'subsystem_id'     => $subsystemId,
-                'name'             => 'GRADUACIÓN',
-                'code'             => 'A',
-                'numeric_code'     => null,
-                'created_at'       => $now, 'updated_at' => $now,
-                'version'          => 1, 'created_by' => 'system', 'updated_by' => 'system',
-            ]
-        );
+        DB::table('process_categories')->insert([
+            'id'               => $categoryId,
+            'subsystem_id'     => $subsystemId,
+            'name'             => 'GRADUACIÓN',
+            'code'             => 'A',
+            'numeric_code'     => null,
+            'created_at'       => $now,
+            'updated_at'       => $now,
+            'version'          => 1,
+            'created_by'       => 'system',
+            'updated_by'       => 'system',
+        ]);
 
         // Proceso: TITULACIÓN (code = 'T')
-        $processId = DB::table('processes')
-            ->where('process_category_id', $categoryId)
-            ->whereNull('parent_id')
-            ->where('code', 'T')->value('id') ?: (string) Str::uuid7();
+        $processId = (string) Str::uuid7();
 
-        DB::table('processes')->updateOrInsert(
-            ['id' => $processId],
-            [
-                'id'                  => $processId,
-                'process_category_id' => $categoryId,
-                'parent_id'           => null,
-                'name'                => 'TITULACIÓN',
-                'code'                => 'T', // solo la letra de proceso
-                'numeric_code'        => null,
-                'created_at'          => $now, 'updated_at' => $now,
-                'version'             => 1, 'created_by' => 'system', 'updated_by' => 'system',
-            ]
-        );
+        DB::table('processes')->insert([
+            'id'                  => $processId,
+            'process_category_id' => $categoryId,
+            'parent_id'           => null,
+            'name'                => 'TITULACIÓN',
+            'code'                => 'T', // solo la letra de proceso
+            'numeric_code'        => null,
+            'created_at'          => $now,
+            'updated_at'          => $now,
+            'version'             => 1,
+            'created_by'          => 'system',
+            'updated_by'          => 'system',
+        ]);
 
         // Helper: genera el “P??” de 3 letras para este árbol
         $base3 = self::PREFIX . 'A' . 'T'; // P + category(A) + process(T)  => "PAT"
@@ -151,23 +147,19 @@ class InstitutionGraduationSeeder extends Seeder
 
         foreach ($subprocesses as $i => $sp) {
             $code = sprintf('%s-%03d', $base3, $sp['n']); // PAT-001
-            DB::table('processes')->updateOrInsert(
-                [
-                    'process_category_id' => $categoryId,
-                    'parent_id'           => $processId,
-                    'code'                => $code,
-                ],
-                [
-                    'id'                  => (string) Str::uuid7(),
-                    'process_category_id' => $categoryId,
-                    'parent_id'           => $processId,
-                    'name'                => strtoupper($sp['name']),
-                    'code'                => $code,
-                    'numeric_code'        => null,
-                    'created_at'          => $now, 'updated_at' => $now,
-                    'version'             => 1, 'created_by' => 'system', 'updated_by' => 'system',
-                ]
-            );
+            DB::table('processes')->insert([
+                'id'                  => (string) Str::uuid7(),
+                'process_category_id' => $categoryId,
+                'parent_id'           => $processId,
+                'name'                => strtoupper($sp['name']),
+                'code'                => $code,
+                'numeric_code'        => null,
+                'created_at'          => $now,
+                'updated_at'          => $now,
+                'version'             => 1,
+                'created_by'          => 'system',
+                'updated_by'          => 'system',
+            ]);
         }
 
         // =========================================================================

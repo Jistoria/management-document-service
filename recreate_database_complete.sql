@@ -223,7 +223,6 @@ CREATE TABLE public.metadata_schemas (
     id uuid NOT NULL,
     name character varying(255) NOT NULL,
     description text,
-    is_canonical boolean DEFAULT false NOT NULL,
     version integer DEFAULT 1 NOT NULL,
     created_by character varying(255),
     updated_by character varying(255),
@@ -238,12 +237,9 @@ CREATE TABLE public.metadata_fields (
     id uuid NOT NULL,
     field_key character varying(255) NOT NULL,
     label character varying(255) NOT NULL,
-    entity_type_id uuid,
-    type_input_id character varying(255) NOT NULL,
-    data_type character varying(255) NOT NULL,
-    is_reference boolean DEFAULT false NOT NULL,
-    reference_entity character varying(255),
-    reference_column character varying(255) DEFAULT 'id'::character varying NOT NULL,
+    entity_type_id integer, -- referencia a tipo de entidad si aplica (user, faculty, career, etc.)
+    type_input_id integer, -- referencia a tipo de input (persona, documental, entidad)
+    data_type character varying(255) NOT NULL,  -- referencia a tipo de input (text, number, date, select, etc.)
     created_by character varying(255),
     updated_by character varying(255),
     created_at timestamp(0) without time zone,
@@ -675,19 +671,19 @@ CREATE UNIQUE INDEX head_offices_pkey ON public.head_offices USING btree (id);
 CREATE UNIQUE INDEX head_offices_code ON public.head_offices USING btree (code) WHERE (deleted_at IS NULL);
 CREATE UNIQUE INDEX departments_pkey ON public.departments USING btree (id);
 CREATE UNIQUE INDEX careers_pkey ON public.careers USING btree (id);
-CREATE UNIQUE INDEX careers_code ON public.careers USING btree (code) WHERE (deleted_at IS NULL);
+--CREATE UNIQUE INDEX careers_code ON public.careers USING btree (code) WHERE (deleted_at IS NULL);
 CREATE UNIQUE INDEX subsystems_pkey ON public.subsystems USING btree (id);
-CREATE UNIQUE INDEX subsystems_code ON public.subsystems USING btree (code) WHERE (deleted_at IS NULL);
+--CREATE UNIQUE INDEX subsystems_code ON public.subsystems USING btree (code) WHERE (deleted_at IS NULL);
 CREATE UNIQUE INDEX careers_subsystems_pkey ON public.careers_subsystems USING btree (career_id, subsystem_id);
 CREATE UNIQUE INDEX process_categories_pkey ON public.process_categories USING btree (id);
 CREATE UNIQUE INDEX processes_pkey ON public.processes USING btree (id);
 CREATE UNIQUE INDEX document_types_pkey ON public.document_types USING btree (id);
 CREATE UNIQUE INDEX document_types_code_unique ON public.document_types USING btree (code);
 CREATE UNIQUE INDEX academic_roles_pkey ON public.academic_roles USING btree (id);
-CREATE UNIQUE INDEX academic_roles_code_unique ON public.academic_roles USING btree (code);
+--CREATE UNIQUE INDEX academic_roles_code_unique ON public.academic_roles USING btree (code);
 CREATE UNIQUE INDEX required_documents_pkey ON public.required_documents USING btree (id);
 CREATE UNIQUE INDEX storage_unit_types_pkey ON public.storage_unit_types USING btree (id);
-CREATE UNIQUE INDEX storage_unit_types_code_unique ON public.storage_unit_types USING btree (code);
+--CREATE UNIQUE INDEX storage_unit_types_code_unique ON public.storage_unit_types USING btree (code);
 CREATE UNIQUE INDEX storage_units_pkey ON public.storage_units USING btree (id);
 CREATE UNIQUE INDEX metadata_schemas_pkey ON public.metadata_schemas USING btree (id);
 CREATE UNIQUE INDEX metadata_schemas_name_unique ON public.metadata_schemas USING btree (name);
@@ -791,31 +787,6 @@ COMMENT ON COLUMN public.metadata_schema_events.service_version IS 'Versión del
 COMMENT ON VIEW public.v_audit_summary_by_user IS 'Resumen de actividad de auditoría agrupada por usuario para reportes';
 COMMENT ON VIEW public.v_recent_changes IS 'Vista de cambios recientes (últimas 24h) para monitoreo en tiempo real';
 
--- =====================================================================================
--- DATOS INICIALES DEL SISTEMA
--- =====================================================================================
-
--- Configuración inicial de APIs externas
-INSERT INTO external_apis (id, service_name, base_url, auth_method, timeout_seconds, retry_attempts, is_active, created_by, updated_by) VALUES
-('4f1fcc45-898e-4508-af76-701231ed491d', 'auth-service', 'https://auth.example.com/api/v1', 'bearer', 30, 3, true, 'system', NULL),
-('74bf06cd-0909-4b55-b4ca-f8e9aef70897', 'user-service', 'https://users.example.com/api/v1', 'bearer', 30, 3, true, 'system', NULL),
-('e0ee67c9-e279-45d2-a0a4-f554b840e0c1', 'file-storage-service', 'https://storage.example.com/api/v1', 'api_key', 60, 3, true, 'system', NULL),
-('bc2aa9af-cc64-4db4-8a5b-44b3a56ddbb8', 'notification-service', 'https://notifications.example.com/api/v1', 'bearer', 15, 3, true, 'system', NULL);
-
--- Esquemas de metadatos del sistema
-INSERT INTO metadata_schemas (id, name, description, is_canonical, version, created_by) VALUES
-('0197ff77-4809-7158-b7a6-1ddf933b32f3', 'Esquema de Proyecto de Grado', 'Esquema para metadatos de proyectos de grado', true, 1, 'system'),
-('0197ff77-4810-720f-bc06-b5b1520e6ef5', 'Esquema de Certificación', 'Esquema para metadatos de certificaciones', true, 1, 'system');
-
--- Roles académicos básicos
-INSERT INTO academic_roles (id, name, code, created_by, version) VALUES
-('0197ff77-47c5-70d8-ba29-ae5d89d8f0f7', 'Estudiante', 'EST', 'system', 1),
-('0197ff77-47cd-71ad-8a10-398e508b4306', 'Docente', 'DOC', 'system', 1),
-('0197ff77-47d3-7046-b680-c8e12530d8fb', 'Coordinador', 'COORD', 'system', 1),
-('0197ff77-47db-718c-a5ce-4fc23e6aae0a', 'Director', 'DIR', 'system', 1),
-('0197ff77-47e2-7386-a5ef-ce3f5c5d59fa', 'Decano', 'DEC', 'system', 1),
-('0197ff77-47ed-7150-ba85-4781df3a1604', 'Secretario Académico', 'SECACAD', 'system', 1),
-('0197ff77-47f7-720c-893c-754fc3b92c5c', 'Jefe de Laboratorio', 'JEFLAB', 'system', 1);
 
 -- =====================================================================================
 -- CONFIGURACIÓN DE PERMISOS (OPCIONAL - AJUSTAR SEGÚN NECESIDADES)
@@ -865,7 +836,6 @@ CARACTERÍSTICAS IMPLEMENTADAS:
 ✅ Vistas de consulta para auditoría
 ✅ Funciones de mantenimiento
 ✅ Constraints de integridad completos
-✅ Datos iniciales del sistema
 ✅ Comentarios descriptivos
 */
 

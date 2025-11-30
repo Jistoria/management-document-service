@@ -20,73 +20,97 @@ class DocenciaStudentDevelopmentSeeder extends Seeder
         $now = Carbon::now()->toDateTimeString();
 
         // ============================================================
-        // 1) SUBSISTEMA DOCENCIA (code = 'A')
+        // 1) Obtener SUBSISTEMA DOCENCIA (code = 'A')
+        //    Debe existir por BaseInstitutionSeeder
         // ============================================================
-        $subsystemId = DB::table('subsystems')->where('code', 'A')->value('id') ?: (string) Str::uuid7();
+        $subsystemId = DB::table('subsystems')->where('code', 'A')->value('id');
 
-        DB::table('subsystems')->updateOrInsert(
-            ['code' => 'A'],
-            [
-                'id'         => $subsystemId,
-                'name'       => 'Docencia',
-                'code'       => 'A',
-                'created_at' => $now,
-                'updated_at' => $now,
-                'created_by' => 'system',
-                'updated_by' => 'system',
-            ]
-        );
+        if (!$subsystemId) {
+            throw new \RuntimeException('Subsystem DOCENCIA (code=A) no encontrado. Ejecuta BaseInstitutionSeeder primero.');
+        }
 
         // ============================================================
         // 2) CATEGORÍA: GESTIÓN Y DESARROLLO ESTUDIANTIL (code = 'A')
+        //    Verificar si ya existe para evitar duplicados
         // ============================================================
-        $categoryId = (string) Str::uuid7();
+        $existingCategory = DB::table('process_categories')
+            ->where('subsystem_id', $subsystemId)
+            ->where('name', 'GESTIÓN Y DESARROLLO ESTUDIANTIL')
+            ->where('code', self::CAT)
+            ->first();
 
-        DB::table('process_categories')->insert([
-            'id'               => $categoryId,
-            'subsystem_id'     => $subsystemId,
-            'name'             => 'GESTIÓN Y DESARROLLO ESTUDIANTIL',
-            'code'             => self::CAT,
-            'created_at'       => $now,
-            'updated_at'       => $now,
-            'created_by'       => 'system',
-            'updated_by'       => 'system',
-        ]);
+        if ($existingCategory) {
+            $categoryId = $existingCategory->id;
+        } else {
+            $categoryId = (string) Str::uuid7();
+
+            DB::table('process_categories')->insert([
+                'id'               => $categoryId,
+                'subsystem_id'     => $subsystemId,
+                'name'             => 'GESTIÓN Y DESARROLLO ESTUDIANTIL',
+                'code'             => self::CAT,
+                'created_at'       => $now,
+                'updated_at'       => $now,
+                'created_by'       => 'system',
+                'updated_by'       => 'system',
+            ]);
+        }
 
         // ============================================================
         // 3) PROCESO: PRÁCTICAS PREPROFESIONALES Y PASANTÍAS (P)
         //    con subproceso PAP-01 + documentos (lo que ya teníamos)
         // ============================================================
-        $procPractId = (string) Str::uuid7();
+        $existingProcPract = DB::table('processes')
+            ->where('process_category_id', $categoryId)
+            ->where('code', self::PROC_P)
+            ->whereNull('parent_id')
+            ->first();
 
-        DB::table('processes')->insert([
-            'id'                  => $procPractId,
-            'process_category_id' => $categoryId,
-            'parent_id'           => null,
-            'name'                => 'PRÁCTICAS PREPROFESIONALES Y PASANTÍAS',
-            'code'                => self::PROC_P,  // 'P'
-            'created_at'          => $now,
-            'updated_at'          => $now,
-            'created_by'          => 'system',
-            'updated_by'          => 'system',
-        ]);
+        if ($existingProcPract) {
+            $procPractId = $existingProcPract->id;
+        } else {
+            $procPractId = (string) Str::uuid7();
+
+            DB::table('processes')->insert([
+                'id'                  => $procPractId,
+                'process_category_id' => $categoryId,
+                'parent_id'           => null,
+                'name'                => 'PRÁCTICAS PREPROFESIONALES Y PASANTÍAS',
+                'code'                => self::PROC_P,  // 'P'
+                'created_at'          => $now,
+                'updated_at'          => $now,
+                'created_by'          => 'system',
+                'updated_by'          => 'system',
+            ]);
+        }
 
         // --- Subproceso PAP-01 (planificación, ejecución, supervisión, evaluación)
         $base3       = self::PREFIX . self::CAT . self::PROC_P; // "PAP"
         $subprocCode = $base3 . '-01';                          // "PAP-01"
-        $subprocId   = (string) Str::uuid7();
 
-        DB::table('processes')->insert([
-            'id'                  => $subprocId,
-            'process_category_id' => $categoryId,
-            'parent_id'           => $procPractId,
-            'name'                => 'PLANIFICACIÓN, EJECUCIÓN, SUPERVISIÓN Y EVALUACIÓN DE PRÁCTICAS PREPROFESIONALES Y PASANTÍAS',
-            'code'                => $subprocCode, // PAP-01
-            'created_at'          => $now,
-            'updated_at'          => $now,
-            'created_by'          => 'system',
-            'updated_by'          => 'system',
-        ]);
+        $existingSubproc = DB::table('processes')
+            ->where('process_category_id', $categoryId)
+            ->where('parent_id', $procPractId)
+            ->where('code', $subprocCode)
+            ->first();
+
+        if ($existingSubproc) {
+            $subprocId = $existingSubproc->id;
+        } else {
+            $subprocId = (string) Str::uuid7();
+
+            DB::table('processes')->insert([
+                'id'                  => $subprocId,
+                'process_category_id' => $categoryId,
+                'parent_id'           => $procPractId,
+                'name'                => 'PLANIFICACIÓN, EJECUCIÓN, SUPERVISIÓN Y EVALUACIÓN DE PRÁCTICAS PREPROFESIONALES Y PASANTÍAS',
+                'code'                => $subprocCode, // PAP-01
+                'created_at'          => $now,
+                'updated_at'          => $now,
+                'created_by'          => 'system',
+                'updated_by'          => 'system',
+            ]);
+        }
 
         // --- Documentos PAP-01-F-001 ... PAP-01-F-006  =>  PAP-01-001 ... PAP-01-006
         $docs = [
@@ -100,55 +124,74 @@ class DocenciaStudentDevelopmentSeeder extends Seeder
 
         foreach ($docs as $d) {
             $codeDefault = sprintf('%s-%03d', $subprocCode, $d['n']); // PAP-01-001, ...
-            DB::table('required_documents')->insert([
-                'id'           => (string) Str::uuid7(),
-                'process_id'   => $subprocId,
-                'name'         => $d['name'],
-                'code_default' => $codeDefault,
-                'created_at'   => $now,
-                'updated_at'   => $now,
-                'created_by'   => 'system',
-                'updated_by'   => 'system',
-            ]);
+
+            // Solo insertar si no existe
+            $existingDoc = DB::table('required_documents')
+                ->where('process_id', $subprocId)
+                ->where('code_default', $codeDefault)
+                ->exists();
+
+            if (!$existingDoc) {
+                DB::table('required_documents')->insert([
+                    'id'           => (string) Str::uuid7(),
+                    'process_id'   => $subprocId,
+                    'name'         => $d['name'],
+                    'code_default' => $codeDefault,
+                    'created_at'   => $now,
+                    'updated_at'   => $now,
+                    'created_by'   => 'system',
+                    'updated_by'   => 'system',
+                ]);
+            }
         }
 
         // ============================================================
         // 4) PROCESO: AYUDANTÍA DE CÁTEDRA E INVESTIGACIÓN (J)
         //    SOLO proceso padre, sin hijos (sin subprocesos ni documentos)
         // ============================================================
-        $procAyudId = (string) Str::uuid7();
+        $existingProcAyud = DB::table('processes')
+            ->where('process_category_id', $categoryId)
+            ->where('code', self::PROC_J)
+            ->whereNull('parent_id')
+            ->exists();
 
-        DB::table('processes')->insert([
-            'id'                  => $procAyudId,
-            'process_category_id' => $categoryId,
-            'parent_id'           => null,
-            'name'                => 'AYUDANTÍA DE CÁTEDRA E INVESTIGACIÓN',
-            'code'                => self::PROC_J,  // 'J'
-            'created_at'          => $now,
-            'updated_at'          => $now,
-            'version'             => 1,
-            'created_by'          => 'system',
-            'updated_by'          => 'system',
-        ]);
+        if (!$existingProcAyud) {
+            DB::table('processes')->insert([
+                'id'                  => (string) Str::uuid7(),
+                'process_category_id' => $categoryId,
+                'parent_id'           => null,
+                'name'                => 'AYUDANTÍA DE CÁTEDRA E INVESTIGACIÓN',
+                'code'                => self::PROC_J,  // 'J'
+                'created_at'          => $now,
+                'updated_at'          => $now,
+                'created_by'          => 'system',
+                'updated_by'          => 'system',
+            ]);
+        }
 
         // ============================================================
         // 5) PROCESO: MOVILIDAD ACADÉMICA / CONVENIOS (I)
         //    SOLO proceso padre, sin hijos
         // ============================================================
-        $procMovId = (string) Str::uuid7();
+        $existingProcMov = DB::table('processes')
+            ->where('process_category_id', $categoryId)
+            ->where('code', self::PROC_I)
+            ->whereNull('parent_id')
+            ->exists();
 
-        DB::table('processes')->insert([
-            'id'                  => $procMovId,
-            'process_category_id' => $categoryId,
-            'parent_id'           => null,
-            'name'                => 'MOVILIDAD ACADÉMICA / CONVENIOS',
-            'code'                => self::PROC_I,  // 'I'
-            'created_at'          => $now,
-            'updated_at'          => $now,
-            'version'             => 1,
-            'created_by'          => 'system',
-            'updated_by'          => 'system',
-        ]);
+        if (!$existingProcMov) {
+            DB::table('processes')->insert([
+                'id'                  => (string) Str::uuid7(),
+                'process_category_id' => $categoryId,
+                'parent_id'           => null,
+                'name'                => 'MOVILIDAD ACADÉMICA / CONVENIOS',
+                'code'                => self::PROC_I,  // 'I'
+                'created_at'          => $now,
+                'updated_at'          => $now,
+                'created_by'          => 'system',
+                'updated_by'          => 'system',
+            ]);
+        }
 
         // (SEGUIMIENTO A GRADUADOS de momento no se crea,
         //  porque en el catálogo no tiene código ni manual definido.)

@@ -77,19 +77,9 @@ verify_database_sync() {
 
     if [ ${#MISSING_TABLES[@]} -eq 0 ]; then
         echo -e "${GREEN}✅ Todas las tablas están presentes${NC}"
-
-        # Verificar datos iniciales
-        API_COUNT=$(psql -U "$DB_USER" -d "$DB_NAME" -t -c "SELECT COUNT(*) FROM external_apis;" 2>/dev/null | xargs)
-        ROLE_COUNT=$(psql -U "$DB_USER" -d "$DB_NAME" -t -c "SELECT COUNT(*) FROM academic_roles;" 2>/dev/null | xargs)
-
-        if [ "$API_COUNT" -ge "4" ] && [ "$ROLE_COUNT" -ge "7" ]; then
-            echo -e "${GREEN}✅ Datos iniciales presentes${NC}"
-            echo -e "${GREEN}✅ Base de datos completamente sincronizada${NC}"
-            return 0
-        else
-            echo -e "${YELLOW}⚠️  Faltan datos iniciales (APIs: $API_COUNT/4, Roles: $ROLE_COUNT/7)${NC}"
-            return 1
-        fi
+        echo -e "${GREEN}✅ Estructura de base de datos sincronizada${NC}"
+        echo -e "${BLUE}ℹ️  Los datos iniciales serán cargados por Laravel Seeders${NC}"
+        return 0
     else
         echo -e "${RED}❌ Faltan tablas: ${MISSING_TABLES[*]}${NC}"
         return 1

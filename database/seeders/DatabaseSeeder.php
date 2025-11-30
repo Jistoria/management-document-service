@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
         if ($environment === 'production') {
 
             $this->call([
+                BaseInstitutionSeeder::class, // ← PRIMERO: crea la estructura base
                 InstitutionGraduationSeeder::class,
                 AdmissionMatriculaDocumentsSeeder::class,
                 DocenciaStudentDevelopmentSeeder::class,
@@ -31,6 +32,7 @@ class DatabaseSeeder extends Seeder
             $this->command->info("ℹ️ Para usar datos de producción, ejecute: php artisan db:seed --class=ProductionSeeder");
 
             $this->call([
+                BaseInstitutionSeeder::class, // ← PRIMERO: crea la estructura base
                 InstitutionGraduationSeeder::class,
                 AdmissionMatriculaDocumentsSeeder::class,
                 DocenciaStudentDevelopmentSeeder::class,

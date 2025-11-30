@@ -94,8 +94,8 @@ class Pap01002MetadataSeeder extends Seeder
             TypeInput::DOCUMENT
         );
 
-        // 2) Esquema para PAP-01-002
-        $schemaName = 'PAP-01-002 Registro Actividades Diarias del Estudiante';
+        // 2) Esquema GENÉRICO para todos los documentos PAP-01
+        $schemaName = 'PAP-01 Prácticas Preprofesionales - Esquema General';
 
         $schema = DB::table('metadata_schemas')
             ->where('name', $schemaName)
@@ -107,7 +107,7 @@ class Pap01002MetadataSeeder extends Seeder
             DB::table('metadata_schemas')->insert([
                 'id'          => $schemaId,
                 'name'        => $schemaName,
-                'description' => 'Metadatos para el formato PAP-01-002 Registro Actividades Diarias del Estudiante',
+                'description' => 'Metadatos generales aplicables a todos los documentos del proceso PAP-01 (Prácticas Preprofesionales y Pasantías)',
                 'version'     => 1,
                 'created_by'  => 'system',
                 'updated_by'  => 'system',
@@ -147,6 +147,36 @@ class Pap01002MetadataSeeder extends Seeder
                     'created_at'          => $now,
                     'updated_at'          => $now,
                 ]);
+            }
+        }
+
+        // 4) Vincular este schema genérico a TODOS los documentos PAP-01
+        //    Obtener todos los required_documents del proceso PAP-01
+        $subprocCode = 'PAP-01';
+
+        // Buscar el proceso PAP-01
+        $process = DB::table('processes')
+            ->where('code', $subprocCode)
+            ->first();
+
+        if ($process) {
+            // Obtener todos los documentos de este proceso
+            $documents = DB::table('required_documents')
+                ->where('process_id', $process->id)
+                ->get();
+
+            // Vincular el schema a cada documento
+            foreach ($documents as $document) {
+                // Solo actualizar si no tiene schema asignado
+                if (!$document->metadata_schema_id) {
+                    DB::table('required_documents')
+                        ->where('id', $document->id)
+                        ->update([
+                            'metadata_schema_id' => $schemaId,
+                            'updated_at' => $now,
+                            'updated_by' => 'system',
+                        ]);
+                }
             }
         }
     }

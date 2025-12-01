@@ -2390,6 +2390,168 @@
                 }
             }
         },
+        "/api/me/entities": {
+            "post": {
+                "tags": [
+                    "Auth Integration"
+                ],
+                "summary": "Traduce team_ids de la sesión a entidades completas",
+                "description": "Endpoint de integración con auth-service. Recibe los team_ids de la sesión del usuario y retorna las entidades completas (Facultades/Carreras) bajo las cuales el usuario puede actuar. Los team_ids vienen en formato FAC:123 o CARR:456.",
+                "operationId": "a649c5bd3bc4c1bb801bb317ab90cec0",
+                "requestBody": {
+                    "description": "Los team_ids vienen automáticamente del middleware auth.service en $request->get('session')['team_ids']",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "session": {
+                                        "description": "Objeto de sesión inyectado por el middleware auth.service",
+                                        "properties": {
+                                            "team_ids": {
+                                                "description": "Array de identificadores de equipos/entidades con prefijo FAC: o CARR:",
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                },
+                                                "example": [
+                                                    "FAC:101",
+                                                    "FAC:102",
+                                                    "CARR:201",
+                                                    "CARR:202"
+                                                ]
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Entidades traducidas exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Operación exitosa"
+                                        },
+                                        "data": {
+                                            "description": "Colección de entidades traducidas",
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "description": "UUID de la entidad",
+                                                        "type": "string",
+                                                        "format": "uuid",
+                                                        "example": "9d5e8b3a-1c2d-4e5f-8a9b-0c1d2e3f4a5b"
+                                                    },
+                                                    "teamId": {
+                                                        "description": "Identificador original del team con prefijo",
+                                                        "type": "string",
+                                                        "example": "FAC:101"
+                                                    },
+                                                    "code": {
+                                                        "description": "Código alfabético de la entidad",
+                                                        "type": "string",
+                                                        "example": "FIN"
+                                                    },
+                                                    "codeNumeric": {
+                                                        "description": "Código numérico de la entidad",
+                                                        "type": "string",
+                                                        "example": "101"
+                                                    },
+                                                    "name": {
+                                                        "description": "Nombre completo de la entidad",
+                                                        "type": "string",
+                                                        "example": "Facultad de Ingeniería"
+                                                    },
+                                                    "type": {
+                                                        "description": "Tipo de entidad",
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "Facultad",
+                                                            "Carrera"
+                                                        ],
+                                                        "example": "Facultad"
+                                                    },
+                                                    "entity": {
+                                                        "description": "Clasificación de la entidad para el sistema",
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "Area",
+                                                            "Carrera"
+                                                        ],
+                                                        "example": "Area"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado o token inválido",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error al procesar las entidades"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
         "/head-offices": {
             "get": {
                 "tags": [
@@ -3633,6 +3795,108 @@
                                                 }
                                             },
                                             "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/metadata-fields/catalogs/entity-types": {
+            "get": {
+                "tags": [
+                    "Metadata Fields"
+                ],
+                "summary": "Get entity types catalog",
+                "operationId": "4f649b1ac9570382da4d1c4ec755f715",
+                "responses": {
+                    "200": {
+                        "description": "Entity types catalog retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Entity types catalog retrieved successfully"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "key": {
+                                                        "type": "string",
+                                                        "example": "user"
+                                                    },
+                                                    "label": {
+                                                        "type": "string",
+                                                        "example": "Usuario"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/metadata-fields/catalogs/type-inputs": {
+            "get": {
+                "tags": [
+                    "Metadata Fields"
+                ],
+                "summary": "Get type inputs catalog",
+                "operationId": "b3b9b4a1f66744ea8b0bf72ec1078437",
+                "responses": {
+                    "200": {
+                        "description": "Type inputs catalog retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Type inputs catalog retrieved successfully"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "key": {
+                                                        "type": "string",
+                                                        "example": "text"
+                                                    },
+                                                    "label": {
+                                                        "type": "string",
+                                                        "example": "Texto"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
                                         }
                                     },
                                     "type": "object"
@@ -9949,6 +10213,10 @@
         {
             "name": "DocumentTypes",
             "description": "DocumentTypes"
+        },
+        {
+            "name": "Auth Integration",
+            "description": "Auth Integration"
         },
         {
             "name": "Process Categories",

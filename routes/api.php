@@ -296,6 +296,9 @@ Route::prefix('storage-units')->group(function () {
 });
 
 
+Route::post('me/entities', App\Http\Controllers\EntityLookupController::class)
+    ->middleware(['auth.service']);
+
 
 // Nested route for careers by department
 Route::get('/departments/{departmentId}/careers', [CareerController::class, 'getByDepartment']);

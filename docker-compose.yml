@@ -3,11 +3,15 @@ services:
         build:
             context: .
             dockerfile: php/Dockerfile
+            args:
+                UID: ${UID:-1000}
+                GID: ${GID:-1000}
         image: management-app
         container_name: management-init
+        user: "0:0"  # Ejecutar como root para poder cambiar permisos
         volumes:
             - .:/var/www
-            - vendor-data:/var/www/vendor # <--- AGREGADO
+            - vendor-data:/var/www/vendor
         depends_on:
             db:
                 condition: service_healthy

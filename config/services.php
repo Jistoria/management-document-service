@@ -13,6 +13,15 @@ return [
     | a conventional file to locate the various service credentials.
     |
     */
+    'azure' => [
+        'tenant_id' => env('AZURE_TENANT_ID'),
+        'client_id' => env('AZURE_CLIENT_ID'), // Para validar que el token sea para ESTA app (aud)
+        'allowed_azp' => env('AZURE_ALLOWED_AZP'), // Para validar clientes autorizados
+    ],
+    
+    'passport' => [
+        'public_key' => storage_path('oauth-public.key'), // La clave que copiaste del Auth Service
+    ],
 
     'kafka' => [
         'brokers' => env('KAFKA_BROKERS'),

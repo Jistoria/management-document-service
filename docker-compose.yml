@@ -79,11 +79,11 @@ services:
                 UID: ${UID:-1000}
                 GID: ${GID:-1000}
         image: management-app
-        user: "${UID:-1000}:${GID:-1000}" # <--- AÑADE ESTO
+        user: "${UID:-1000}:${GID:-1000}"
         container_name: management-app
         volumes:
             - .:/var/www
-            - vendor-data:/var/www/vendor # <--- AGREGADO
+            - vendor-data:/var/www/vendor
         environment:
             - KAFKA_BROKERS=auth-kafka:9092
             - KAFKA_CLIENT_ID=management-service
@@ -145,7 +145,28 @@ services:
         command: php artisan auth-sync:consume
         volumes:
             - .:/var/www
-            - vendor-data:/var/www/vendor # <--- AGREGADO
+            - vendor-data:/var/www/vendor
+        # 👇 AGREGAR ESTA SECCIÓN COMPLETA 👇
+        environment:
+            # Conexión a Kafka (Red compartida: auth-kafka)
+            - KAFKA_BROKERS=auth-kafka:9092
+            
+            # Grupo de consumo (para no repetir mensajes si levantas réplicas)
+            - AUTH_SYNC_GROUP=management-document-service-group
+            
+            # Identidad del Microservicio (CRÍTICO para los Handlers)
+            - APP_MICROSERVICE_ID=${APP_MICROSERVICE_ID}
+            
+            # Topics a escuchar
+            - AUTH_SYNC_TOPICS=${AUTH_SYNC_TOPICS:-auth.rbac.permission-granted,auth.rbac.permission-revoked,auth.user.updated,auth.user.deleted,auth.user.restored}
+            
+            # Configuración de BD (El consumidor necesita escribir en la DB)
+            - DB_HOST=db
+            - DB_PORT=5432
+            - DB_DATABASE=management_db
+            - DB_USERNAME=user123
+            - DB_PASSWORD=pass123
+        # 👆 FIN DE LA SECCIÓN AGREGADA 👆
         depends_on:
             app:
                 condition: service_started
@@ -156,7 +177,6 @@ services:
         networks:
             - thesis-net
             - management-net
-
 
 volumes:
     postgres_data:

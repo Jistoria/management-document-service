@@ -296,7 +296,7 @@ Route::prefix('storage-units')->group(function () {
 });
 
 
-Route::post('me/entities', App\Http\Controllers\EntityLookupController::class)
+Route::get('me/entities', App\Http\Controllers\EntityLookupController::class)
     ->middleware(['auth.service']);
 
 

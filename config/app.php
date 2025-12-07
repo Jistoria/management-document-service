@@ -12,6 +12,7 @@ return [
     | other UI elements where an application name needs to be displayed.
     |
     */
+    'microservice_id' => env('APP_MICROSERVICE_ID'), // <--- Necesario para identificar el microservicio
 
     'name' => env('APP_NAME', 'Laravel'),
 

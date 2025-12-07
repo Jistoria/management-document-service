@@ -2,7 +2,7 @@
 
 return [
 
-    'jwks_url' => env('AUTH_JWKS_URL', 'http://auth-service/.well-known/jwks.json'),
+    'jwks_url' => env('AUTH_JWKS_URL', 'http://auth-app/.well-known/jwks.json'),
 
     /*
     |--------------------------------------------------------------------------

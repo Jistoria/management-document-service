@@ -53,7 +53,7 @@ class MetadataFieldController extends Controller
                 $this->metadataFieldService,
                 MetadataFieldResource::class,
                 $request,
-                ApiIndexBuilder::extractFilters($request, ['field_key', 'data_type', 'type_input_id', 'entity_type_id'])
+                ApiIndexBuilder::extractFilters($request, ['field_key', 'data_type', 'type_input_id', 'entity_type_id', 'schema_id'])
             );
         }, 'Metadata fields retrieved successfully');
     }

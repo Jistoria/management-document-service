@@ -96,6 +96,7 @@ class MetadataFieldService
      */
     private function applyFilters(Builder $query, array $filters): void
     {
+
         if (!empty($filters['search'])) {
             $search = $filters['search'];
             $query->where(function ($q) use ($search) {
@@ -115,6 +116,13 @@ class MetadataFieldService
         if (!empty($filters['entity_type_id'])) {
             $query->where('entity_type_id', (int) $filters['entity_type_id']);
         }
+        
+        $query->when(!empty($filters['schema_id']), function (Builder $q) use ($filters) {
+            $schemaId = $filters['schema_id'];
+            $q->whereHas('metadataSchemas', function (Builder $subQuery) use ($schemaId) {
+                $subQuery->where('metadata_schemas.id', $schemaId);
+            });
+        });
     }
 
     /**

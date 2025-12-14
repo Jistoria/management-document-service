@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Helpers\ApiResponse;
 
 class RolesService
 {
@@ -44,17 +45,8 @@ class RolesService
                 'permission' => $permission
             ]);
 
-            return response()->json([
-                'message' => 'No tienes permisos para realizar esta acción.',
-                'required' => $permission
-            ], 403);
+            return ApiResponse::error('No tienes permisos para realizar esta acción.', 403);
         }
-
-        // Log de éxito (opcional, útil para debug)
-        Log::debug('[RolesService] Acceso Permitido', [
-            'user' => $userId, 
-            'perm' => $permission
-        ]);
 
         return $next($request);
     }

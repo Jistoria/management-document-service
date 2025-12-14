@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use Firebase\JWT\JWT;
-use Firebase\JWT\JWK; // <--- IMPORTANTE: Usamos el parser nativo
+use Firebase\JWT\JWK;
 use Firebase\JWT\Key;
 
 class AuthenticateService
@@ -35,7 +35,7 @@ class AuthenticateService
         // ---------------------------------------------------------
         try {
             // Cacheamos las JWKS crudas (el JSON)
-            $jwks = cache()->remember('auth-jwks', 3600, function () {
+            $jwks = cache()->remember('auth-jwks', 36000, function () {
                 $url = config('auth.jwks_url'); // Asegúrate que esto cargue 'http://auth-nginx/.well-known/jwks.json'
                 $response = Http::timeout(5)->get($url);
                 

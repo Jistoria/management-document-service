@@ -7,6 +7,7 @@ use App\Kafka\Topics;
 use App\Services\AuthProjectionService;
 use App\Support\KafkaMessage;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Log;
 
 final class UserRestoredHandler implements MessageHandler
 {
@@ -19,6 +20,8 @@ final class UserRestoredHandler implements MessageHandler
 
     public function handle(KafkaMessage $message): void
     {
+        Log::info('Procesando mensaje', ['payload' => $message->payload(), 'topic' => $this->topic(), 'local_microservice_id' => config('app.microservice_id'), 'message_microservice_id' => $message->microserviceId()]);
+
         if ($message->microserviceId() !== config('app.microservice_id')) return;
 
         $tenantId = $message->tenantId();

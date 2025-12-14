@@ -28,6 +28,7 @@ class VerifyJwtMiddleware
                 $response = Http::get(config('auth.jwks_url'));
                 return $response->json();
             });
+            dd($jwks);
 
             $keyData = collect($jwks['keys'])->firstWhere('kid', 'passport-v1');
             if (!$keyData) {

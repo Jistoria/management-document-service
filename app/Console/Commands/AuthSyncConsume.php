@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Log;
 use Junges\Kafka\Facades\Kafka;
 use Junges\Kafka\Message\ConsumedMessage;
 
+
 class AuthSyncConsume extends Command
 {
     protected $signature = 'auth-sync:consume
@@ -75,9 +76,12 @@ class AuthSyncConsume extends Command
                 }
 
                 try {
-                    // 2) Proyección dentro de una transacción
+
+                    Log::info('Procesando mensaje', ['payload' => $km->payload(), 'topic' => $topic]);
+
                     DB::transaction(function () use ($km, $topic) {
                         $handler = $this->handlers[$topic] ?? null;
+                        Log::info('Procesando mensaje', ['handler_exists' => $handler !== null, 'topic' => $topic, 'handlers_available' => array_keys($this->handlers)]);
                         if (!$handler) {
                             throw new \RuntimeException("No hay handler para topic [$topic]");
                         }

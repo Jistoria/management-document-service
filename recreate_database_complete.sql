@@ -422,16 +422,18 @@ CREATE TABLE public.inbox_events (
 CREATE TABLE public.md_auth_users (
   tenant_id       uuid NULL,
   user_id         uuid NOT NULL,
+  guid_ms         uuid NULL,
   name            text NULL,
   email           text NULL,
   status          text NULL,
   deleted_at      timestamptz NULL,
   updated_at_src  timestamptz NULL, -- desde snapshot/evento fuente
   updated_at      timestamptz NOT NULL DEFAULT now(),
-  PRIMARY KEY (tenant_id, user_id)
+  PRIMARY KEY (user_id)
 );
 
 CREATE INDEX md_auth_users_email_idx ON md_auth_users (email);
+CREATE INDEX md_auth_users_guid_ms_idx ON md_auth_users (guid_ms);
 
 -- 3) Permisos (catálogo local por slug)
 CREATE TABLE public.md_auth_permissions (
@@ -446,11 +448,13 @@ CREATE TABLE public.md_auth_user_permissions (
   granted_by      uuid NULL,
   reason          text NULL,
   created_at      timestamptz NOT NULL DEFAULT now(),
-  PRIMARY KEY (tenant_id, user_id, permission_slug)
+  PRIMARY KEY (user_id, permission_slug)
 );
 
-CREATE INDEX md_auth_user_perm_user_idx ON md_auth_user_permissions (tenant_id, user_id);
 CREATE INDEX md_auth_user_perm_perm_idx ON md_auth_user_permissions (permission_slug);
+CREATE UNIQUE INDEX md_auth_user_perm_unique 
+            ON md_auth_user_permissions (user_id, permission_slug, tenant_id) 
+            NULLS NOT DISTINCT;
 -- =====================================================================================
 -- CONFIGURACIÓN DE MICROSERVICIOS
 -- =====================================================================================

@@ -573,13 +573,13 @@ INSERT INTO academic_roles (id, name, code, created_by, version) VALUES
 -- Este script crea una base de datos completa y optimizada para un microservicio
 -- de gestión documental con las siguientes características:
 --
--- ✅ Arquitectura de microservicio (sin dependencias de auth/cache/jobs)
--- ✅ Campos de referencia externa para integración
--- ✅ Sistema de auditoría y versionado completo
--- ✅ Índices optimizados para performance
--- ✅ Vistas materializadas para consultas complejas
--- ✅ Triggers automáticos para mantenimiento
--- ✅ Validaciones de negocio robustas
--- ✅ Sistema de metadatos flexible y extensible
--- ✅ Configuración inicial lista para uso
+--  Arquitectura de microservicio (sin dependencias de auth/cache/jobs)
+--  Campos de referencia externa para integración
+--  Sistema de auditoría y versionado completo
+--  Índices optimizados para performance
+--  Vistas materializadas para consultas complejas
+--  Triggers automáticos para mantenimiento
+--  Validaciones de negocio robustas
+--  Sistema de metadatos flexible y extensible
+--  Configuración inicial lista para uso
 -- =====================================================================================

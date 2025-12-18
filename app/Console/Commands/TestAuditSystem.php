@@ -45,7 +45,7 @@ class TestAuditSystem extends Command
             'code' => 'SPA-' . rand(100, 999),
             'created_by' => $this->option('user-id') ?? 'test-user-123',
         ]);
-        $this->info("✅ HeadOffice creado: {$headOffice->id}");
+        $this->info(" HeadOffice creado: {$headOffice->id}");
 
         // Test 2: Actualizar HeadOffice
         $this->info('📝 Test 2: Actualizando HeadOffice...');
@@ -53,7 +53,7 @@ class TestAuditSystem extends Command
             'name' => 'Sede de Prueba Auditoría ACTUALIZADA',
             'updated_by' => $this->option('user-id') ?? 'test-user-123',
         ]);
-        $this->info("✅ HeadOffice actualizado");
+        $this->info(" HeadOffice actualizado");
 
         // Test 3: Crear Department
         $this->info('📝 Test 3: Creando Department...');
@@ -63,7 +63,7 @@ class TestAuditSystem extends Command
             'code' => 'DP-' . rand(100, 999),
             'created_by' => $this->option('user-id') ?? 'test-user-123',
         ]);
-        $this->info("✅ Department creado: {$department->id}");
+        $this->info(" Department creado: {$department->id}");
 
         // Test 4: Crear Career
         $this->info('📝 Test 4: Creando Career...');
@@ -73,17 +73,17 @@ class TestAuditSystem extends Command
             'code' => 'CP-' . rand(100, 999),
             'created_by' => $this->option('user-id') ?? 'test-user-123',
         ]);
-        $this->info("✅ Career creado: {$career->id}");
+        $this->info(" Career creado: {$career->id}");
 
         // Test 5: Soft Delete
         $this->info('📝 Test 5: Soft Delete de Career...');
         $career->delete();
-        $this->info("✅ Career eliminado (soft delete)");
+        $this->info(" Career eliminado (soft delete)");
 
         // Test 6: Restore
         $this->info('📝 Test 6: Restaurando Career...');
         $career->restore();
-        $this->info("✅ Career restaurado");
+        $this->info(" Career restaurado");
 
         // Test 7: Auditoría manual
         $this->info('📝 Test 7: Auditoría manual...');
@@ -92,7 +92,7 @@ class TestAuditSystem extends Command
             'approved_by_role' => 'director',
             'test_mode' => true,
         ]);
-        $this->info("✅ Auditoría manual creada");
+        $this->info(" Auditoría manual creada");
 
         // Mostrar resumen de auditoría
         $this->showAuditSummary($headOffice, $department, $career);
@@ -184,6 +184,6 @@ class TestAuditSystem extends Command
             ->whereIn('record_id', [$headOffice->id, $department->id, $career->id])
             ->delete();
 
-        $this->info('✅ Datos de prueba limpiados');
+        $this->info(' Datos de prueba limpiados');
     }
 }

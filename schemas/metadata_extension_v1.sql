@@ -12,21 +12,21 @@
 -- 
 -- Las siguientes tablas YA EXISTEN en la base de datos con esquemas más completos:
 -- 
--- ✅ metadata_schemas - CON COLUMNAS ADICIONALES:
+--  metadata_schemas - CON COLUMNAS ADICIONALES:
 --    - external_system_id, api_endpoint, cache_ttl
 --    - created_by, updated_by, deleted_at
 --    - triggers para updated_at
 --
--- ✅ metadata_fields - CON COLUMNAS ADICIONALES:
+--  metadata_fields - CON COLUMNAS ADICIONALES:
 --    - lookup_keywords (JSONB), ocr_hint
 --    - ignore_in_similarity
 --    - chk_valid_data_type constraint con tipos específicos
 --    - created_at, updated_at
 --
--- ✅ metadata_schema_events - CON COLUMNAS ADICIONALES:
+--  metadata_schema_events - CON COLUMNAS ADICIONALES:
 --    - correlation_id, external_user_id, service_version
 --
--- ✅ required_documents - YA MODIFICADO:
+--  required_documents - YA MODIFICADO:
 --    - metadata_schema_id (no schema_id)
 --    - chk_required_documents_has_reference constraint
 --    - índices para performance

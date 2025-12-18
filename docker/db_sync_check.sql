@@ -48,7 +48,7 @@ existing_tables AS (
 )
 SELECT
     et.table_name,
-    CASE WHEN ext.table_name IS NOT NULL THEN '✅ EXISTS' ELSE '❌ MISSING' END as status
+    CASE WHEN ext.table_name IS NOT NULL THEN ' EXISTS' ELSE '❌ MISSING' END as status
 FROM expected_tables et
 LEFT JOIN existing_tables ext ON et.table_name = ext.table_name
 ORDER BY et.table_name;
@@ -96,7 +96,7 @@ WHERE schemaname = 'public';
 SELECT
     indexname,
     tablename,
-    CASE WHEN indexname IS NOT NULL THEN '✅ EXISTS' ELSE '❌ MISSING' END as status
+    CASE WHEN indexname IS NOT NULL THEN ' EXISTS' ELSE '❌ MISSING' END as status
 FROM pg_indexes
 WHERE schemaname = 'public'
     AND indexname IN (
@@ -195,7 +195,7 @@ SELECT
         AND (
             SELECT COUNT(*) FROM academic_roles WHERE created_by = 'system'
         ) >= 7
-        THEN '✅ FULLY_SYNCHRONIZED'
+        THEN ' FULLY_SYNCHRONIZED'
         ELSE '❌ NEEDS_SYNC'
     END as sync_status,
     NOW() as check_timestamp;

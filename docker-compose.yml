@@ -65,7 +65,7 @@ services:
             bash -c "
               echo '🔍 Ejecutando verificación de sincronización de DB...';
               psql -f /app/db_sync_check.sql;
-              echo '✅ Verificación completada';
+              echo ' Verificación completada';
             "
         restart: "no"
         networks:
@@ -146,7 +146,7 @@ services:
         volumes:
             - .:/var/www
             - vendor-data:/var/www/vendor
-        # 👇 AGREGAR ESTA SECCIÓN COMPLETA 👇
+        #  AGREGAR ESTA SECCIÓN COMPLETA 
         environment:
             # Conexión a Kafka (Red compartida: auth-kafka)
             - KAFKA_BROKERS=auth-kafka:9092

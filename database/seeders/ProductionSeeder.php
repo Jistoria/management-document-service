@@ -58,7 +58,7 @@ class ProductionSeeder extends Seeder
             // Seed document related entities
             $this->call(DocumentProductionSeeder::class);
 
-            $this->command->info('✅ Seeder de producción completado exitosamente');
+            $this->command->info(' Seeder de producción completado exitosamente');
         } finally {
             // Re-enable foreign key checks (PostgreSQL compatible)
             DB::unprepared('SET session_replication_role = DEFAULT;');

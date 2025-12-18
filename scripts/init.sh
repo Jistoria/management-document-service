@@ -96,11 +96,11 @@ rm -rf "$STORAGE_DIR/framework/views/"* || true
 # --- Migraciones & seeders ---
 echo "=== Ejecutando migraciones ==="
 su -s /bin/bash "$APP_USER" -c "php artisan migrate --force --no-interaction"
-echo "✅ Migraciones completadas"
+echo " Migraciones completadas"
 
 echo "=== Ejecutando seeders ==="
 su -s /bin/bash "$APP_USER" -c "php artisan db:seed --force --no-interaction"
-echo "✅ Seeders completados"
+echo " Seeders completados"
 
 # --- Cachear SOLO en producción ---
 if [ "$APP_ENV_VALUE" = "production" ]; then

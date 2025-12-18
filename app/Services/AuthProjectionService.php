@@ -13,13 +13,9 @@ final class AuthProjectionService
         $userId = $snap['id'] ?? null;
         if (!$userId) return;
 
-        // Sanitización de nulos
-        $tenantId = empty($tenantId) ? null : $tenantId;
-
         DB::table('md_auth_users')->upsert([
             [
                 'user_id'        => $userId,
-                'tenant_id'      => $tenantId, // Ahora es un campo de datos normal
                 'name'           => $snap['name']        ?? null,
                 'email'          => $snap['email']       ?? null,
                 'status'         => $snap['status']      ?? null,
@@ -29,14 +25,8 @@ final class AuthProjectionService
                 'updated_at'     => now(),
             ]
         ], 
-        // ------------------------------------------------------------------
-        // CORRECCIÓN AQUÍ: La llave única ahora es solo 'user_id'
-        // ------------------------------------------------------------------
         ['user_id'], 
-        
-        // Columnas a actualizar si el usuario ya existe
         [
-            'tenant_id', // Agregado: actualizar tenant si cambia
             'name', 
             'email', 
             'status', 
@@ -62,14 +52,9 @@ final class AuthProjectionService
 
     public function attachPermissions(?string $tenantId, ?string $userId, array $perms, ?string $grantedBy, ?string $reason): void
     {
-        // CORRECCIÓN 1: Permitir tenant_id nulo (solo validar userId)
-
-        Log::info('AttachPermissions called', ['tenantId' => $tenantId, 'userId' => $userId, 'permissions' => $perms, 'grantedBy' => $grantedBy, 'reason' => $reason]);
+        Log::info('AttachPermissions called', ['userId' => $userId, 'permissions' => $perms, 'grantedBy' => $grantedBy, 'reason' => $reason]);
 
         if (!$userId) return;
-        
-        // Sanitizar string vacío a NULL
-        $tenantId = empty($tenantId) ? null : $tenantId;
 
         // Extraer slugs limpios
         $slugs = array_values(array_unique(array_filter(array_map(fn($p) => $p['slug'] ?? null, $perms))));
@@ -82,13 +67,12 @@ final class AuthProjectionService
             ['permission_slug']
         );
 
-        // 2. Asignaciones (Upsert con lógica NULL safe)
+        // 2. Asignaciones (Upsert simplificado sin tenant_id)
         $now = now();
         $records = [];
         
         foreach ($slugs as $slug) {
             $records[] = [
-                'tenant_id'       => $tenantId,
                 'user_id'         => $userId,
                 'permission_slug' => $slug,
                 'granted_by'      => $grantedBy,
@@ -97,36 +81,24 @@ final class AuthProjectionService
             ];
         }
 
-        // CORRECCIÓN 2: Upsert usando el nuevo índice único
         DB::table('md_auth_user_permissions')->upsert(
             $records,
-            // Postgres usará el índice único (user_id, permission_slug, tenant_id) automáticamente
-            ['user_id', 'permission_slug', 'tenant_id'], 
+            ['user_id', 'permission_slug'], 
             ['granted_by', 'reason', 'created_at']
         );
     }
 
     public function detachPermissions(?string $tenantId, ?string $userId, array $perms): void
     {
-        // Sanitizar y validar
-        $userId = $userId ?: null;
-        $tenantId = empty($tenantId) ? null : $tenantId; // Convertir "" a NULL
+        if (!$userId) return;
         
         $slugs = array_values(array_unique(array_filter(array_map(fn($p) => $p['slug'] ?? null, $perms))));
         
-        if ($userId && !empty($slugs)) {
-            $query = DB::table('md_auth_user_permissions')
+        if (!empty($slugs)) {
+            DB::table('md_auth_user_permissions')
                 ->where('user_id', $userId)
-                ->whereIn('permission_slug', $slugs);
-
-            // Manejo explícito de NULL para SQL
-            if (is_null($tenantId)) {
-                $query->whereNull('tenant_id');
-            } else {
-                $query->where('tenant_id', $tenantId);
-            }
-
-            $query->delete();
+                ->whereIn('permission_slug', $slugs)
+                ->delete();
         }
     }
 
@@ -136,7 +108,6 @@ final class AuthProjectionService
         if (!$userId) return;
 
         DB::table('md_auth_users')
-            ->where('tenant_id', $tenantId)
             ->where('user_id', $userId)
             ->update(['deleted_at' => now(), 'updated_at' => now()]);
     }

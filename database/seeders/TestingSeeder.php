@@ -49,7 +49,7 @@ class TestingSeeder extends Seeder
             // Crear grupos de subsistemas y relaciones
             $this->createSubsystemGroupsAndRelationships();
 
-            $this->command->info('✅ Seeder de testing completado exitosamente');
+            $this->command->info(' Seeder de testing completado exitosamente');
         } finally {
             // Re-enable foreign key checks (PostgreSQL compatible)
             DB::unprepared('SET session_replication_role = DEFAULT;');

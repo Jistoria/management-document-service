@@ -64,19 +64,19 @@ check_docker() {
 start_db() {
     echo -e "${BLUE}🚀 Iniciando contenedor PostgreSQL...${NC}"
     docker-compose up -d postgres
-    echo -e "${GREEN}✅ Contenedor iniciado${NC}"
+    echo -e "${GREEN} Contenedor iniciado${NC}"
 
     # Esperar a que esté saludable
     echo -e "${YELLOW}⏳ Esperando a que la DB esté lista...${NC}"
     timeout 60 bash -c 'until docker-compose ps postgres | grep -q "healthy"; do sleep 2; done'
-    echo -e "${GREEN}✅ Base de datos lista${NC}"
+    echo -e "${GREEN} Base de datos lista${NC}"
 }
 
 # Función para detener el contenedor
 stop_db() {
     echo -e "${YELLOW}🛑 Deteniendo contenedor PostgreSQL...${NC}"
     docker-compose stop postgres
-    echo -e "${GREEN}✅ Contenedor detenido${NC}"
+    echo -e "${GREEN} Contenedor detenido${NC}"
 }
 
 # Función para reiniciar el contenedor
@@ -131,7 +131,7 @@ recreate_db() {
         # Ejecutar script de recreación
         docker exec -i $DB_CONTAINER psql -U $DB_USER -d $DB_NAME -f /docker-entrypoint-initdb.d/recreate_database_complete.sql
 
-        echo -e "${GREEN}✅ Base de datos recreada exitosamente${NC}"
+        echo -e "${GREEN} Base de datos recreada exitosamente${NC}"
         check_sync
     else
         echo -e "${YELLOW}❌ Operación cancelada${NC}"
@@ -145,7 +145,7 @@ backup_db() {
 
     docker exec $DB_CONTAINER pg_dump -U $DB_USER -d $DB_NAME > "$backup_file"
 
-    echo -e "${GREEN}✅ Backup creado: $backup_file${NC}"
+    echo -e "${GREEN} Backup creado: $backup_file${NC}"
     echo -e "${CYAN}📁 Tamaño: $(du -h "$backup_file" | cut -f1)${NC}"
 }
 
@@ -177,7 +177,7 @@ restore_db() {
         # Restaurar backup
         docker exec -i $DB_CONTAINER psql -U $DB_USER -d $DB_NAME < "$backup_file"
 
-        echo -e "${GREEN}✅ Backup restaurado exitosamente${NC}"
+        echo -e "${GREEN} Backup restaurado exitosamente${NC}"
         check_sync
     else
         echo -e "${YELLOW}❌ Operación cancelada${NC}"
@@ -202,7 +202,7 @@ reset_db() {
         echo -e "${BLUE}🚀 Iniciando desde cero...${NC}"
         start_db
 
-        echo -e "${GREEN}✅ Reset completo realizado${NC}"
+        echo -e "${GREEN} Reset completo realizado${NC}"
     else
         echo -e "${YELLOW}❌ Operación cancelada${NC}"
     fi

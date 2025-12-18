@@ -42,7 +42,7 @@ check_database_exists() {
         );" 2>/dev/null | xargs)
 
     if [ "$TABLE_COUNT" -eq "10" ]; then
-        echo -e "${GREEN}✅ Base de datos existe con todas las tablas principales${NC}"
+        echo -e "${GREEN} Base de datos existe con todas las tablas principales${NC}"
         return 0
     else
         echo -e "${YELLOW}⚠️  Base de datos incompleta o no existe (encontradas $TABLE_COUNT/10 tablas)${NC}"
@@ -76,8 +76,8 @@ verify_database_sync() {
     done
 
     if [ ${#MISSING_TABLES[@]} -eq 0 ]; then
-        echo -e "${GREEN}✅ Todas las tablas están presentes${NC}"
-        echo -e "${GREEN}✅ Estructura de base de datos sincronizada${NC}"
+        echo -e "${GREEN} Todas las tablas están presentes${NC}"
+        echo -e "${GREEN} Estructura de base de datos sincronizada${NC}"
         echo -e "${BLUE}ℹ️  Los datos iniciales serán cargados por Laravel Seeders${NC}"
         return 0
     else
@@ -95,7 +95,7 @@ recreate_database() {
 
         # Ejecutar el script de recreación
         if psql -U "$DB_USER" -d "$DB_NAME" -f "$SQL_SCRIPT"; then
-            echo -e "${GREEN}✅ Base de datos creada exitosamente${NC}"
+            echo -e "${GREEN} Base de datos creada exitosamente${NC}"
 
             # Verificar que todo se creó correctamente
             if verify_database_sync; then
@@ -120,7 +120,7 @@ main() {
     echo -e "${BLUE}🏁 Iniciando proceso de inicialización...${NC}"
 
     # En el contexto de docker-entrypoint-initdb.d, PostgreSQL ya está listo
-    echo -e "${GREEN}✅ PostgreSQL está listo${NC}"
+    echo -e "${GREEN} PostgreSQL está listo${NC}"
 
     # Verificar estado actual de la base de datos
     if check_database_exists; then

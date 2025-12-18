@@ -84,7 +84,7 @@ function Test-Docker {
 function Start-Database {
     Write-ColorOutput "🚀 Iniciando contenedor PostgreSQL..." "Blue"
     docker-compose up -d postgres
-    Write-ColorOutput "✅ Contenedor iniciado" "Green"
+    Write-ColorOutput " Contenedor iniciado" "Green"
 
     # Esperar a que esté saludable
     Write-ColorOutput "⏳ Esperando a que la DB esté lista..." "Yellow"
@@ -97,7 +97,7 @@ function Start-Database {
     } while (-not $status -and $elapsed -lt $timeout)
 
     if ($status) {
-        Write-ColorOutput "✅ Base de datos lista" "Green"
+        Write-ColorOutput " Base de datos lista" "Green"
     } else {
         Write-ColorOutput "⚠️ Timeout esperando la base de datos" "Yellow"
     }
@@ -107,7 +107,7 @@ function Start-Database {
 function Stop-Database {
     Write-ColorOutput "🛑 Deteniendo contenedor PostgreSQL..." "Yellow"
     docker-compose stop postgres
-    Write-ColorOutput "✅ Contenedor detenido" "Green"
+    Write-ColorOutput " Contenedor detenido" "Green"
 }
 
 # Función para reiniciar el contenedor
@@ -161,7 +161,7 @@ function Reset-Database {
         # Ejecutar script de recreación
         docker exec -i $DB_CONTAINER psql -U $DB_USER -d $DB_NAME -f /docker-entrypoint-initdb.d/recreate_database_complete.sql
 
-        Write-ColorOutput "✅ Base de datos recreada exitosamente" "Green"
+        Write-ColorOutput " Base de datos recreada exitosamente" "Green"
         Test-Sync
     } else {
         Write-ColorOutput "❌ Operación cancelada" "Yellow"
@@ -176,7 +176,7 @@ function New-Backup {
 
     docker exec $DB_CONTAINER pg_dump -U $DB_USER -d $DB_NAME | Out-File -FilePath $backupFile -Encoding UTF8
 
-    Write-ColorOutput "✅ Backup creado: $backupFile" "Green"
+    Write-ColorOutput " Backup creado: $backupFile" "Green"
     $size = (Get-Item $backupFile).Length / 1MB
     Write-ColorOutput "📁 Tamaño: $([math]::Round($size, 2)) MB" "Cyan"
 }
@@ -208,7 +208,7 @@ function Restore-Backup {
         # Restaurar backup
         Get-Content $BackupFile | docker exec -i $DB_CONTAINER psql -U $DB_USER -d $DB_NAME
 
-        Write-ColorOutput "✅ Backup restaurado exitosamente" "Green"
+        Write-ColorOutput " Backup restaurado exitosamente" "Green"
         Test-Sync
     } else {
         Write-ColorOutput "❌ Operación cancelada" "Yellow"
@@ -236,7 +236,7 @@ function Reset-Complete {
         Write-ColorOutput "🚀 Iniciando desde cero..." "Blue"
         Start-Database
 
-        Write-ColorOutput "✅ Reset completo realizado" "Green"
+        Write-ColorOutput " Reset completo realizado" "Green"
     } else {
         Write-ColorOutput "❌ Operación cancelada" "Yellow"
     }

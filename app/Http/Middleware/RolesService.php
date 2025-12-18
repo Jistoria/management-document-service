@@ -39,10 +39,31 @@ class RolesService
         // 2. Validación de Permisos (Contra la Tabla Espejo Local)
         $hasPermission = $this->checkLocalPermission($userId, $permission);
 
+        // 3. Fallback a Redis si Kafka está caído (no hay permisos en BD)
+        if (!$hasPermission) {
+            $redisPermissions = $request->attributes->get('redis_permissions', []);
+            
+            if (!empty($redisPermissions)) {
+                $requiredPermission = 'md.' . $permission;
+                $hasPermission = in_array($requiredPermission, $redisPermissions);
+                
+                if ($hasPermission) {
+                    Log::info('[RolesService] Permiso validado desde Redis (Kafka fallback)', [
+                        'user_id'    => $userId,
+                        'permission' => $requiredPermission
+                    ]);
+                    
+                    // Sincronizar permisos de Redis a BD en background
+                    $this->syncRedisPermissionsToDB($userId, $redisPermissions);
+                }
+            }
+        }
+
         if (!$hasPermission) {
             Log::warning('[RolesService] Acceso Denegado', [
                 'user_id'    => $userId,
-                'permission' => $permission
+                'permission' => $permission,
+                'checked_redis' => !empty($request->attributes->get('redis_permissions', []))
             ]);
 
             return ApiResponse::error('No tienes permisos para realizar esta acción.', 403);
@@ -61,5 +82,41 @@ class RolesService
             ->where('user_id', $userId)
             ->where('permission_slug', 'md.'.$permission)
             ->exists();
+    }
+
+    /**
+     * Sincroniza permisos de Redis a la base de datos local.
+     * Se ejecuta en background cuando se usa fallback de Redis.
+     */
+    private function syncRedisPermissionsToDB(string $userId, array $redisPermissions): void
+    {
+        try {
+            // Usar el servicio de proyección para sincronizar
+            $authProjection = app(\App\Services\AuthProjectionService::class);
+            
+            // Convertir array de strings a array de objetos con 'slug'
+            $permissionsArray = array_map(fn($slug) => ['slug' => $slug], $redisPermissions);
+            
+            // Sincronizar sin tenant (null), con metadata de fallback
+            $authProjection->attachPermissions(
+                tenantId: null,
+                userId: $userId,
+                perms: $permissionsArray,
+                grantedBy: null, // granted_by es UUID, dejarlo nulo para fallback
+                reason: 'Sincronización automática desde Redis (Kafka caído)'
+            );
+            
+            Log::info('[RolesService] Permisos sincronizados desde Redis a BD', [
+                'user_id' => $userId,
+                'count' => count($redisPermissions)
+            ]);
+            
+        } catch (\Exception $e) {
+            // No fallar la request si la sincronización falla
+            Log::error('[RolesService] Error al sincronizar permisos desde Redis', [
+                'user_id' => $userId,
+                'error' => $e->getMessage()
+            ]);
+        }
     }
 }

@@ -126,6 +126,6 @@ class BaseInstitutionSeeder extends Seeder
             ]
         );
 
-        $this->command->info("✅ Estructura base creada: Sede, Facultad, Carreras y Subsistema Docencia");
+        $this->command->info(" Estructura base creada: Sede, Facultad, Carreras y Subsistema Docencia");
     }
 }

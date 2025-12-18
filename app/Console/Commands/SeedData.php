@@ -55,7 +55,7 @@ class SeedData extends Command
 
             $this->info('🔄 Refrescando base de datos...');
             Artisan::call('migrate:refresh', [], $this->getOutput());
-            $this->info('✅ Base de datos refrescada');
+            $this->info(' Base de datos refrescada');
         }
 
         // Ejecutar seeders según el tipo
@@ -94,7 +94,7 @@ class SeedData extends Command
         ], $this->getOutput());
 
         if ($exitCode === 0) {
-            $this->info('✅ ProductionSeeder completado exitosamente');
+            $this->info(' ProductionSeeder completado exitosamente');
         } else {
             $this->error('❌ Error ejecutando ProductionSeeder');
         }
@@ -112,7 +112,7 @@ class SeedData extends Command
         ], $this->getOutput());
 
         if ($exitCode === 0) {
-            $this->info('✅ TestingSeeder completado exitosamente');
+            $this->info(' TestingSeeder completado exitosamente');
         } else {
             $this->error('❌ Error ejecutando TestingSeeder');
         }

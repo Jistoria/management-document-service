@@ -28,3 +28,6 @@ php artisan make:migration fix_md_auth_users_schema
 php artisan migrate
 php artisan migrate
 exit
+php artisan make:controller SyncExportController
+exir
+exit

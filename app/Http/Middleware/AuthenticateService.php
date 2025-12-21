@@ -28,14 +28,71 @@ class AuthenticateService
             return response()->json(['message' => 'Falta el token'], 401);
         }
 
+        $hash = hash('sha256', $token);
+        $session = null;
+        $tokenType = null;
         $decodedToken = null;
+
+        // ---------------------------------------------------------
+        // PASO 1: Intentar obtener sesión desde Redis (ya validada por auth-service)
+        // ---------------------------------------------------------
+        try {
+            $redisData = Redis::get("laravel_database_session:{$hash}");
+            
+            if ($redisData) {
+                $session = json_decode($redisData, true);
+                $tokenType = $session['token_type'] ?? null;
+                
+                Log::info("[AuthenticateService] ✅ Token encontrado en Redis", [
+                    'token_type' => $tokenType,
+                    'user_id' => $session['user_id'] ?? 'unknown',
+                    'source' => 'redis_cache'
+                ]);
+
+                // Extraer permisos del microservicio management-document-service
+                $msData = $session['microservices_data']['by_code']['management-document-service'] ?? null;
+                if ($msData) {
+                    $redisPermissions = $msData['permissions'] ?? [];
+                    Log::info("[AuthenticateService] Permisos encontrados en Redis", [
+                        'count' => count($redisPermissions),
+                        'permissions' => $redisPermissions
+                    ]);
+                    $request->attributes->set('redis_permissions', $redisPermissions);
+                }
+
+                // Decodificar payload del token para uso interno (sin validar firma, ya fue validado)
+                try {
+                    $parts = explode('.', $token);
+                    if (count($parts) === 3) {
+                        $payload = json_decode(base64_decode(strtr($parts[1], '-_', '+/')), true);
+                        $decodedToken = (object) $payload;
+                    }
+                } catch (\Exception $e) {
+                    Log::warning('[AuthenticateService] No se pudo decodificar payload del token');
+                }
+
+                // Inyectar atributos al request
+                $request->attributes->set('token_hash', $hash);
+                $request->attributes->set('jwt_payload', $decodedToken);
+                $request->attributes->set('session', $session);
+                $request->attributes->set('auth_source', 'redis_cache');
+                $request->attributes->set('token_type', $tokenType);
+
+                return $next($request);
+            }
+
+            Log::warning("[AuthenticateService] ⚠️ Token NO encontrado en Redis - Fallback a validación criptográfica");
+
+        } catch (Exception $e) {
+            Log::error('[AuthenticateService] Error al consultar Redis: ' . $e->getMessage());
+        }
+
+        // ---------------------------------------------------------
+        // PASO 2: Fallback - Validación Criptográfica (si no está en Redis)
+        // ---------------------------------------------------------
         $tokenType = $this->detectTokenType($token);
+        Log::info("[AuthenticateService] Validando token manualmente", ['type' => $tokenType]);
 
-        Log::info("[AuthenticateService] Token detectado", ['type' => $tokenType]);
-
-        // ---------------------------------------------------------
-        // PASO 1: Validación Criptográfica según tipo de token
-        // ---------------------------------------------------------
         try {
             if ($tokenType === 'microsoft') {
                 $decodedToken = $this->validateMicrosoftToken($token);
@@ -55,56 +112,19 @@ class AuthenticateService
             ], 401);
         }
 
-        // ---------------------------------------------------------
-        // PASO 2: Enriquecimiento con Redis
-        // ---------------------------------------------------------
-        $hash = hash('sha256', $token);
-        $session = null;
-        $source = 'token_fallback';
-
-        try {
-            // Intenta leer sesión de Redis (solo loguea error si falla la conexión)
-            $redisData = Redis::get("laravel_database_session:{$hash}");
-            Log::info("[AuthenticateService] Sesión obtenida: " . ($redisData ? '' : '❌ No encontrada en Redis'));
-            if ($redisData) {
-                $session = json_decode($redisData, true);
-                $source = 'redis_cache';
-                
-                // Extraer permisos del microservicio management-document-service
-                $msData = $session['microservices_data']['by_code']['management-document-service'] ?? null;
-                if ($msData) {
-                    $redisPermissions = $msData['permissions'] ?? [];
-                    Log::info("[AuthenticateService] Permisos encontrados en Redis", [
-                        'count' => count($redisPermissions),
-                        'permissions' => $redisPermissions
-                    ]);
-                    // Inyectar permisos en el request para uso de fallback
-                    $request->attributes->set('redis_permissions', $redisPermissions);
-                }
-            }
-        } catch (Exception $e) {
-            Log::error('[AuthenticateService] Redis no disponible: ' . $e->getMessage());
-        }
-
-        // ---------------------------------------------------------
-        // PASO 3: Fusión y Fallback
-        // ---------------------------------------------------------
-        if (!$session) {
-            // Si Redis falla o no tiene la sesión, usamos los datos del JWT validado
-            $session = [
-                'user_id' => $decodedToken->sub ?? null,
-                'scopes'  => $decodedToken->scopes ?? [],
-                // Mapea otros campos necesarios que vengan en tu token
-            ];
-        }
+        // Construir sesión mínima desde el token decodificado
+        $session = [
+            'user_id' => $decodedToken->sub ?? $decodedToken->oid ?? null,
+            'scopes'  => $decodedToken->scopes ?? [],
+            'token_type' => $tokenType,
+        ];
 
         // Inyectar atributos al request
         $request->attributes->set('token_hash', $hash);
         $request->attributes->set('jwt_payload', $decodedToken);
         $request->attributes->set('session', $session);
-        $request->attributes->set('auth_source', $source);
-
-        
+        $request->attributes->set('auth_source', 'token_fallback');
+        $request->attributes->set('token_type', $tokenType);
 
         return $next($request);
     }

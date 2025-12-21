@@ -6,6 +6,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Microsoft Azure AD Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for validating Microsoft Azure AD tokens
+    |
+    */
+
+    'microsoft_tenant_id' => env('AZURE_TENANT_ID'),
+    'azure_allowed_azp' => env('AZURE_ALLOWED_AZP'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Authentication Defaults
     |--------------------------------------------------------------------------
     |

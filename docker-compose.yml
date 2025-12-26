@@ -114,6 +114,7 @@ services:
             - app
         networks:
             - management-net
+            - thesis-net
 
     #   queue:
     #       image: management-app
@@ -180,7 +181,7 @@ services:
 
 volumes:
     postgres_data:
-    vendor-data: # <--- AGREGADO
+    vendor-data: 
 
 networks:
     thesis-net:

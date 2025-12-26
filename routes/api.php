@@ -14,6 +14,7 @@ use App\Http\Controllers\MetadataFieldController;
 use App\Http\Controllers\MetadataSchemaController;
 use App\Http\Controllers\StorageUnitController;
 use App\Http\Controllers\StorageUnitTypeController;
+use App\Http\Controllers\SyncExportController;
 use Illuminate\Support\Facades\Route;
 
 // Head Offices Routes
@@ -307,6 +308,7 @@ Route::get('/departments/{departmentId}/careers', [CareerController::class, 'get
 //     Route::get('/secure/data', fn() => response()->json(['ok' => true]));
 // });
 
+Route::get('/internal/sync-master-data', [SyncExportController::class, 'export']);
 
 Route::fallback(function () {
     return response()->json(['message' => 'API connection successful.']);

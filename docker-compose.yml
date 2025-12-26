@@ -181,7 +181,7 @@ services:
 
 volumes:
     postgres_data:
-    vendor-data: # <--- AGREGADO
+    vendor-data: 
 
 networks:
     thesis-net:

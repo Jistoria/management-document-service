@@ -28,7 +28,7 @@ class ProductionSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->command->info('🏭 Iniciando seeder de producción...');
+        $this->command->info('Iniciando seeder de producción...');
 
         // Disable foreign key checks for faster seeding (PostgreSQL compatible)
         DB::unprepared('SET session_replication_role = replica;');

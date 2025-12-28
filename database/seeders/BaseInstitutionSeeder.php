@@ -24,16 +24,16 @@ class BaseInstitutionSeeder extends Seeder
         // =========================================================================
         // 1) HEAD OFFICE (Sede)
         // =========================================================================
-        $headOfficeId = DB::table('head_offices')->where('code', 'ULEAM-MAN')->value('id') 
+        $headOfficeId = DB::table('head_offices')->where('code', 'ULEAM-MAT')->value('id') 
             ?: (string) Str::uuid7();
 
         DB::table('head_offices')->updateOrInsert(
-            ['code' => 'ULEAM-MAN'],
+            ['code' => 'ULEAM-MAT'], // MAT para identificar que es la Matriz
             [
                 'id'           => $headOfficeId,
-                'name'         => 'ULEAM Extensión Manta',
-                'code'         => 'ULEAM-MAN',
-                'code_numeric' => null,
+                'name'         => 'ULEAM Sede Matriz Manta', // Nombre institucional correcto
+                'code'         => 'ULEAM-MAT',
+                'code_numeric' => '174',
                 'created_at'   => $now,
                 'updated_at'   => $now,
                 'version'      => 1,
@@ -68,22 +68,24 @@ class BaseInstitutionSeeder extends Seeder
 
         // =========================================================================
         // 3) CAREERS (Carreras vigentes)
-        // =========================================================================
+        // ========================================================================= 
         $careers = [
-            ['name' => 'Agropecuaria',                   'code_numeric' => '213.1'],
-            ['name' => 'Ingeniería en Agropecuaria',     'code_numeric' => '213.2'],
-            ['name' => 'Agronegocios',                   'code_numeric' => '213.4'],
-            ['name' => 'Agroindustria',                  'code_numeric' => '213.5'],
-            ['name' => 'Ingeniería Ambiental',           'code_numeric' => '213.7'],
-            ['name' => 'Tecnologías de la Información',  'code_numeric' => '213.9'],
-            ['name' => 'Software',                       'code_numeric' => '213.11'],
-            ['name' => 'Biología',                       'code_numeric' => '213.14'],
-            ['name' => 'Alimentos',                      'code_numeric' => '213.17'],
+            ['name' => 'Agropecuaria',                  'code' => 'AGR',  'code_numeric' => '213.1'],
+            ['name' => 'Ingeniería en Agropecuaria',    'code' => 'IAGR', 'code_numeric' => '213.2'], // (o AGR según malla)
+            ['name' => 'Agronegocios',                  'code' => 'AGRN', 'code_numeric' => '213.4'],
+            ['name' => 'Agroindustria',                 'code' => 'AGRI', 'code_numeric' => '213.5'],
+            ['name' => 'Ingeniería Ambiental',          'code' => 'IAMB', 'code_numeric' => '213.7'],
+            ['name' => 'Tecnologías de la Información', 'code' => 'TDI',  'code_numeric' => '213.9'],
+            ['name' => 'Software',                      'code' => 'SOFT', 'code_numeric' => '213.11'],
+            ['name' => 'Biología',                      'code' => 'BIOL', 'code_numeric' => '213.14'],
+            ['name' => 'Alimentos',                     'code' => 'ALIM', 'code_numeric' => '213.17'],
         ];
 
+    
         foreach ($careers as $c) {
-            $careerCode = Str::of($c['name'])->upper()->slug('_')->value();
-            
+            // code ahora es la abreviatura oficial
+            $careerCode = strtoupper(trim($c['code']));
+
             DB::table('careers')->updateOrInsert(
                 ['department_id' => $deptId, 'code' => $careerCode],
                 [
@@ -91,10 +93,12 @@ class BaseInstitutionSeeder extends Seeder
                         ->where('department_id', $deptId)
                         ->where('code', $careerCode)
                         ->value('id') ?: (string) Str::uuid7(),
+
                     'department_id' => $deptId,
                     'name'          => $c['name'],
                     'code'          => $careerCode,
                     'code_numeric'  => $c['code_numeric'],
+
                     'created_at'    => $now,
                     'updated_at'    => $now,
                     'version'       => 1,
@@ -103,7 +107,6 @@ class BaseInstitutionSeeder extends Seeder
                 ]
             );
         }
-
         // =========================================================================
         // 4) SUBSYSTEM: DOCENCIA (code = 'A')
         //    Este es el único lugar donde se crea el subsistema

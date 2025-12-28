@@ -15,11 +15,10 @@ class ProcessCategoryResource extends BaseResource
             'subsystemId' => $this->subsystem_id,
             'createdAt' => $this->created_at?->toISOString(),
             'updatedAt' => $this->updated_at?->toISOString(),
-            'processes' => ProcessResource::collection($this->whenLoaded('processes')),
-            'subsystem' => SubsystemResource::make($this->whenLoaded('subsystem')),
+            'processes' => ProcessResource::collection($this->whenLoaded('processesRoot') ?? $this->whenLoaded('processes')),
             'processesCount' => $this->when(
-                $this->relationLoaded('processes'), 
-                fn() => $this->processes->count()
+                $this->relationLoaded('processesRoot') || $this->relationLoaded('processes'),
+                fn() => ($this->processesRoot?->count() ?? 0) + ($this->processes?->count() ?? 0)
             ),
         ];
     }

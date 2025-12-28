@@ -30,7 +30,7 @@ class ProcessResource extends BaseResource
                 $this->relationLoaded('parent'),
                 fn () => new ProcessResource($this->parent)
             ),
-            'children' => ProcessResource::collection($this->whenLoaded('children')),
+            'subProcesses' => ProcessResource::collection($this->whenLoaded('children')),
             'requiredDocuments' => RequiredDocumentResource::collection($this->whenLoaded('requiredDocuments')),
         ];
     }

@@ -79,6 +79,14 @@ class ProcessCategory extends Model
         return $this->hasMany(Process::class);
     }
 
+    /** 
+     * Get the processes root for this process category.
+     */
+    public function processesRoot(): HasMany
+    {
+        return $this->hasMany(Process::class)->whereNull('parent_id');
+    }
+
     /**
      * Get active processes for this process category.
      */

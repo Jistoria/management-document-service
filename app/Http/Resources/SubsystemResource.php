@@ -16,6 +16,7 @@ class SubsystemResource extends BaseResource
             'createdBy' => $this->created_by,
             'updatedBy' => $this->updated_by,
             'version' => $this->version,
+            'processCategories' => ProcessCategoryResource::collection($this->whenLoaded('processCategories')),
             'createdAt' => $this->created_at?->toISOString(),
             'updatedAt' => $this->updated_at?->toISOString(),
             'countCareers' => $this->careers->count(),

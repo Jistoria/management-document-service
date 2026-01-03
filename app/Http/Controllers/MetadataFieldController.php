@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Constants\EntityType;
+use App\Constants\MetadataFieldDataType;
 use App\Constants\TypeInput;
 use App\Helpers\ApiIndexBuilder;
 use App\Http\Requests\MetadataField\FiltersMetadataFieldRequest;
@@ -241,15 +242,7 @@ class MetadataFieldController extends Controller
     public function getEntityTypes(): JsonResponse
     {
         return catchSync(function () {
-            $entityTypes = [];
-            foreach (EntityType::all() as $id) {
-                $entityTypes[] = [
-                    'id' => $id,
-                    'key' => EntityType::getKey($id),
-                    'label' => EntityType::getLabel($id),
-                ];
-            }
-            return $entityTypes;
+            return $this->buildEntityTypes();
         }, 'Entity types catalog retrieved successfully');
     }
 
@@ -280,15 +273,104 @@ class MetadataFieldController extends Controller
     public function getTypeInputs(): JsonResponse
     {
         return catchSync(function () {
-            $typeInputs = [];
-            foreach (TypeInput::all() as $id) {
-                $typeInputs[] = [
-                    'id' => $id,
-                    'key' => TypeInput::getKey($id),
-                    'label' => TypeInput::getLabel($id),
-                ];
-            }
-            return $typeInputs;
+            return $this->buildTypeInputs();
         }, 'Type inputs catalog retrieved successfully');
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/metadata-fields/catalogs/data-types",
+     *     summary="Get data types catalog",
+     *     tags={"Metadata Fields"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Data types catalog retrieved successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Data types catalog retrieved successfully"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     @OA\Property(property="key", type="string", example="string"),
+     *                     @OA\Property(property="label", type="string", example="string")
+     *                 )
+     *             )
+     *         )
+     *     )
+     * )
+     */
+    public function getDataTypes(): JsonResponse
+    {
+        return catchSync(function () {
+            return $this->buildDataTypes();
+        }, 'Data types catalog retrieved successfully');
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/metadata-fields/catalogs",
+     *     summary="Get all metadata catalogs",
+     *     tags={"Metadata Fields"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Metadata catalogs retrieved successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Metadata catalogs retrieved successfully"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="entityTypes", type="array", @OA\Items(type="object")),
+     *                 @OA\Property(property="typeInputs", type="array", @OA\Items(type="object")),
+     *                 @OA\Property(property="dataTypes", type="array", @OA\Items(type="object"))
+     *             )
+     *         )
+     *     )
+     * )
+     */
+    public function getCatalogs(): JsonResponse
+    {
+        return catchSync(function () {
+            return [
+                'entityTypes' => $this->buildEntityTypes(),
+                'typeInputs' => $this->buildTypeInputs(),
+                'dataTypes' => $this->buildDataTypes(),
+            ];
+        }, 'Metadata catalogs retrieved successfully');
+    }
+
+    private function buildEntityTypes(): array
+    {
+        $entityTypes = [];
+        foreach (EntityType::all() as $id) {
+            $entityTypes[] = [
+                'id' => $id,
+                'key' => EntityType::getKey($id),
+                'label' => EntityType::getLabel($id),
+            ];
+        }
+        return $entityTypes;
+    }
+
+    private function buildTypeInputs(): array
+    {
+        $typeInputs = [];
+        foreach (TypeInput::all() as $id) {
+            $typeInputs[] = [
+                'id' => $id,
+                'key' => TypeInput::getKey($id),
+                'label' => TypeInput::getLabel($id),
+            ];
+        }
+        return $typeInputs;
+    }
+
+    private function buildDataTypes(): array
+    {
+        return array_map(
+            fn (string $type) => ['key' => $type, 'label' => $type],
+            MetadataFieldDataType::ALL
+        );
     }
 }

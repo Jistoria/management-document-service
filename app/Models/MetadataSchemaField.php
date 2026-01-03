@@ -19,6 +19,10 @@ class MetadataSchemaField extends Pivot
         'metadata_schema_id',
         'metadata_field_id',
         'is_required',
+        'is_repeatable',
+        'min_occurs',
+        'max_occurs',
+        'allow_duplicates',
         'sort_order',
         'default_value',
         'created_by',
@@ -27,7 +31,11 @@ class MetadataSchemaField extends Pivot
 
     protected $casts = [
         'is_required' => 'boolean',
+        'is_repeatable' => 'boolean',
+        'allow_duplicates' => 'boolean',
         'sort_order' => 'integer',
+        'min_occurs' => 'integer',
+        'max_occurs' => 'integer',
     ];
 
     public function metadataSchema(): BelongsTo

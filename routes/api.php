@@ -241,7 +241,11 @@ Route::prefix('metadata-schemas')->group(function () {
 // Metadata Fields Routes
 Route::prefix('metadata-fields')->group(function () {
     // Catalogs must be before {metadata_field} to avoid route conflicts
+    Route::get('/catalogs', [MetadataFieldController::class, 'getCatalogs'])
+        ->middleware(['auth.service', 'permission:metadata_field.read']);
     Route::get('/catalogs/entity-types', [MetadataFieldController::class, 'getEntityTypes'])
+        ->middleware(['auth.service', 'permission:metadata_field.read']);
+    Route::get('/catalogs/data-types', [MetadataFieldController::class, 'getDataTypes'])
         ->middleware(['auth.service', 'permission:metadata_field.read']);
     Route::get('/catalogs/type-inputs', [MetadataFieldController::class, 'getTypeInputs'])
         ->middleware(['auth.service', 'permission:metadata_field.read']);

@@ -255,6 +255,10 @@ CREATE TABLE public.metadata_schema_fields (
     metadata_schema_id uuid NOT NULL,
     metadata_field_id uuid NOT NULL,
     is_required boolean DEFAULT false NOT NULL,
+    is_repeatable boolean DEFAULT false NOT NULL,
+    min_occurs integer DEFAULT 0 NOT NULL,
+    max_occurs integer,
+    allow_duplicates boolean DEFAULT true NOT NULL,
     sort_order integer,
     default_value text,
     created_by character varying(255),
@@ -265,7 +269,8 @@ CREATE TABLE public.metadata_schema_fields (
     CONSTRAINT metadata_schema_fields_schema_id_foreign FOREIGN KEY (metadata_schema_id) REFERENCES metadata_schemas(id) ON DELETE CASCADE,
     CONSTRAINT metadata_schema_fields_field_id_foreign FOREIGN KEY (metadata_field_id) REFERENCES metadata_fields(id) ON DELETE CASCADE,
     CONSTRAINT metadata_schema_fields_unique_schema_field UNIQUE (metadata_schema_id, metadata_field_id),
-    CONSTRAINT chk_metadata_schema_fields_sort_order_positive CHECK (sort_order IS NULL OR sort_order > 0)
+    CONSTRAINT chk_metadata_schema_fields_sort_order_positive CHECK (sort_order IS NULL OR sort_order > 0),
+    CONSTRAINT chk_metadata_schema_fields_occurs_valid CHECK (max_occurs IS NULL OR max_occurs >= min_occurs)
 );
 
 -- Tabla: Eventos del sistema de metadatos para auditoría

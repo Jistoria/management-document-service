@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
                 AdmissionMatriculaDocumentsSeeder::class,
                 DocenciaStudentDevelopmentSeeder::class,
                 Pap01002MetadataSeeder::class,
+                UniversityMetadataFieldsSeeder::class,
             ]);
         } else {
             // Datos de prueba para desarrollo/testing
@@ -37,6 +38,7 @@ class DatabaseSeeder extends Seeder
                 AdmissionMatriculaDocumentsSeeder::class,
                 DocenciaStudentDevelopmentSeeder::class,
                 Pap01002MetadataSeeder::class,
+                UniversityMetadataFieldsSeeder::class,
             ]);
         }
     }

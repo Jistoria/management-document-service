@@ -74,7 +74,7 @@ class MetadataSchema extends Model
     {
         return $this->belongsToMany(MetadataField::class, 'metadata_schema_fields', 'metadata_schema_id', 'metadata_field_id')
             ->using(MetadataSchemaField::class)
-            ->withPivot(['id', 'is_required', 'sort_order', 'default_value'])
+            ->withPivot(['id', 'is_required', 'is_repeatable', 'min_occurs', 'max_occurs', 'allow_duplicates', 'sort_order', 'default_value'])
             ->withTimestamps()
             ->orderBy('metadata_schema_fields.sort_order');
     }

@@ -36,7 +36,7 @@ class MetadataFieldController extends Controller
      *     @OA\Parameter(name="data_type", in="query", description="Filter by data type", @OA\Schema(type="string")),
      *     @OA\Parameter(name="entity_type_id", in="query", description="Filter by entity type ID", @OA\Schema(type="integer")),
      *     @OA\Parameter(name="type_input_id", in="query", description="Filter by type input ID", @OA\Schema(type="integer")),
-     *     @OA\Parameter(name="withoutSchemaId", in="query", description="Return fields without schema association", @OA\Schema(type="boolean")),
+     *     @OA\Parameter(name="withoutSchemaId", in="query", description="Return fields that do not belong to the provided schema ID", @OA\Schema(type="string", format="uuid")),
      *     @OA\Response(
      *         response=200,
      *         description="Metadata fields retrieved successfully",

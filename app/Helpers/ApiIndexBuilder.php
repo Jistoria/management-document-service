@@ -189,12 +189,6 @@ class ApiIndexBuilder
             }
         }
 
-        if ($request->has('withoutSchemaId')) {
-            $filters['without_schema_id'] = $request->boolean('withoutSchemaId');
-        } elseif ($request->has('without_schema_id')) {
-            $filters['without_schema_id'] = $request->boolean('without_schema_id');
-        }
-
         return $filters;
     }
 

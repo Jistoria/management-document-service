@@ -118,7 +118,10 @@ class MetadataFieldService
         }
 
         if (!empty($filters['without_schema_id'])) {
-            $query->whereDoesntHave('metadataSchemas');
+            $schemaId = $filters['without_schema_id'];
+            $query->whereDoesntHave('metadataSchemas', function (Builder $subQuery) use ($schemaId) {
+                $subQuery->where('metadata_schemas.id', $schemaId);
+            });
         }
         
         $query->when(!empty($filters['schema_id']), function (Builder $q) use ($filters) {

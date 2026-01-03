@@ -116,6 +116,10 @@ class MetadataFieldService
         if (!empty($filters['entity_type_id'])) {
             $query->where('entity_type_id', (int) $filters['entity_type_id']);
         }
+
+        if (!empty($filters['without_schema_id'])) {
+            $query->whereDoesntHave('metadataSchemas');
+        }
         
         $query->when(!empty($filters['schema_id']), function (Builder $q) use ($filters) {
             $schemaId = $filters['schema_id'];

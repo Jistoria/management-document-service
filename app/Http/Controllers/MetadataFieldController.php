@@ -36,6 +36,7 @@ class MetadataFieldController extends Controller
      *     @OA\Parameter(name="data_type", in="query", description="Filter by data type", @OA\Schema(type="string")),
      *     @OA\Parameter(name="entity_type_id", in="query", description="Filter by entity type ID", @OA\Schema(type="integer")),
      *     @OA\Parameter(name="type_input_id", in="query", description="Filter by type input ID", @OA\Schema(type="integer")),
+     *     @OA\Parameter(name="withoutSchemaId", in="query", description="Return fields without schema association", @OA\Schema(type="boolean")),
      *     @OA\Response(
      *         response=200,
      *         description="Metadata fields retrieved successfully",
@@ -54,7 +55,7 @@ class MetadataFieldController extends Controller
                 $this->metadataFieldService,
                 MetadataFieldResource::class,
                 $request,
-                ApiIndexBuilder::extractFilters($request, ['field_key', 'data_type', 'type_input_id', 'entity_type_id', 'schema_id'])
+                ApiIndexBuilder::extractFilters($request, ['field_key', 'data_type', 'type_input_id', 'entity_type_id', 'schema_id', 'without_schema_id'])
             );
         }, 'Metadata fields retrieved successfully');
     }

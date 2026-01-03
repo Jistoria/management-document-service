@@ -173,6 +173,7 @@ class ApiIndexBuilder
             'documentTypeId' => 'document_type_id',
             'academicRoleId' => 'academic_role_id',
             'metadataSchemaId' => 'metadata_schema_id',
+            'withoutSchemaId' => 'without_schema_id',
             'isPublic' => 'is_public',
             'externalUserId' => 'external_user_id',
             'externalOrganizationId' => 'external_organization_id',
@@ -186,6 +187,12 @@ class ApiIndexBuilder
             } elseif ($request->filled($snakeCase)) {
                 $filters[$snakeCase] = $request->input($snakeCase);
             }
+        }
+
+        if ($request->has('withoutSchemaId')) {
+            $filters['without_schema_id'] = $request->boolean('withoutSchemaId');
+        } elseif ($request->has('without_schema_id')) {
+            $filters['without_schema_id'] = $request->boolean('without_schema_id');
         }
 
         return $filters;

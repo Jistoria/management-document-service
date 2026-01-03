@@ -120,6 +120,10 @@ class MetadataSchemaService
 
             $pivotData[$fieldId] = [
                 'is_required' => $fieldData['is_required'] ?? false,
+                'is_repeatable' => $fieldData['is_repeatable'] ?? false,
+                'min_occurs' => $fieldData['min_occurs'] ?? 0,
+                'max_occurs' => $fieldData['max_occurs'] ?? null,
+                'allow_duplicates' => $fieldData['allow_duplicates'] ?? true,
                 'sort_order' => $fieldData['sort_order'] ?? null,
                 'default_value' => $fieldData['default_value'] ?? null,
             ];
@@ -130,4 +134,3 @@ class MetadataSchemaService
         }
     }
 }
-

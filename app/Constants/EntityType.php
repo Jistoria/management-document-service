@@ -16,6 +16,7 @@ class EntityType
     public const DOCUMENT = 5;
     public const PROCESS = 6;
     public const ACADEMIC_ROLE = 7;
+    public const PERSON = 8;
 
     /**
      * Get all entity type IDs
@@ -32,6 +33,7 @@ class EntityType
             self::DOCUMENT,
             self::PROCESS,
             self::ACADEMIC_ROLE,
+            self::PERSON,
         ];
     }
 
@@ -51,6 +53,7 @@ class EntityType
             self::DOCUMENT => 'Documento',
             self::PROCESS => 'Proceso',
             self::ACADEMIC_ROLE => 'Rol Académico',
+            self::PERSON => 'Persona',
             default => 'Desconocido',
         };
     }
@@ -71,6 +74,7 @@ class EntityType
             self::DOCUMENT => 'document',
             self::PROCESS => 'process',
             self::ACADEMIC_ROLE => 'academic_role',
+            self::PERSON => 'person',
             default => 'unknown',
         };
     }
@@ -90,6 +94,7 @@ class EntityType
             'document' => 'Documento',
             'process' => 'Proceso',
             'academic_role' => 'Rol Académico',
+            'person' => 'Persona',
         ];
     }
 

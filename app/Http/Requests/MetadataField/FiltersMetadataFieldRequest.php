@@ -26,6 +26,8 @@ class FiltersMetadataFieldRequest extends DefaultFiltersRequest
             'entity_type_id' => ['nullable', 'uuid'],
             'is_reference' => ['nullable', 'boolean'],
             'schema_id' => ['nullable', 'uuid'],
+            'without_schema_id' => ['nullable', 'uuid'],
+            'withoutSchemaId' => ['nullable', 'uuid'],
         ]);
     }
 

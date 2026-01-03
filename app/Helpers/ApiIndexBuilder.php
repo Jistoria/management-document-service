@@ -173,6 +173,7 @@ class ApiIndexBuilder
             'documentTypeId' => 'document_type_id',
             'academicRoleId' => 'academic_role_id',
             'metadataSchemaId' => 'metadata_schema_id',
+            'withoutSchemaId' => 'without_schema_id',
             'isPublic' => 'is_public',
             'externalUserId' => 'external_user_id',
             'externalOrganizationId' => 'external_organization_id',

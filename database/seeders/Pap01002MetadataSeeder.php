@@ -135,11 +135,16 @@ class Pap01002MetadataSeeder extends Seeder
                 ->exists();
 
             if (! $exists) {
+                $isRequired = true;
                 DB::table('metadata_schema_fields')->insert([
                     'id'                  => (string) Str::uuid(),
                     'metadata_schema_id'  => $schemaId,
                     'metadata_field_id'   => $fieldId,
-                    'is_required'         => true,
+                    'is_required'         => $isRequired,
+                    'is_repeatable'       => false,
+                    'min_occurs'          => $isRequired ? 1 : 0,
+                    'max_occurs'          => 1,
+                    'allow_duplicates'    => true,
                     'sort_order'          => $sortOrder++,
                     'default_value'       => null,
                     'created_by'          => 'system',

@@ -31,3 +31,7 @@ exit
 php artisan make:controller SyncExportController
 exir
 exit
+php artisan l5-swagger:generate
+exit
+php artisan tinker
+exit

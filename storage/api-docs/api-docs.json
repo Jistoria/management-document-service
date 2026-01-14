@@ -8730,6 +8730,18 @@
                         "type": "integer",
                         "example": 1
                     },
+                    "templatePath": {
+                        "description": "Ruta de la plantilla del documento en MinIO",
+                        "type": "string",
+                        "example": "system-templates/1df8f8b0-6618-4cfc-80db-0410b1d5d1e4.docx",
+                        "nullable": true
+                    },
+                    "templateFilename": {
+                        "description": "Nombre original del archivo de plantilla",
+                        "type": "string",
+                        "example": "PAP-01-F-002-Registro-Actividades-Diarias-del-Estudiante.docx",
+                        "nullable": true
+                    },
                     "createdBy": {
                         "description": "Usuario que creó el documento",
                         "type": "string",
@@ -8851,6 +8863,20 @@
                         "type": "integer",
                         "minimum": 0,
                         "nullable": true
+                    },
+                    "templatePath": {
+                        "description": "Ruta de la plantilla del documento en MinIO (proporcionada por el microservicio de almacenamiento)",
+                        "type": "string",
+                        "maxLength": 500,
+                        "example": "system-templates/1df8f8b0-6618-4cfc-80db-0410b1d5d1e4.docx",
+                        "nullable": true
+                    },
+                    "templateFilename": {
+                        "description": "Nombre original del archivo de plantilla para mostrar en descarga",
+                        "type": "string",
+                        "maxLength": 255,
+                        "example": "PAP-01-F-002-Registro-Actividades-Diarias-del-Estudiante.docx",
+                        "nullable": true
                     }
                 },
                 "type": "object"
@@ -8895,6 +8921,20 @@
                         "description": "Orden en el que se solicita el documento",
                         "type": "integer",
                         "minimum": 0,
+                        "nullable": true
+                    },
+                    "templatePath": {
+                        "description": "Ruta de la plantilla del documento en MinIO (proporcionada por el microservicio de almacenamiento)",
+                        "type": "string",
+                        "maxLength": 500,
+                        "example": "system-templates/1df8f8b0-6618-4cfc-80db-0410b1d5d1e4.docx",
+                        "nullable": true
+                    },
+                    "templateFilename": {
+                        "description": "Nombre original del archivo de plantilla para mostrar en descarga",
+                        "type": "string",
+                        "maxLength": 255,
+                        "example": "PAP-01-F-002-Registro-Actividades-Diarias-del-Estudiante.docx",
                         "nullable": true
                     }
                 },

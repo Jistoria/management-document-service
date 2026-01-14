@@ -23,6 +23,8 @@ class RequiredDocumentResource extends BaseResource
             'codeDefault' => $this->code_default,
             'urlResource' => $this->url_resource,
             'isPublic' => (bool) $this->is_public,
+            'templatePath' => $this->template_path,
+            'templateFilename' => $this->template_filename,
             'createdAt' => $this->created_at?->toISOString(),
             'updatedAt' => $this->updated_at?->toISOString(),
             'createdBy' => $this->createdBy,

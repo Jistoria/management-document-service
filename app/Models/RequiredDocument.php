@@ -24,6 +24,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $code_default
  * @property bool $is_public
  * @property string $url_resource
+ * @property string|null $template_path
+ * @property string|null $template_filename
  * @property string $created_by
  * @property string $updated_by
  * @property string deleted_by
@@ -52,6 +54,8 @@ class RequiredDocument extends Model
         'is_public',
         'metadata_schema_id',
         'order',
+        'template_path',
+        'template_filename',
         'created_by',
         'updated_by'
     ];

@@ -22,6 +22,8 @@ class UpdateRequiredDocumentRequest extends BaseFormRequest
             'urlResource' => ['sometimes', 'nullable', 'string'],
             'isPublic' => ['sometimes', 'boolean'],
             'order' => ['sometimes', 'integer', 'min:0'],
+            'templatePath' => ['sometimes', 'nullable', 'string', 'max:500'],
+            'templateFilename' => ['sometimes', 'nullable', 'string', 'max:255'],
         ];
     }
 
@@ -51,6 +53,11 @@ class UpdateRequiredDocumentRequest extends BaseFormRequest
             'order.integer' => 'El orden debe ser un número entero',
             'order.min' => 'El orden no puede ser negativo',
 
+            'templatePath.string' => 'La ruta de la plantilla debe ser una cadena de texto',
+            'templatePath.max' => 'La ruta de la plantilla no puede exceder 500 caracteres',
+
+            'templateFilename.string' => 'El nombre de archivo de la plantilla debe ser una cadena de texto',
+            'templateFilename.max' => 'El nombre de archivo de la plantilla no puede exceder 255 caracteres',
         ];
     }
 
@@ -65,6 +72,8 @@ class UpdateRequiredDocumentRequest extends BaseFormRequest
             'urlResource' => 'URL del recurso',
             'isPublic' => 'visibilidad pública',
             'order' => 'orden',
+            'templatePath' => 'ruta de la plantilla',
+            'templateFilename' => 'nombre de archivo de la plantilla',
         ];
     }
 

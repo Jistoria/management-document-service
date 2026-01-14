@@ -138,6 +138,8 @@ namespace App\Http\Controllers;
  *     @OA\Property(property="urlResource", type="string", nullable=true, example="https://example.com/templates/doc.pdf", description="URL del recurso de referencia"),
  *     @OA\Property(property="isPublic", type="boolean", example=false, description="Indica si el documento es visible públicamente"),
  *     @OA\Property(property="order", type="integer", example=1, description="Orden de presentación"),
+ *     @OA\Property(property="templatePath", type="string", nullable=true, example="system-templates/1df8f8b0-6618-4cfc-80db-0410b1d5d1e4.docx", description="Ruta de la plantilla del documento en MinIO"),
+ *     @OA\Property(property="templateFilename", type="string", nullable=true, example="PAP-01-F-002-Registro-Actividades-Diarias-del-Estudiante.docx", description="Nombre original del archivo de plantilla"),
  *     @OA\Property(property="createdBy", type="string", nullable=true, example="system", description="Usuario que creó el documento"),
  *     @OA\Property(property="updatedBy", type="string", nullable=true, example="admin", description="Usuario que actualizó el documento"),
  *     @OA\Property(property="createdAt", type="string", format="date-time", example="2024-05-01T12:00:00Z", description="Fecha de creación"),
@@ -175,6 +177,8 @@ namespace App\Http\Controllers;
  *     @OA\Property(property="urlResource", type="string", nullable=true, description="URL del recurso de referencia"),
  *     @OA\Property(property="isPublic", type="boolean", nullable=true, description="Visibilidad pública del documento"),
  *     @OA\Property(property="order", type="integer", minimum=0, nullable=true, description="Orden en el que se solicita el documento"),
+ *     @OA\Property(property="templatePath", type="string", maxLength=500, nullable=true, description="Ruta de la plantilla del documento en MinIO (proporcionada por el microservicio de almacenamiento)", example="system-templates/1df8f8b0-6618-4cfc-80db-0410b1d5d1e4.docx"),
+ *     @OA\Property(property="templateFilename", type="string", maxLength=255, nullable=true, description="Nombre original del archivo de plantilla para mostrar en descarga", example="PAP-01-F-002-Registro-Actividades-Diarias-del-Estudiante.docx"),
  * )
  *
  * @OA\Schema(
@@ -188,6 +192,8 @@ namespace App\Http\Controllers;
  *     @OA\Property(property="urlResource", type="string", nullable=true, description="URL del recurso de referencia"),
  *     @OA\Property(property="isPublic", type="boolean", nullable=true, description="Visibilidad pública del documento"),
  *     @OA\Property(property="order", type="integer", minimum=0, nullable=true, description="Orden en el que se solicita el documento"),
+ *     @OA\Property(property="templatePath", type="string", maxLength=500, nullable=true, description="Ruta de la plantilla del documento en MinIO (proporcionada por el microservicio de almacenamiento)", example="system-templates/1df8f8b0-6618-4cfc-80db-0410b1d5d1e4.docx"),
+ *     @OA\Property(property="templateFilename", type="string", maxLength=255, nullable=true, description="Nombre original del archivo de plantilla para mostrar en descarga", example="PAP-01-F-002-Registro-Actividades-Diarias-del-Estudiante.docx"),
  * )
  *
  * @OA\Schema(

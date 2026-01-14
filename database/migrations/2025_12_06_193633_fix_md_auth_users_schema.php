@@ -30,18 +30,25 @@ return new class extends Migration
         if (str_contains($currentPK, 'tenant_id') && str_contains($currentPK, 'user_id')) {
             DB::statement('ALTER TABLE md_auth_users DROP CONSTRAINT md_auth_users_pkey');
             DB::statement('ALTER TABLE md_auth_users ADD PRIMARY KEY (user_id)');
-            
+
             // Agregar índice para búsquedas por tenant si no existe
             $indexExists = DB::select(
-                "SELECT indexname FROM pg_indexes 
-                 WHERE tablename = 'md_auth_users' 
+                "SELECT indexname FROM pg_indexes
+                 WHERE tablename = 'md_auth_users'
                  AND indexname = 'md_auth_users_tenant_id_user_id_index'"
             );
-            
+
             if (empty($indexExists)) {
                 DB::statement('CREATE INDEX md_auth_users_tenant_id_user_id_index ON md_auth_users (tenant_id, user_id)');
             }
         }
+
+        Schema::table('required_documents', function (Blueprint $table) {
+            // Ruta del archivo en MinIO
+            $table->string('template_path')->nullable()->after('description');
+            // Nombre original para mostrar en el botón de descarga (ej: "Formato_Tesis_v2.docx")
+            $table->string('template_filename')->nullable()->after('template_path');
+        });
     }
 
     public function down(): void

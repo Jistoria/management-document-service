@@ -78,19 +78,25 @@ class DatabaseSeeder extends Seeder
                 // - Documentos requeridos: PVV-02-F-001 a PVV-02-F-007
 
                 // ─────────────────────────────────────────────────────────────
-                // PASO 5: Metadatos de Documentos Específicos
-                // ─────────────────────────────────────────────────────────────
-                Pap01002MetadataSeeder::class,
-                // Crea esquema de metadatos para PAP-01-F-002 (Docencia)
-
-                VinculacionPvv02002MetadataSeeder::class,
-                // Crea esquema de metadatos para PVV-02-F-002 (Vinculación)
-
-                // ─────────────────────────────────────────────────────────────
-                // PASO 6: Campos de Metadatos Genéricos
+                // PASO 5: Campos de Metadatos Genéricos (ANTES de los esquemas)
                 // ─────────────────────────────────────────────────────────────
                 UniversityMetadataFieldsSeeder::class,
                 // Crea campos de metadatos reutilizables para toda la universidad
+
+                // ─────────────────────────────────────────────────────────────
+                // PASO 6: Esquemas de Metadatos (DESPUÉS de los campos)
+                // ─────────────────────────────────────────────────────────────
+                Pap01002MetadataSeeder::class,
+                // Crea esquema de metadatos general para PAP-01 (Docencia)
+
+                VinculacionPvv02002MetadataSeeder::class,
+                // Crea esquema de metadatos específico para PVV-02-F-002 (Vinculación)
+
+                AdmissionMatriculaMetadataSeeder::class,
+                // Crea esquema de metadatos general para PAM-04 (Admisión/Matrícula)
+
+                VinculacionDefaultMetadataSeeder::class,
+                // Crea esquema de metadatos general para documentos PVV-02 sin schema
             ]);
 
             $this->command->info(" Seeders de producción ejecutados exitosamente");
@@ -109,9 +115,11 @@ class DatabaseSeeder extends Seeder
                 AdmissionMatriculaDocumentsSeeder::class,
                 DocenciaStudentDevelopmentSeeder::class,
                 VinculacionGestionConocimientoSeeder::class,
+                UniversityMetadataFieldsSeeder::class,
                 Pap01002MetadataSeeder::class,
                 VinculacionPvv02002MetadataSeeder::class,
-                UniversityMetadataFieldsSeeder::class,
+                AdmissionMatriculaMetadataSeeder::class,
+                VinculacionDefaultMetadataSeeder::class,
             ]);
 
             $this->command->info(" Seeders de desarrollo ejecutados exitosamente");
@@ -128,7 +136,8 @@ class DatabaseSeeder extends Seeder
         $this->command->info("   • 4 Subsystems (Docencia, Investigación, Vinculación, Gestión)");
         $this->command->info("   • Procesos de Docencia (Graduación, Admisión, Desarrollo Estudiantil)");
         $this->command->info("   • Procesos de Vinculación (Gestión del Conocimiento)");
-        $this->command->info("   • Metadatos para PAP-01-F-002 y PVV-02-F-002");
+        $this->command->info("   • Esquemas de metadatos para PAP-01, PAM-04 y PVV-02");
         $this->command->info("   • Campos de metadatos universitarios genéricos");
+        $this->command->info("   • Todos los documentos con tipos y esquemas asignados");
     }
 }

@@ -21,7 +21,6 @@ class RequiredDocumentResource extends BaseResource
             'documentTypeId' => $this->document_type_id,
             'metadataSchemaId' => $this->metadata_schema_id,
             'codeDefault' => $this->code_default,
-            'urlResource' => $this->url_resource,
             'isPublic' => (bool) $this->is_public,
             'templatePath' => $this->template_path,
             'templateFilename' => $this->template_filename,

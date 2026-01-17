@@ -296,7 +296,6 @@ CREATE TABLE public.required_documents (
     code_default text DEFAULT 'S/C' NOT NULL,
     name text DEFAULT 'S/N' NOT NULL,
     "order" integer DEFAULT 0 NOT NULL,
-    url_resource text,
     is_public boolean DEFAULT false NOT NULL,
     created_at timestamp(0) without time zone,
     updated_at timestamp(0) without time zone,

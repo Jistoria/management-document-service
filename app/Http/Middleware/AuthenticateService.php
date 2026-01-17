@@ -43,7 +43,7 @@ class AuthenticateService
                 $session = json_decode($redisData, true);
                 $tokenType = $session['token_type'] ?? null;
                 
-                Log::info("[AuthenticateService] ✅ Token encontrado en Redis", [
+                Log::info("[AuthenticateService]  Token encontrado en Redis", [
                     'token_type' => $tokenType,
                     'user_id' => $session['user_id'] ?? 'unknown',
                     'source' => 'redis_cache'

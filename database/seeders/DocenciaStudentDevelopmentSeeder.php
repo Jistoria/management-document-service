@@ -114,16 +114,26 @@ class DocenciaStudentDevelopmentSeeder extends Seeder
 
         // --- Documentos PAP-01-F-001 ... PAP-01-F-006  =>  PAP-01-001 ... PAP-01-006
         $docs = [
-            ['n' => 1, 'name' => 'Planificación Semestral de Prácticas Preprofesionales'],
-            ['n' => 2, 'name' => 'Registro Actividades Diarias del Estudiante'],
-            ['n' => 3, 'name' => 'Ficha para Supervisar al Estudiante'],
-            ['n' => 4, 'name' => 'Informe Final del Estudiante'],
-            ['n' => 5, 'name' => 'Evaluación General de Prácticas y Pasantías'],
-            ['n' => 6, 'name' => 'Solicitud de prácticas preprofesionales'],
+            ['n' => 1, 'name' => 'Planificación Semestral de Prácticas Preprofesionales', 'type_code' => 'PLAN'],
+            ['n' => 2, 'name' => 'Registro Actividades Diarias del Estudiante', 'type_code' => 'REG'],
+            ['n' => 3, 'name' => 'Ficha para Supervisar al Estudiante', 'type_code' => 'EVAL'],
+            ['n' => 4, 'name' => 'Informe Final del Estudiante', 'type_code' => 'INF'],
+            ['n' => 5, 'name' => 'Evaluación General de Prácticas y Pasantías', 'type_code' => 'EVAL'],
+            ['n' => 6, 'name' => 'Solicitud de prácticas preprofesionales', 'type_code' => 'SOL'],
         ];
+
+        // Obtener los IDs de los tipos de documentos
+        $docTypeIds = DB::table('document_types')
+            ->whereIn('code', ['PLAN', 'REG', 'EVAL', 'INF', 'SOL'])
+            ->pluck('id', 'code');
 
         foreach ($docs as $d) {
             $codeDefault = sprintf('%s-%03d', $subprocCode, $d['n']); // PAP-01-001, ...
+            $documentTypeId = $docTypeIds[$d['type_code']] ?? null;
+
+            if (!$documentTypeId) {
+                throw new \RuntimeException("Tipo de documento '{$d['type_code']}' no encontrado. Ejecuta AdditionalDocumentTypesSeeder primero.");
+            }
 
             // Solo insertar si no existe
             $existingDoc = DB::table('required_documents')
@@ -133,14 +143,15 @@ class DocenciaStudentDevelopmentSeeder extends Seeder
 
             if (!$existingDoc) {
                 DB::table('required_documents')->insert([
-                    'id'           => (string) Str::uuid7(),
-                    'process_id'   => $subprocId,
-                    'name'         => $d['name'],
-                    'code_default' => $codeDefault,
-                    'created_at'   => $now,
-                    'updated_at'   => $now,
-                    'created_by'   => 'system',
-                    'updated_by'   => 'system',
+                    'id'               => (string) Str::uuid7(),
+                    'process_id'       => $subprocId,
+                    'document_type_id' => $documentTypeId,
+                    'name'             => $d['name'],
+                    'code_default'     => $codeDefault,
+                    'created_at'       => $now,
+                    'updated_at'       => $now,
+                    'created_by'       => 'system',
+                    'updated_by'       => 'system',
                 ]);
             }
         }

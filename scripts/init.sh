@@ -48,7 +48,7 @@ if [ ! -f "vendor/autoload.php" ]; then
   chown -R "$APP_USER:$APP_GROUP" "$VENDOR_DIR" || true
   chmod -R 775 "$VENDOR_DIR" || true
 else
-  echo "ℹ️  Dependencias ya instaladas, se omite Composer install."
+  echo "  Dependencias ya instaladas, se omite Composer install."
 fi
 # --- Espera de dependencias ---
 wait_for_service() {

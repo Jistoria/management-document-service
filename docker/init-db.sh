@@ -78,7 +78,7 @@ verify_database_sync() {
     if [ ${#MISSING_TABLES[@]} -eq 0 ]; then
         echo -e "${GREEN} Todas las tablas están presentes${NC}"
         echo -e "${GREEN} Estructura de base de datos sincronizada${NC}"
-        echo -e "${BLUE}ℹ️  Los datos iniciales serán cargados por Laravel Seeders${NC}"
+        echo -e "${BLUE}  Los datos iniciales serán cargados por Laravel Seeders${NC}"
         return 0
     else
         echo -e "${RED}❌ Faltan tablas: ${MISSING_TABLES[*]}${NC}"

@@ -21,7 +21,6 @@ trait HasCamelCaseAttributes
         'templatePath' => 'template_path',
         'templateFilename' => 'template_filename',
         'codeDefault' => 'code_default',
-        'urlResource' => 'url_resource',
         'isPublic' => 'is_public',  
         'createdBy' => 'created_by',
         'updatedBy' => 'updated_by',

@@ -23,7 +23,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property int $order
  * @property string $code_default
  * @property bool $is_public
- * @property string $url_resource
  * @property string|null $template_path
  * @property string|null $template_filename
  * @property string $created_by
@@ -50,7 +49,6 @@ class RequiredDocument extends Model
         'document_type_id',
         'academic_role_id',
         'code_default',
-        'url_resource',
         'is_public',
         'metadata_schema_id',
         'order',

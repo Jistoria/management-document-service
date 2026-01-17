@@ -117,14 +117,23 @@ class AdmissionMatriculaDocumentsSeeder extends Seeder
         //     Solo insertar si no existen
         // ------------------------------------------------------------------------------
         $docs = [
-            ['n' => 1, 'name' => 'Solicitud tercera matrícula'],
-            ['n' => 2, 'name' => 'Acta de compromiso tercera matrícula'],
-            ['n' => 3, 'name' => 'Solicitud de matrícula especial'],
-            ['n' => 4, 'name' => 'Solicitud exoneración costo matrícula'],
-            ['n' => 5, 'name' => 'Solicitud de retiro de asignaturas por causa fortuita o fuerza mayor'],
-            ['n' => 6, 'name' => 'Solicitud matrícula excepcional'],
-            ['n' => 7, 'name' => 'Solicitud para retiro de asignatura aplicabilidad de la resolución RPC-SE-03-No. 046-2020 CES'],
+            ['n' => 1, 'name' => 'Solicitud tercera matrícula', 'type_code' => 'SOL'],
+            ['n' => 2, 'name' => 'Acta de compromiso tercera matrícula', 'type_code' => 'SOL'],
+            ['n' => 3, 'name' => 'Solicitud de matrícula especial', 'type_code' => 'SOL'],
+            ['n' => 4, 'name' => 'Solicitud exoneración costo matrícula', 'type_code' => 'SOL'],
+            ['n' => 5, 'name' => 'Solicitud de retiro de asignaturas por causa fortuita o fuerza mayor', 'type_code' => 'SOL'],
+            ['n' => 6, 'name' => 'Solicitud matrícula excepcional', 'type_code' => 'SOL'],
+            ['n' => 7, 'name' => 'Solicitud para retiro de asignatura aplicabilidad de la resolución RPC-SE-03-No. 046-2020 CES', 'type_code' => 'SOL'],
         ];
+
+        // Obtener el ID del tipo de documento Solicitud
+        $solTypeId = DB::table('document_types')
+            ->where('code', 'SOL')
+            ->value('id');
+
+        if (!$solTypeId) {
+            throw new \RuntimeException('Tipo de documento "SOL" (Solicitud) no encontrado. Ejecuta AdditionalDocumentTypesSeeder primero.');
+        }
 
         foreach ($docs as $i => $d) {
             $codeDefault = sprintf('%s-%03d', $subprocCode, $d['n']); // PAM-04-001, ...
@@ -137,14 +146,15 @@ class AdmissionMatriculaDocumentsSeeder extends Seeder
 
             if (!$existingDoc) {
                 DB::table('required_documents')->insert([
-                    'id'           => (string) Str::uuid7(),
-                    'process_id'   => $subprocId,
-                    'name'         => $d['name'],
-                    'code_default' => $codeDefault,
-                    'created_at'   => $now,
-                    'updated_at'   => $now,
-                    'created_by'   => 'system',
-                    'updated_by'   => 'system',
+                    'id'               => (string) Str::uuid7(),
+                    'process_id'       => $subprocId,
+                    'document_type_id' => $solTypeId,
+                    'name'             => $d['name'],
+                    'code_default'     => $codeDefault,
+                    'created_at'       => $now,
+                    'updated_at'       => $now,
+                    'created_by'       => 'system',
+                    'updated_by'       => 'system',
                 ]);
             }
         }

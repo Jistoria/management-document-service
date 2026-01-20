@@ -260,6 +260,7 @@ CREATE TABLE public.metadata_schema_fields (
     max_occurs integer,
     allow_duplicates boolean DEFAULT true NOT NULL,
     sort_order integer,
+    regexs text,
     default_value text,
     created_by character varying(255),
     updated_by character varying(255),

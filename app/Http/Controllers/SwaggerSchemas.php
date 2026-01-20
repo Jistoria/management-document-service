@@ -870,6 +870,225 @@ namespace App\Http\Controllers;
  *         nullable=true
  *     )
  * )
+ *
+ * ========================================================================
+ * PUBLIC API SCHEMAS (Sin información sensible)
+ * ========================================================================
+ *
+ * @OA\Schema(
+ *     schema="PublicHeadOffice",
+ *     type="object",
+ *     title="Public Head Office",
+ *     description="Sede - Vista pública sin información sensible",
+ *     @OA\Property(
+ *         property="id",
+ *         type="string",
+ *         format="uuid",
+ *         example="0197d795-7572-7331-903b-3aeed9fb34c2",
+ *         description="ID único de la sede"
+ *     ),
+ *     @OA\Property(
+ *         property="code",
+ *         type="string",
+ *         example="CENTRAL",
+ *         description="Código único de la sede"
+ *     ),
+ *     @OA\Property(
+ *         property="name",
+ *         type="string",
+ *         example="Sede Central",
+ *         description="Nombre de la sede"
+ *     ),
+ *     @OA\Property(
+ *         property="departmentsCount",
+ *         type="integer",
+ *         example=5,
+ *         description="Número de departamentos asociados",
+ *         nullable=true
+ *     )
+ * )
+ *
+ * @OA\Schema(
+ *     schema="PublicDepartment",
+ *     type="object",
+ *     title="Public Department",
+ *     description="Departamento - Vista pública sin información sensible",
+ *     @OA\Property(
+ *         property="id",
+ *         type="string",
+ *         format="uuid",
+ *         example="8015bc21-9a48-4b9c-a552-71d1f6f6fb15"
+ *     ),
+ *     @OA\Property(property="code", type="string", example="INFO"),
+ *     @OA\Property(property="name", type="string", example="Departamento de Informática"),
+ *     @OA\Property(
+ *         property="headOffice",
+ *         type="object",
+ *         nullable=true,
+ *         @OA\Property(property="id", type="string", format="uuid"),
+ *         @OA\Property(property="name", type="string"),
+ *         @OA\Property(property="code", type="string")
+ *     ),
+ *     @OA\Property(property="careersCount", type="integer", example=3, nullable=true)
+ * )
+ *
+ * @OA\Schema(
+ *     schema="PublicCareer",
+ *     type="object",
+ *     title="Public Career",
+ *     description="Carrera - Vista pública sin información sensible",
+ *     @OA\Property(
+ *         property="id",
+ *         type="string",
+ *         format="uuid",
+ *         example="310331bc-9201-472f-8d23-26ebcd3a8fdf"
+ *     ),
+ *     @OA\Property(property="code", type="string", example="ISIST"),
+ *     @OA\Property(property="name", type="string", example="Ingeniería de Sistemas"),
+ *     @OA\Property(
+ *         property="department",
+ *         type="object",
+ *         nullable=true,
+ *         @OA\Property(property="id", type="string", format="uuid"),
+ *         @OA\Property(property="name", type="string"),
+ *         @OA\Property(property="code", type="string")
+ *     ),
+ *     @OA\Property(
+ *         property="headOffice",
+ *         type="object",
+ *         nullable=true,
+ *         @OA\Property(property="id", type="string", format="uuid"),
+ *         @OA\Property(property="name", type="string"),
+ *         @OA\Property(property="code", type="string")
+ *     )
+ * )
+ *
+ * @OA\Schema(
+ *     schema="PublicProcessCategory",
+ *     type="object",
+ *     title="Public Process Category",
+ *     description="Categoría de proceso - Vista pública",
+ *     @OA\Property(
+ *         property="id",
+ *         type="string",
+ *         format="uuid",
+ *         example="550e8400-e29b-41d4-a716-446655440000"
+ *     ),
+ *     @OA\Property(property="code", type="string", example="ADMISIONES"),
+ *     @OA\Property(property="name", type="string", example="Procesos de Admisiones"),
+ *     @OA\Property(property="description", type="string", example="Categoría para procesos relacionados con admisiones", nullable=true),
+ *     @OA\Property(property="processesCount", type="integer", example=10, nullable=true)
+ * )
+ *
+ * @OA\Schema(
+ *     schema="PublicDocumentType",
+ *     type="object",
+ *     title="Public Document Type",
+ *     description="Tipo de documento - Vista pública",
+ *     @OA\Property(
+ *         property="id",
+ *         type="string",
+ *         format="uuid",
+ *         example="0197d795-7572-7331-903b-3aeed9fb34c2"
+ *     ),
+ *     @OA\Property(property="code", type="string", example="CERT_ACAD"),
+ *     @OA\Property(property="name", type="string", example="Certificado Académico"),
+ *     @OA\Property(
+ *         property="description",
+ *         type="string",
+ *         example="Certificado de estudios académicos",
+ *         nullable=true
+ *     )
+ * )
+ *
+ * @OA\Schema(
+ *     schema="PublicDropdownResponse",
+ *     type="object",
+ *     title="Public Dropdown Response",
+ *     description="Respuesta de dropdown para endpoints públicos",
+ *     @OA\Property(
+ *         property="options",
+ *         type="array",
+ *         @OA\Items(
+ *             type="object",
+ *             @OA\Property(
+ *                 property="value",
+ *                 type="string",
+ *                 format="uuid",
+ *                 example="8015bc21-9a48-4b9c-a552-71d1f6f6fb15"
+ *             ),
+ *             @OA\Property(property="label", type="string", example="Sede Central"),
+ *             @OA\Property(property="code", type="string", example="CENTRAL")
+ *         )
+ *     ),
+ *     @OA\Property(property="count", type="integer", example=10)
+ * )
+ *
+ * @OA\Schema(
+ *     schema="PublicCollectionResponse",
+ *     type="object",
+ *     title="Public Collection Response",
+ *     description="Respuesta de colección para endpoints públicos",
+ *     @OA\Property(
+ *         property="data",
+ *         type="array",
+ *         @OA\Items(
+ *             oneOf={
+ *                 @OA\Schema(ref="#/components/schemas/PublicHeadOffice"),
+ *                 @OA\Schema(ref="#/components/schemas/PublicDepartment"),
+ *                 @OA\Schema(ref="#/components/schemas/PublicCareer"),
+ *                 @OA\Schema(ref="#/components/schemas/PublicProcessCategory"),
+ *                 @OA\Schema(ref="#/components/schemas/PublicDocumentType")
+ *             }
+ *         )
+ *     ),
+ *     @OA\Property(property="count", type="integer", example=15)
+ * )
+ *
+ * @OA\Schema(
+ *     schema="PublicMinimalResponse",
+ *     type="object",
+ *     title="Public Minimal Response",
+ *     description="Respuesta minimal para endpoints públicos",
+ *     @OA\Property(
+ *         property="data",
+ *         type="array",
+ *         @OA\Items(
+ *             type="object",
+ *             @OA\Property(property="id", type="string", format="uuid"),
+ *             @OA\Property(property="code", type="string"),
+ *             @OA\Property(property="name", type="string")
+ *         )
+ *     ),
+ *     @OA\Property(property="count", type="integer", example=10)
+ * )
+ *
+ * @OA\Schema(
+ *     schema="PublicSuccessResponse",
+ *     type="object",
+ *     title="Public Success Response",
+ *     description="Respuesta exitosa estándar para API pública",
+ *     @OA\Property(property="success", type="boolean", example=true),
+ *     @OA\Property(property="message", type="string", example="Datos obtenidos exitosamente"),
+ *     @OA\Property(
+ *         property="data",
+ *         description="Datos de respuesta (puede ser objeto, array, o estructura específica)"
+ *     )
+ * )
+ *
+ * @OA\Schema(
+ *     schema="RateLimitError",
+ *     type="object",
+ *     title="Rate Limit Error",
+ *     description="Error cuando se excede el límite de peticiones (429 Too Many Requests)",
+ *     @OA\Property(property="success", type="boolean", example=false),
+ *     @OA\Property(
+ *         property="message",
+ *         type="string",
+ *         example="Demasiadas solicitudes. Por favor, intente nuevamente en un minuto."
+ *     ),
+ *     @OA\Property(property="error", type="string", example="rate_limit_exceeded")
+ * )
  */
 class SwaggerSchemas
 {

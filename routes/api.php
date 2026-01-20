@@ -15,7 +15,48 @@ use App\Http\Controllers\MetadataSchemaController;
 use App\Http\Controllers\StorageUnitController;
 use App\Http\Controllers\StorageUnitTypeController;
 use App\Http\Controllers\SyncExportController;
+use App\Http\Controllers\Public\PublicCatalogController;
 use Illuminate\Support\Facades\Route;
+
+/*
+|--------------------------------------------------------------------------
+| Public Routes (No Authentication Required)
+|--------------------------------------------------------------------------
+| 
+| Endpoints públicos para frontend sin autenticación.
+| Solo expone datos seguros (id, code, name) sin información sensible.
+| Rate limited a 60 requests por minuto por IP.
+|
+*/
+Route::prefix('public')
+    ->middleware('throttle:public-api')
+    ->group(function () {
+    
+    // Head Offices - Sedes
+    Route::get('/head-offices', [PublicCatalogController::class, 'headOffices']);
+    Route::get('/head-offices/{id}', [PublicCatalogController::class, 'showHeadOffice']);
+    
+    // Departments - Departamentos
+    Route::get('/departments', [PublicCatalogController::class, 'departments']);
+    Route::get('/departments/{id}', [PublicCatalogController::class, 'showDepartment']);
+    
+    // Careers - Carreras
+    Route::get('/careers', [PublicCatalogController::class, 'careers']);
+    Route::get('/careers/{id}', [PublicCatalogController::class, 'showCareer']);
+    Route::get('/departments/{id}/careers', [PublicCatalogController::class, 'careersByDepartment']);
+    
+    // Process Categories - Categorías de Procesos
+    Route::get('/process-categories', [PublicCatalogController::class, 'processCategories']);
+    
+    // Document Types - Tipos de Documentos
+    Route::get('/document-types', [PublicCatalogController::class, 'documentTypes']);
+});
+
+/*
+|--------------------------------------------------------------------------
+| Protected Routes (Authentication Required)
+|--------------------------------------------------------------------------
+*/
 
 // Head Offices Routes
 Route::prefix('head-offices')->group(function () {

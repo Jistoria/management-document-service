@@ -299,26 +299,6 @@ CREATE TABLE metadata_schema_events (
 -- CONFIGURACIÓN DE MICROSERVICIOS
 -- =====================================================================================
 
--- Tabla: Configuración de APIs externas
-CREATE TABLE external_apis (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    service_name VARCHAR(255) NOT NULL,
-    base_url VARCHAR(500) NOT NULL,
-    auth_method VARCHAR(50) NOT NULL,
-    timeout_seconds INTEGER DEFAULT 30,
-    retry_attempts INTEGER DEFAULT 3,
-    is_active BOOLEAN DEFAULT true NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    created_by VARCHAR(255),
-    updated_by VARCHAR(255),
-    -- Constraints
-    CONSTRAINT chk_auth_method
-        CHECK (auth_method IN ('bearer', 'basic', 'api_key', 'oauth2')),
-    CONSTRAINT chk_timeout_positive CHECK (timeout_seconds > 0),
-    CONSTRAINT chk_retry_non_negative CHECK (retry_attempts >= 0)
-);
-
 -- Tabla: Migraciones de Laravel
 CREATE TABLE migrations (
     id SERIAL PRIMARY KEY,
@@ -360,10 +340,6 @@ CREATE INDEX idx_head_offices_code_active
 
 CREATE INDEX idx_subsystems_code_active
     ON subsystems(code) WHERE deleted_at IS NULL;
-
--- Índices para APIs externas
-CREATE INDEX idx_external_apis_service_active
-    ON external_apis(service_name) WHERE is_active = true;
 
 -- =====================================================================================
 -- FUNCIONES Y TRIGGERS
@@ -519,7 +495,6 @@ COMMENT ON TABLE head_offices IS 'Sedes principales de la organización';
 COMMENT ON TABLE departments IS 'Departamentos que pertenecen a las sedes';
 COMMENT ON TABLE careers IS 'Carreras académicas que pertenecen a los departamentos';
 COMMENT ON TABLE subsystems IS 'Subsistemas del sistema de gestión documental';
-COMMENT ON TABLE external_apis IS 'Configuración de APIs externas para integración entre microservicios';
 COMMENT ON TABLE metadata_schemas IS 'Esquemas de metadatos con versionado y herencia';
 COMMENT ON MATERIALIZED VIEW mv_process_hierarchy IS 'Vista materializada con jerarquía completa de procesos para consultas optimizadas';
 
@@ -535,18 +510,10 @@ COMMENT ON COLUMN metadata_schemas.cache_ttl IS 'TTL en segundos para cache de m
 COMMENT ON COLUMN metadata_schema_events.correlation_id IS 'ID para tracing distribuido entre microservicios';
 COMMENT ON COLUMN metadata_schema_events.external_user_id IS 'Usuario desde microservicio externo';
 COMMENT ON COLUMN metadata_schema_events.service_version IS 'Versión del servicio que hizo el cambio';
-COMMENT ON COLUMN external_apis.auth_method IS 'Método de autenticación: bearer, basic, api_key, oauth2';
 
 -- =====================================================================================
 -- DATOS INICIALES DE CONFIGURACIÓN
 -- =====================================================================================
-
--- Configuración inicial de APIs externas
-INSERT INTO external_apis (service_name, base_url, auth_method, timeout_seconds, created_by) VALUES
-('auth-service', 'https://auth.example.com/api/v1', 'bearer', 30, 'system'),
-('user-service', 'https://users.example.com/api/v1', 'bearer', 30, 'system'),
-('file-storage-service', 'https://storage.example.com/api/v1', 'api_key', 60, 'system'),
-('notification-service', 'https://notifications.example.com/api/v1', 'bearer', 15, 'system');
 
 -- Esquema de metadatos del sistema
 INSERT INTO metadata_schemas (id, name, description, is_canonical, version, created_by) VALUES

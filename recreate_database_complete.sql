@@ -425,7 +425,7 @@ CREATE TABLE public.inbox_events (
 
 -- 2) Usuarios espejo
 CREATE TABLE public.md_auth_users (
-  tenant_id       uuid NULL,
+  tenant_id       varchar(255) NULL,
   user_id         uuid NOT NULL,
   guid_ms         uuid NULL,
   name            text NULL,
@@ -447,7 +447,7 @@ CREATE TABLE public.md_auth_permissions (
 
 -- 4) Asignación usuario-permiso (por tenant)
 CREATE TABLE public.md_auth_user_permissions (
-  tenant_id       uuid NULL,
+  tenant_id       varchar(255) NULL,
   user_id         uuid NOT NULL,
   permission_slug text NOT NULL REFERENCES md_auth_permissions(permission_slug) ON DELETE RESTRICT,
   granted_by      uuid NULL,
@@ -460,28 +460,6 @@ CREATE INDEX md_auth_user_perm_perm_idx ON md_auth_user_permissions (permission_
 CREATE UNIQUE INDEX md_auth_user_perm_unique 
             ON md_auth_user_permissions (user_id, permission_slug, tenant_id) 
             NULLS NOT DISTINCT;
--- =====================================================================================
--- CONFIGURACIÓN DE MICROSERVICIOS
--- =====================================================================================
-
--- Tabla: Configuración de APIs externas
-CREATE TABLE public.external_apis (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    service_name character varying(255) NOT NULL,
-    base_url character varying(500) NOT NULL,
-    auth_method character varying(50) NOT NULL,
-    timeout_seconds integer DEFAULT 30,
-    retry_attempts integer DEFAULT 3,
-    is_active boolean DEFAULT true NOT NULL,
-    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
-    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
-    created_by character varying(255),
-    updated_by character varying(255),
-    CONSTRAINT external_apis_pkey PRIMARY KEY (id),
-    CONSTRAINT external_apis_auth_method_check CHECK (auth_method::text = ANY (ARRAY['bearer'::character varying, 'basic'::character varying, 'api_key'::character varying, 'oauth2'::character varying]::text[])),
-    CONSTRAINT external_apis_timeout_seconds_check CHECK (timeout_seconds > 0),
-    CONSTRAINT external_apis_retry_attempts_check CHECK (retry_attempts >= 0)
-);
 
 -- =====================================================================================
 -- FUNCIONES DEFINIDAS POR EL USUARIO
@@ -701,7 +679,6 @@ CREATE UNIQUE INDEX metadata_fields_field_key_unique ON public.metadata_fields U
 CREATE UNIQUE INDEX metadata_schema_fields_pkey ON public.metadata_schema_fields USING btree (id);
 CREATE UNIQUE INDEX metadata_schema_fields_schema_field_unique ON public.metadata_schema_fields USING btree (metadata_schema_id, metadata_field_id);
 CREATE UNIQUE INDEX metadata_schema_events_pkey ON public.metadata_schema_events USING btree (id);
-CREATE UNIQUE INDEX external_apis_pkey ON public.external_apis USING btree (id);
 CREATE UNIQUE INDEX audit_logs_pkey ON public.audit_logs USING btree (id);
 CREATE UNIQUE INDEX audit_metrics_pkey ON public.audit_metrics USING btree (id);
 
@@ -738,8 +715,6 @@ CREATE INDEX idx_required_documents_metadata_schema ON public.required_documents
 CREATE INDEX idx_required_documents_process_nullable ON public.required_documents USING btree (process_id) WHERE (process_id IS NOT NULL);
 CREATE INDEX idx_required_documents_type_process_schema ON public.required_documents USING btree (document_type_id, process_id, metadata_schema_id) WHERE (deleted_at IS NULL);
 
--- Índices para APIs externas
-CREATE INDEX idx_external_apis_service_active ON public.external_apis USING btree (service_name) WHERE (is_active = true);
 
 -- Índices para audit_metrics
 CREATE INDEX idx_audit_metrics_table_action_period ON public.audit_metrics USING btree (table_name, action, period_start, period_end);
@@ -757,7 +732,6 @@ CREATE INDEX idx_mv_process_hierarchy_parent ON public.mv_process_hierarchy USIN
 -- Comentarios en tablas principales
 COMMENT ON TABLE public.audit_logs IS 'Registro completo de auditoría con metadatos detallados para todas las operaciones del sistema';
 COMMENT ON TABLE public.audit_metrics IS 'Métricas agregadas de auditoría para reportes, dashboards y análisis de patrones';
-COMMENT ON TABLE public.external_apis IS 'Configuración de APIs externas para integración entre microservicios';
 COMMENT ON MATERIALIZED VIEW public.mv_process_hierarchy IS 'Vista materializada con jerarquía completa de procesos para consultas optimizadas';
 
 -- Comentarios en columnas críticas
@@ -777,9 +751,6 @@ COMMENT ON COLUMN public.audit_metrics.metric_name IS 'Nombre de la métrica (ej
 COMMENT ON COLUMN public.audit_metrics.period_start IS 'Inicio del período de agregación de la métrica';
 COMMENT ON COLUMN public.audit_metrics.period_end IS 'Fin del período de agregación de la métrica';
 COMMENT ON COLUMN public.audit_metrics.granularity IS 'Granularidad temporal: hour, day, week, month';
-
-COMMENT ON COLUMN public.external_apis.service_name IS 'Nombre del microservicio externo';
-COMMENT ON COLUMN public.external_apis.auth_method IS 'Método de autenticación: bearer, basic, api_key, oauth2';
 
 COMMENT ON COLUMN public.required_documents.process_id IS 'ID del proceso (nullable) - permite documentos independientes de procesos específicos';
 COMMENT ON COLUMN public.required_documents.metadata_schema_id IS 'ID del esquema de metadatos - permite reutilizar esquemas normalizados entre documentos';
@@ -831,7 +802,6 @@ PARA USAR ESTE SCRIPT:
    SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';
 
 5. VERIFICAR DATOS INICIALES:
-   SELECT * FROM external_apis;
    SELECT * FROM academic_roles;
    SELECT * FROM metadata_schemas;
 

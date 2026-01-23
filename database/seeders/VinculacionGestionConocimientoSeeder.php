@@ -182,6 +182,7 @@ class VinculacionGestionConocimientoSeeder extends Seeder
                     'process_id'       => $execSubprocId,
                     'document_type_id' => $infTypeId,
                     'name'             => $doc['name'],
+                    'is_public'        => true,
                     'code_default'     => $doc['code_default'],
                     'order'            => $order++,
                     'created_at'       => $now,

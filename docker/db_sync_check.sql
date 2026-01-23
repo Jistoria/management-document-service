@@ -133,12 +133,6 @@ WHERE trigger_schema = 'public';
 -- VERIFICACIÓN DE DATOS INICIALES
 -- =====================================================================================
 
--- External APIs
-SELECT
-    'EXTERNAL_APIS' as data_type,
-    COUNT(*) as count,
-    string_agg(service_name, ', ' ORDER BY service_name) as services
-FROM external_apis;
 
 -- Academic Roles
 SELECT
@@ -189,9 +183,6 @@ SELECT
             SELECT COUNT(*) FROM information_schema.tables
             WHERE table_schema = 'public' AND table_type = 'BASE TABLE'
         ) >= 19
-        AND (
-            SELECT COUNT(*) FROM external_apis
-        ) >= 4
         AND (
             SELECT COUNT(*) FROM academic_roles WHERE created_by = 'system'
         ) >= 7

@@ -148,6 +148,7 @@ class DocenciaStudentDevelopmentSeeder extends Seeder
                     'document_type_id' => $documentTypeId,
                     'name'             => $d['name'],
                     'code_default'     => $codeDefault,
+                    'is_public'        => true,
                     'created_at'       => $now,
                     'updated_at'       => $now,
                     'created_by'       => 'system',

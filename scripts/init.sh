@@ -98,9 +98,18 @@ echo "=== Ejecutando migraciones ==="
 su -s /bin/bash "$APP_USER" -c "php artisan migrate --force --no-interaction"
 echo " Migraciones completadas"
 
-echo "=== Ejecutando seeders ==="
-su -s /bin/bash "$APP_USER" -c "php artisan db:seed --force --no-interaction"
-echo " Seeders completados"
+echo "=== Verificando si es necesario ejecutar seeders ==="
+# Verificar si ya existen datos (usando HeadOffice como indicador)
+SEED_CHECK_CMD="echo \App\Models\HeadOffice::exists() ? 'SEED_DONE' : 'SEED_NEEDED';"
+SEED_STATUS=$(su -s /bin/bash "$APP_USER" -c "php artisan tinker --execute=\"$SEED_CHECK_CMD\"" 2>/dev/null)
+
+if [[ "$SEED_STATUS" == *"SEED_DONE"* ]]; then
+  echo "  Base de datos ya contiene información (Sedes detectadas). Se omiten los seeders."
+else
+  echo "=== Ejecutando seeders ==="
+  su -s /bin/bash "$APP_USER" -c "php artisan db:seed --force --no-interaction"
+  echo " Seeders completados"
+fi
 
 # --- Cachear SOLO en producción ---
 if [ "$APP_ENV_VALUE" = "production" ]; then

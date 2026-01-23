@@ -38,7 +38,7 @@ check_database_exists() {
         AND table_name IN (
             'head_offices', 'departments', 'careers', 'subsystems',
             'metadata_schemas', 'metadata_fields', 'audit_logs',
-            'external_apis', 'document_types', 'academic_roles'
+             'document_types', 'academic_roles'
         );" 2>/dev/null | xargs)
 
     if [ "$TABLE_COUNT" -eq "10" ]; then
@@ -60,7 +60,7 @@ verify_database_sync() {
                      "process_categories" "processes" "document_types" "academic_roles"
                      "required_documents" "storage_unit_types" "storage_units"
                      "metadata_schemas" "metadata_fields" "metadata_schema_events"
-                     "audit_logs" "audit_metrics" "external_apis")
+                     "audit_logs" "audit_metrics")
 
     MISSING_TABLES=()
 

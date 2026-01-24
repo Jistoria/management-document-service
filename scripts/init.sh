@@ -133,3 +133,4 @@ else
 fi
 
 echo "🎉 Inicialización completada exitosamente"
+exit 0

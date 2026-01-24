@@ -457,8 +457,8 @@ CREATE TABLE public.md_auth_user_permissions (
 );
 
 CREATE INDEX md_auth_user_perm_perm_idx ON md_auth_user_permissions (permission_slug);
-CREATE UNIQUE INDEX md_auth_user_perm_unique 
-            ON md_auth_user_permissions (user_id, permission_slug, tenant_id) 
+CREATE UNIQUE INDEX md_auth_user_perm_unique
+            ON md_auth_user_permissions (user_id, permission_slug, tenant_id)
             NULLS NOT DISTINCT;
 
 -- =====================================================================================
@@ -653,7 +653,7 @@ ORDER BY created_at DESC;
 -- =====================================================================================
 
 -- Índices únicos (Primary Keys y Unique Constraints)
-CREATE UNIQUE INDEX migrations_pkey ON public.migrations USING btree (id);
+-- CREATE UNIQUE INDEX migrations_pkey ON public.migrations USING btree (id);
 CREATE UNIQUE INDEX head_offices_pkey ON public.head_offices USING btree (id);
 CREATE UNIQUE INDEX head_offices_code ON public.head_offices USING btree (code) WHERE (deleted_at IS NULL);
 CREATE UNIQUE INDEX departments_pkey ON public.departments USING btree (id);

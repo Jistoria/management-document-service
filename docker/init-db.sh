@@ -20,8 +20,8 @@ echo -e "${BLUE} MANAGEMENT DOCUMENT SERVICE - DB INITIALIZATION${NC}"
 echo -e "${BLUE}=================================================${NC}"
 
 # Variables de configuración
-DB_NAME="management_db"
-DB_USER="user123"
+DB_NAME="${POSTGRES_DB:-management_db}"
+DB_USER="${POSTGRES_USER:-user123}"
 DB_HOST="127.0.0.1"
 SQL_SCRIPT="/docker-entrypoint-initdb.d/recreate_database_complete.sql"
 SYNC_CHECK_SCRIPT="/docker-entrypoint-initdb.d/db_sync_check.sql"

@@ -1,3 +1,13 @@
+
+.git
+.env
+.env.backup
+.env.production
+vendor
 node_modules
 dist
 storage/*
+!storage/app/public/
+!storage/framework/views/
+tests
+docker

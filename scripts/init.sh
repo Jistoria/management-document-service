@@ -43,7 +43,7 @@ if [ ! -f "vendor/autoload.php" ]; then
   else
     su -s /bin/bash "$APP_USER" -c "composer install --optimize-autoloader --no-interaction --prefer-dist --no-ansi"
   fi
-  
+
   # Asegurar permisos correctos después de la instalación
   chown -R "$APP_USER:$APP_GROUP" "$VENDOR_DIR" || true
   chmod -R 775 "$VENDOR_DIR" || true
@@ -100,8 +100,18 @@ echo " Migraciones completadas"
 
 echo "=== Verificando si es necesario ejecutar seeders ==="
 # Verificar si ya existen datos (usando HeadOffice como indicador)
-SEED_CHECK_CMD="echo \App\Models\HeadOffice::exists() ? 'SEED_DONE' : 'SEED_NEEDED';"
-SEED_STATUS=$(su -s /bin/bash "$APP_USER" -c "php artisan tinker --execute=\"$SEED_CHECK_CMD\"" 2>/dev/null)
+# Se ejecuta en todos los entornos para asegurar datos iniciales
+SEED_CHECK_CMD="try { echo \App\Models\HeadOffice::exists() ? 'SEED_DONE' : 'SEED_NEEDED'; } catch (\Exception \$e) { echo 'ERROR: ' . \$e->getMessage(); }"
+echo " Ejecutando check de seeders con Tinker..."
+
+# Permitir que falle temporalmente para ver el error
+set +e
+SEED_STATUS=$(su -s /bin/bash "$APP_USER" -c "php artisan tinker --execute=\"$SEED_CHECK_CMD\"" 2>&1)
+EXIT_CODE=$?
+set -e
+
+echo " Check completado (Código $EXIT_CODE). Resultado:"
+echo "$SEED_STATUS"
 
 if [[ "$SEED_STATUS" == *"SEED_DONE"* ]]; then
   echo "  Base de datos ya contiene información (Sedes detectadas). Se omiten los seeders."
@@ -110,6 +120,7 @@ else
   su -s /bin/bash "$APP_USER" -c "php artisan db:seed --force --no-interaction"
   echo " Seeders completados"
 fi
+
 
 # --- Cachear SOLO en producción ---
 if [ "$APP_ENV_VALUE" = "production" ]; then

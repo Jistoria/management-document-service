@@ -1,190 +1,115 @@
 services:
-    init:
-        build:
-            context: .
-            dockerfile: php/Dockerfile
-            args:
-                UID: ${UID:-1000}
-                GID: ${GID:-1000}
-        image: management-app
-        container_name: management-init
-        user: "0:0"  # Ejecutar como root para poder cambiar permisos
-        volumes:
-            - .:/var/www
-            - vendor-data:/var/www/vendor
-        depends_on:
-            db:
-                condition: service_healthy
-        command: ["bash", "/var/www/scripts/init.sh"]
-        restart: "no"
-        networks:
-            - management-net
+  # 1) JOB de init (migraciones/seed/caches)
+  init:
+    build:
+      context: .
+      dockerfile: php/Dockerfile
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    image: management-app:prod
+    container_name: management-init
+    user: "0:0"
+    env_file:
+      - docker/app.env
+      - docker/db.env
+    depends_on:
+      db:
+        condition: service_healthy
+    command: ["bash", "/var/www/scripts/init.sh"]
+    restart: "no"
+    networks:
+      - management-net
 
-    db:
-        image: postgres:16
-        container_name: management-db
-        restart: unless-stopped
-        environment:
-            POSTGRES_DB: management_db
-            POSTGRES_USER: user123
-            POSTGRES_PASSWORD: pass123
-            POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
-        ports:
-            - "5450:5432"
-        volumes:
-            - postgres_data:/var/lib/postgresql/data
-            # Scripts de inicialización
-            - ./recreate_database_complete.sql:/docker-entrypoint-initdb.d/recreate_database_complete.sql:ro
-            - ./docker/db_sync_check.sql:/docker-entrypoint-initdb.d/db_sync_check.sql:ro
-            - ./docker/init-db.sh:/docker-entrypoint-initdb.d/01-init-db.sh:ro
-        healthcheck:
-            test: ["CMD-SHELL", "pg_isready -U user123 -d management_db"]
-            interval: 10s
-            timeout: 5s
-            retries: 10
-            start_period: 60s
-        networks:
-            - management-net
+  # 2) App PHP-FPM
+  app:
+    build:
+      context: .
+      dockerfile: php/Dockerfile
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    image: management-app:prod
+    container_name: management-app
+    env_file:
+      - docker/app.env
+      - docker/db.env
+    depends_on:
+      db:
+        condition: service_healthy
+      init:
+        condition: service_completed_successfully
+    networks:
+      - management-net
+      - thesis-net
+    restart: unless-stopped
 
+  # 3) Nginx interno (solo localhost)
+  nginx:
+    image: nginx:alpine
+    container_name: management-nginx
+    depends_on: [app]
+    ports:
+      - "127.0.0.1:8002:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      # OJO: en prod NO montes ./public del host
+      # El docroot debe estar dentro de la imagen; ver Dockerfile abajo
+    networks:
+      - management-net
+      - thesis-net
+    restart: unless-stopped
 
-    # Servicio de verificación de base de datos (opcional para debugging)
-    db-sync-checker:
-        image: postgres:16
-        container_name: db-sync-checker
-        depends_on:
-            db:
-                condition: service_healthy
-        environment:
-            PGHOST: db
-            PGDATABASE: management_db
-            PGUSER: user123
-            PGPASSWORD: pass123
-        volumes:
-            - ./docker/db_sync_check.sql:/app/db_sync_check.sql:ro
-        command: >
-            bash -c "
-              echo '🔍 Ejecutando verificación de sincronización de DB...';
-              psql -f /app/db_sync_check.sql;
-              echo ' Verificación completada';
-            "
-        restart: "no"
-        networks:
-            - management-net
+  # 4) Consumer Kafka (si lo mantienes)
+  consumer-auth:
+    build:
+      context: .
+      dockerfile: php/Dockerfile
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    image: management-app:prod
+    container_name: management-consumer-auth
+    command: php artisan auth-sync:consume
+    env_file:
+      - docker/app.env
+      - docker/db.env
+    depends_on:
+      db:
+        condition: service_healthy
+      init:
+        condition: service_completed_successfully
+    networks:
+      - management-net
+      - thesis-net
+    restart: unless-stopped
 
-    app:
-        build:
-            context: .
-            dockerfile: php/Dockerfile
-            args:
-                UID: ${UID:-1000}
-                GID: ${GID:-1000}
-        image: management-app
-        user: "${UID:-1000}:${GID:-1000}"
-        container_name: management-app
-        volumes:
-            - .:/var/www
-            - vendor-data:/var/www/vendor
-        environment:
-            - KAFKA_BROKERS=auth-kafka:9092
-            - KAFKA_CLIENT_ID=management-service
-            - KAFKA_SECURITY_PROTOCOL=PLAINTEXT
-            - KAFKA_SASL_USERNAME=
-            - KAFKA_SASL_PASSWORD=
-            - KAFKA_SASL_MECHANISMS=
-            - KAFKA_DEBUG=false
-            - KAFKA_E2E=true
-        networks:
-            - thesis-net
-            - management-net
-        depends_on:
-            init:
-                condition: service_completed_successfully
-            db:
-                condition: service_healthy
-
-    nginx:
-        image: nginx:alpine
-        container_name: management-nginx
-        ports:
-            - "8002:80"
-        volumes:
-            - .:/var/www
-            - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
-        depends_on:
-            - app
-        networks:
-            - management-net
-            - thesis-net
-
-    #   queue:
-    #       image: management-app
-    #       container_name: management-queue
-    #       command: php artisan queue:work --verbose --tries=1 --timeout=90
-    #       volumes:
-    #           - .:/var/www
-    #           - vendor-data:/var/www/vendor # <--- AGREGADO
-    #       depends_on:
-    #           app:
-    #               condition: service_started
-    #           init:
-    #               condition: service_completed_successfully
-    #           db:
-    #               condition: service_healthy
-    #       networks:
-    #           - management-net
-
-    consumer-auth:
-        build:
-            context: .
-            dockerfile: php/Dockerfile
-            args:
-                UID: ${UID:-1000}
-                GID: ${GID:-1000}
-        image: management-app
-        user: "${UID:-1000}:${GID:-1000}"
-        container_name: management-consumer-auth
-        command: php artisan auth-sync:consume
-        volumes:
-            - .:/var/www
-            - vendor-data:/var/www/vendor
-        #  AGREGAR ESTA SECCIÓN COMPLETA 
-        environment:
-            # Conexión a Kafka (Red compartida: auth-kafka)
-            - KAFKA_BROKERS=auth-kafka:9092
-            
-            # Grupo de consumo (para no repetir mensajes si levantas réplicas)
-            - AUTH_SYNC_GROUP=management-document-service-group
-            
-            # Identidad del Microservicio (CRÍTICO para los Handlers)
-            - APP_MICROSERVICE_ID=${APP_MICROSERVICE_ID}
-            
-            # Topics a escuchar
-            - AUTH_SYNC_TOPICS=${AUTH_SYNC_TOPICS:-auth.rbac.permission-granted,auth.rbac.permission-revoked,auth.user.updated,auth.user.deleted,auth.user.restored}
-            
-            # Configuración de BD (El consumidor necesita escribir en la DB)
-            - DB_HOST=db
-            - DB_PORT=5432
-            - DB_DATABASE=management_db
-            - DB_USERNAME=user123
-            - DB_PASSWORD=pass123
-        # 👆 FIN DE LA SECCIÓN AGREGADA 👆
-        depends_on:
-            app:
-                condition: service_started
-            init:
-                condition: service_completed_successfully
-            db:
-                condition: service_healthy
-        networks:
-            - thesis-net
-            - management-net
+  # 5) DB (no expuesta)
+  db:
+    image: postgres:16
+    container_name: management-db
+    env_file:
+      - docker/db.env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # Si necesitas el SQL inicial, déjalo, pero ojo: solo corre en DB vacía
+      - ./recreate_database_complete.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./docker/init-db.sh:/docker-entrypoint-initdb.d/02-init-db.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+    networks:
+      - management-net
+    restart: unless-stopped
 
 volumes:
-    postgres_data:
-    vendor-data: 
+  postgres_data:
 
 networks:
-    thesis-net:
-        external: true
-    management-net:
-        driver: bridge
+  thesis-net:
+    external: true
+  management-net:
+    driver: bridge

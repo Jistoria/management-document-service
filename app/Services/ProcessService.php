@@ -38,9 +38,11 @@ class ProcessService
     {
         $data = Process::convertToSnakeCase($data);
 
-        if (isNull($data['order'])) {
+        if (!isset($data['order'])) {
             $maxOrder = Process::where('process_category_id', $data['process_category_id'])
                 ->max('order');
+            
+            // Si no hay registros, maxOrder es null, entonces empezamos en 1
             $data['order'] = $maxOrder !== null ? $maxOrder + 1 : 1;
         }
 

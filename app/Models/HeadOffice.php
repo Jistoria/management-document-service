@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $id
  * @property string $name
  * @property string $code
+ * @property string|null $code_numeric
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  * @property \Carbon\Carbon|null $deleted_at
@@ -46,6 +47,7 @@ class HeadOffice extends Model
     protected $fillable = [
         'name',
         'code',
+        'code_numeric',
         'created_by',
         'updated_by',
         'version'

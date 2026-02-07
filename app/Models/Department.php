@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $head_office_id
  * @property string $name
  * @property string|null $code
+ * @property string|null $code_numeric
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
@@ -51,6 +52,7 @@ class Department extends Model
         'head_office_id',
         'name',
         'code',
+        'code_numeric',
         'created_by',
         'updated_by',
         'version'

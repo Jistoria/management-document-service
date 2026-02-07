@@ -476,46 +476,6 @@ BEGIN
 END;
 $function$;
 
--- Función para refrescar vista materializada
-CREATE OR REPLACE FUNCTION public.refresh_process_hierarchy()
-RETURNS void
-LANGUAGE plpgsql
-AS $function$
-BEGIN
-    REFRESH MATERIALIZED VIEW CONCURRENTLY mv_process_hierarchy;
-    INSERT INTO metadata_schema_events (
-        id,
-        schema_id,
-        event_type,
-        event_time,
-        details,
-        service_version
-    ) VALUES (
-        gen_random_uuid(),
-        (SELECT id FROM metadata_schemas WHERE name = 'system' LIMIT 1),
-        'materialized_view_refresh',
-        CURRENT_TIMESTAMP,
-        '{"view": "mv_process_hierarchy", "status": "success"}'::jsonb,
-        '1.0.0'
-    );
-EXCEPTION
-    WHEN OTHERS THEN
-        -- Si falla el refresh concurrente, usar refresh normal
-        REFRESH MATERIALIZED VIEW mv_process_hierarchy;
-END;
-$function$;
-
--- Función trigger para refrescar vista automáticamente
-CREATE OR REPLACE FUNCTION public.trigger_refresh_process_hierarchy()
-RETURNS trigger
-LANGUAGE plpgsql
-AS $function$
-BEGIN
-    PERFORM refresh_process_hierarchy();
-    RETURN COALESCE(NEW, OLD);
-END;
-$function$;
-
 -- =====================================================================================
 -- TRIGGERS PARA ACTUALIZACIÓN AUTOMÁTICA
 -- =====================================================================================
@@ -558,95 +518,6 @@ CREATE TRIGGER trigger_process_categories_refresh_hierarchy
     AFTER INSERT OR UPDATE OR DELETE ON process_categories
     FOR EACH STATEMENT EXECUTE FUNCTION trigger_refresh_process_hierarchy();
 
--- =====================================================================================
--- VISTAS MATERIALIZADAS PARA PERFORMANCE
--- =====================================================================================
-
--- Vista materializada para jerarquías de procesos
-CREATE MATERIALIZED VIEW public.mv_process_hierarchy AS
-WITH RECURSIVE process_tree AS (
-    -- Nodos raíz (sin padre)
-    SELECT
-        processes.id,
-        processes.parent_id,
-        processes.name,
-        processes.code,
-        processes.process_category_id,
-        processes."order",
-        0 AS level,
-        ARRAY[processes.id] AS path,
-        processes.name::text AS full_path
-    FROM processes
-    WHERE processes.parent_id IS NULL AND processes.deleted_at IS NULL
-
-    UNION ALL
-
-    -- Nodos hijos recursivos
-    SELECT
-        p.id,
-        p.parent_id,
-        p.name,
-        p.code,
-        p.process_category_id,
-        p."order",
-        pt_1.level + 1,
-        pt_1.path || p.id,
-        (pt_1.full_path || ' > '::text) || p.name::text AS full_path
-    FROM processes p
-    JOIN process_tree pt_1 ON p.parent_id = pt_1.id
-    WHERE p.deleted_at IS NULL
-)
-SELECT
-    pt.id,
-    pt.parent_id,
-    pt.name,
-    pt.code,
-    pt.process_category_id,
-    pt."order",
-    pt.level,
-    pt.path,
-    pt.full_path,
-    pc.name AS category_name,
-    pc.code AS category_code
-FROM process_tree pt
-JOIN process_categories pc ON pt.process_category_id = pc.id
-WHERE pc.deleted_at IS NULL
-WITH DATA;
-
--- =====================================================================================
--- VISTAS PARA CONSULTAS DE AUDITORÍA
--- =====================================================================================
-
--- Vista para auditoría resumida por usuario
-CREATE OR REPLACE VIEW public.v_audit_summary_by_user AS
-SELECT
-    external_user_id,
-    user_name,
-    table_name,
-    action,
-    count(*) AS operation_count,
-    min(created_at) AS first_operation,
-    max(created_at) AS last_operation,
-    array_agg(DISTINCT record_id) AS affected_records
-FROM audit_logs
-WHERE external_user_id IS NOT NULL
-GROUP BY external_user_id, user_name, table_name, action;
-
--- Vista para cambios recientes
-CREATE OR REPLACE VIEW public.v_recent_changes AS
-SELECT
-    id,
-    table_name,
-    record_id,
-    action,
-    external_user_id,
-    created_at,
-    changed_fields,
-    change_metadata ->> 'summary'::text AS change_summary,
-    array_length(changed_fields, 1) AS fields_changed_count
-FROM audit_logs
-WHERE created_at >= (now() - '24:00:00'::interval)
-ORDER BY created_at DESC;
 
 -- =====================================================================================
 -- ÍNDICES PARA PERFORMANCE
@@ -661,7 +532,6 @@ CREATE UNIQUE INDEX careers_pkey ON public.careers USING btree (id);
 --CREATE UNIQUE INDEX careers_code ON public.careers USING btree (code) WHERE (deleted_at IS NULL);
 CREATE UNIQUE INDEX subsystems_pkey ON public.subsystems USING btree (id);
 --CREATE UNIQUE INDEX subsystems_code ON public.subsystems USING btree (code) WHERE (deleted_at IS NULL);
-CREATE UNIQUE INDEX careers_subsystems_pkey ON public.careers_subsystems USING btree (career_id, subsystem_id);
 CREATE UNIQUE INDEX process_categories_pkey ON public.process_categories USING btree (id);
 CREATE UNIQUE INDEX processes_pkey ON public.processes USING btree (id);
 CREATE UNIQUE INDEX document_types_pkey ON public.document_types USING btree (id);
@@ -721,9 +591,7 @@ CREATE INDEX idx_audit_metrics_table_action_period ON public.audit_metrics USING
 CREATE INDEX idx_audit_metrics_metric_period ON public.audit_metrics USING btree (metric_name, granularity, period_start DESC);
 CREATE INDEX idx_audit_metrics_user_period ON public.audit_metrics USING btree (user_id, period_start DESC) WHERE (user_id IS NOT NULL);
 
--- Índices para vistas materializadas
-CREATE INDEX idx_mv_process_hierarchy_category ON public.mv_process_hierarchy USING btree (process_category_id, level);
-CREATE INDEX idx_mv_process_hierarchy_parent ON public.mv_process_hierarchy USING btree (parent_id);
+
 
 -- =====================================================================================
 -- COMENTARIOS DESCRIPTIVOS
@@ -732,7 +600,6 @@ CREATE INDEX idx_mv_process_hierarchy_parent ON public.mv_process_hierarchy USIN
 -- Comentarios en tablas principales
 COMMENT ON TABLE public.audit_logs IS 'Registro completo de auditoría con metadatos detallados para todas las operaciones del sistema';
 COMMENT ON TABLE public.audit_metrics IS 'Métricas agregadas de auditoría para reportes, dashboards y análisis de patrones';
-COMMENT ON MATERIALIZED VIEW public.mv_process_hierarchy IS 'Vista materializada con jerarquía completa de procesos para consultas optimizadas';
 
 -- Comentarios en columnas críticas
 COMMENT ON COLUMN public.audit_logs.table_name IS 'Nombre de la tabla afectada';

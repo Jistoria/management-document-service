@@ -128,6 +128,7 @@ class MetadataFieldService
             $schemaId = $filters['schema_id'];
             $q->whereHas('metadataSchemas', function (Builder $subQuery) use ($schemaId) {
                 $subQuery->where('metadata_schemas.id', $schemaId);
+                $subQuery->with('metadataFields');
             });
         });
     }

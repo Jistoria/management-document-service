@@ -21,6 +21,7 @@ class CareerResource extends BaseResource
             'id' => $this->id,
             'name' => $this->name,
             'code' => $this->code,
+            'codeNumeric' => $this->code_numeric,
             'departmentId' => $this->department_id,
             'createdAt' => $this->created_at?->toISOString(),
             'updatedAt' => $this->updated_at?->toISOString(),
@@ -76,6 +77,7 @@ class CareerResource extends BaseResource
                     'value' => $career->id,
                     'label' => $career->name,
                     'code' => $career->code,
+                    'codeNumeric' => $career->code_numeric,
                     'departmentId' => $career->department_id,
                     'departmentName' => $career->department?->name,
                 ];
@@ -104,10 +106,12 @@ class CareerResource extends BaseResource
                     'id' => $this->department->id,
                     'name' => $this->department->name,
                     'code' => $this->department->code,
+                    'codeNumeric' => $this->department->code_numeric,
                     'headOffice' => $this->department->headOffice ? [
                         'id' => $this->department->headOffice->id,
                         'name' => $this->department->headOffice->name,
                         'code' => $this->department->headOffice->code,
+                        'codeNumeric' => $this->department->headOffice->code_numeric,
                     ] : null,
                 ];
             }),
@@ -136,6 +140,7 @@ class CareerResource extends BaseResource
             'id' => $this->id,
             'name' => $this->name,
             'code' => $this->code,
+            'codeNumeric' => $this->code_numeric,
         ];
     }
 

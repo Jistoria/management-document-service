@@ -17,8 +17,9 @@ class CareerPublicResource extends BaseResource
         return [
             'id' => $this->id,
             'code' => $this->code,
+            'codeNumeric' => $this->code_numeric,
             'name' => $this->name,
-            
+
             // Departamento relacionado
             'department' => $this->when(
                 $this->relationLoaded('department'),
@@ -26,9 +27,10 @@ class CareerPublicResource extends BaseResource
                     'id' => $this->department_id,
                     'name' => $this->department?->name,
                     'code' => $this->department?->code,
+                    'codeNumeric' => $this->department?->code_numeric,
                 ]
             ),
-            
+
             // Sede relacionada
             'headOffice' => $this->when(
                 $this->relationLoaded('headOffice'),
@@ -36,6 +38,7 @@ class CareerPublicResource extends BaseResource
                     'id' => $this->head_office_id,
                     'name' => $this->headOffice?->name,
                     'code' => $this->headOffice?->code,
+                    'codeNumeric' => $this->headOffice?->code_numeric,
                 ]
             ),
         ];
@@ -46,6 +49,7 @@ class CareerPublicResource extends BaseResource
         return [
             'id' => $this->id,
             'code' => $this->code,
+            'codeNumeric' => $this->code_numeric,
             'name' => $this->name,
             'departmentName' => $this->department?->name,
         ];
@@ -56,6 +60,7 @@ class CareerPublicResource extends BaseResource
         return [
             'id' => $this->id,
             'code' => $this->code,
+            'codeNumeric' => $this->code_numeric,
             'name' => $this->name,
             'departmentName' => $this->department?->name,
         ];
@@ -73,6 +78,7 @@ class CareerPublicResource extends BaseResource
                 'value' => $item->id,
                 'label' => $item->name,
                 'code' => $item->code,
+                'codeNumeric' => $item->code_numeric,
                 'departmentId' => $item->department_id,
                 'headOfficeId' => $item->head_office_id,
             ])->values(),

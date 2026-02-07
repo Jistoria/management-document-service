@@ -17,8 +17,9 @@ class DepartmentPublicResource extends BaseResource
         return [
             'id' => $this->id,
             'code' => $this->code,
+            'codeNumeric' => $this->code_numeric,
             'name' => $this->name,
-            
+
             // Sede relacionada
             'headOffice' => $this->when(
                 $this->relationLoaded('headOffice'),
@@ -26,9 +27,10 @@ class DepartmentPublicResource extends BaseResource
                     'id' => $this->head_office_id,
                     'name' => $this->headOffice?->name,
                     'code' => $this->headOffice?->code,
+                    'codeNumeric' => $this->headOffice?->code_numeric,
                 ]
             ),
-            
+
             // Conteo de carreras
             'careersCount' => $this->when(
                 $this->relationLoaded('careers'),
@@ -42,6 +44,7 @@ class DepartmentPublicResource extends BaseResource
         return [
             'id' => $this->id,
             'code' => $this->code,
+            'codeNumeric' => $this->code_numeric,
             'name' => $this->name,
             'headOfficeName' => $this->headOffice?->name,
         ];
@@ -52,6 +55,7 @@ class DepartmentPublicResource extends BaseResource
         return [
             'id' => $this->id,
             'code' => $this->code,
+            'codeNumeric' => $this->code_numeric,
             'name' => $this->name,
             'headOfficeName' => $this->headOffice?->name,
         ];
@@ -69,6 +73,7 @@ class DepartmentPublicResource extends BaseResource
                 'value' => $item->id,
                 'label' => $item->name,
                 'code' => $item->code,
+                'codeNumeric' => $item->code_numeric,
                 'headOfficeId' => $item->head_office_id,
             ])->values(),
             'count' => $collection->count()

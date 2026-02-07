@@ -24,6 +24,7 @@ class HeadOfficeResource extends BaseResource
             'id' => $this->id,
             'name' => $this->name,
             'code' => $this->code,
+            'codeNumeric' => $this->code_numeric,
             'createdAt' => $this->created_at?->toISOString(),
             'updatedAt' => $this->updated_at?->toISOString(),
             'createdBy' => $this->created_by,
@@ -89,6 +90,7 @@ class HeadOfficeResource extends BaseResource
             'id' => $this->id,
             'name' => $this->name,
             'code' => $this->code,
+            'codeNumeric' => $this->code_numeric,
             'departmentsCount' => $this->departments()->count(),
         ];
     }
@@ -112,6 +114,7 @@ class HeadOfficeResource extends BaseResource
                     'value' => $headOffice->id,
                     'label' => $headOffice->name,
                     'code' => $headOffice->code,
+                    'codeNumeric' => $headOffice->code_numeric,
                 ];
             }),
             'count' => count($collection)
@@ -130,11 +133,13 @@ class HeadOfficeResource extends BaseResource
                         'id' => $department->id,
                         'name' => $department->name,
                         'code' => $department->code,
+                        'codeNumeric' => $department->code_numeric,
                         'careers' => $department->careers ? $department->careers->map(function ($career) {
                             return [
                                 'id' => $career->id,
                                 'name' => $career->name,
                                 'code' => $career->code,
+                                'codeNumeric' => $career->code_numeric,
                             ];
                         }) : [],
                     ];

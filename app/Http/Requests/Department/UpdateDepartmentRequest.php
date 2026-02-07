@@ -51,6 +51,13 @@ class UpdateDepartmentRequest extends FormRequest
                     ->ignore($departmentId)
                     ->whereNull('deleted_at')
             ],
+            'codeNumeric' => [
+                'nullable',
+                'string',
+                'max:50',
+                Rule::unique('departments', 'code_numeric')
+                    ->ignore($departmentId)
+            ],
         ];
     }
 
@@ -71,6 +78,9 @@ class UpdateDepartmentRequest extends FormRequest
             'code.alpha_num' => 'El código solo puede contener letras y números.',
             'code.uppercase' => 'El código debe estar en mayúsculas.',
             'code.unique' => 'Ya existe un departamento con este código.',
+            'codeNumeric.string' => 'El código numérico debe ser una cadena de texto.',
+            'codeNumeric.max' => 'El código numérico no puede exceder los 50 caracteres.',
+            'codeNumeric.unique' => 'Ya existe un departamento con este código numérico.',
         ];
     }
 
@@ -83,6 +93,7 @@ class UpdateDepartmentRequest extends FormRequest
             'headOfficeId' => 'sede',
             'name' => 'nombre',
             'code' => 'código',
+            'codeNumeric' => 'código numérico',
         ];
     }
 
@@ -100,6 +111,12 @@ class UpdateDepartmentRequest extends FormRequest
         if ($this->has('code') && $this->input('code')) {
             $this->merge([
                 'code' => strtoupper($this->input('code'))
+            ]);
+        }
+
+        if ($this->has('codeNumeric')) {
+            $this->merge([
+                'codeNumeric' => trim((string) $this->input('codeNumeric'))
             ]);
         }
     }

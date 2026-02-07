@@ -25,6 +25,7 @@ class DepartmentResource extends BaseResource
             'headOfficeId' => $this->head_office_id,
             'name' => $this->name,
             'code' => $this->code,
+            'codeNumeric' => $this->code_numeric,
             'createdAt' => $this->created_at?->toISOString(),
             'updatedAt' => $this->updated_at?->toISOString(),
             'createdBy' => $this->created_by,
@@ -74,6 +75,7 @@ class DepartmentResource extends BaseResource
                         'id' => $this->headOffice?->id,
                         'name' => $this->headOffice?->name,
                         'code' => $this->headOffice?->code,
+                        'codeNumeric' => $this->headOffice?->code_numeric,
                     ],
                     'careersCount' => $this->careers->count(),
                     'careers' => CareerResource::collection($this->careers ?? collect())
@@ -96,6 +98,7 @@ class DepartmentResource extends BaseResource
             'id' => $this->id,
             'name' => $this->name,
             'code' => $this->code,
+            'codeNumeric' => $this->code_numeric,
             'headOfficeId' => $this->head_office_id,
             'careersCount' => $this->careers()->count(),
         ];
@@ -120,7 +123,8 @@ class DepartmentResource extends BaseResource
                     'value' => $department->id,
                     'label' => $department->name,
                     'code' => $department->code,
-                    'head_office_id' => $department->head_office_id,
+                    'codeNumeric' => $department->code_numeric,
+                    'headOfficeId' => $department->head_office_id,
                 ];
             }),
             'count' => count($collection)
@@ -139,6 +143,7 @@ class DepartmentResource extends BaseResource
                         'id' => $career->id,
                         'name' => $career->name,
                         'code' => $career->code,
+                        'codeNumeric' => $career->code_numeric,
                         'subsystems' => $career->subsystems ? $career->subsystems->map(function ($subsystem) {
                             return [
                                 'id' => $subsystem->id,

@@ -24,14 +24,15 @@ class HeadOfficePublicResource extends BaseResource
         return [
             'id' => $this->id,
             'code' => $this->code,
+            'codeNumeric' => $this->code_numeric,
             'name' => $this->name,
-            
+
             // Relaciones solo si están cargadas
             'departmentsCount' => $this->when(
                 $this->relationLoaded('departments'),
                 fn() => $this->departments->count()
             ),
-            
+
             // NO exponer: created_by, updated_by, created_at, updated_at, version, deleted_at
         ];
     }
@@ -44,6 +45,7 @@ class HeadOfficePublicResource extends BaseResource
         return [
             'id' => $this->id,
             'code' => $this->code,
+            'codeNumeric' => $this->code_numeric,
             'name' => $this->name,
         ];
     }
@@ -56,6 +58,7 @@ class HeadOfficePublicResource extends BaseResource
         return [
             'id' => $this->id,
             'code' => $this->code,
+            'codeNumeric' => $this->code_numeric,
             'name' => $this->name,
         ];
     }
@@ -78,6 +81,7 @@ class HeadOfficePublicResource extends BaseResource
                 'value' => $item->id,
                 'label' => $item->name,
                 'code' => $item->code,
+                'codeNumeric' => $item->code_numeric,
             ])->values(),
             'count' => $collection->count()
         ];

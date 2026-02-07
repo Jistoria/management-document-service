@@ -36,6 +36,12 @@ class StoreCareerRequest extends FormRequest
                 'regex:/^[A-Z0-9_-]+$/',
                 Rule::unique('careers', 'code')->whereNull('deleted_at'),
             ],
+            'codeNumeric' => [
+                'nullable',
+                'string',
+                'max:50',
+                Rule::unique('careers', 'code_numeric'),
+            ],
             'departmentId' => [
                 'required',
                 'uuid',
@@ -64,6 +70,9 @@ class StoreCareerRequest extends FormRequest
             'code.max' => 'El código no puede tener más de 20 caracteres.',
             'code.regex' => 'El código solo puede contener letras mayúsculas, números, guiones y guiones bajos.',
             'code.unique' => 'Este código ya está en uso por otra carrera.',
+            'codeNumeric.string' => 'El código numérico debe ser una cadena de texto.',
+            'codeNumeric.max' => 'El código numérico no puede tener más de 50 caracteres.',
+            'codeNumeric.unique' => 'Este código numérico ya está en uso por otra carrera.',
 
             'departmentId.required' => 'El departamento es requerido.',
             'departmentId.uuid' => 'El ID del departamento debe ser un UUID válido.',
@@ -82,6 +91,7 @@ class StoreCareerRequest extends FormRequest
         return [
             'name' => 'nombre',
             'code' => 'código',
+            'codeNumeric' => 'código numérico',
             'departmentId' => 'departamento',
             'createdBy' => 'creado por',
         ];
@@ -105,6 +115,12 @@ class StoreCareerRequest extends FormRequest
         if ($this->has('code') && !empty($this->input('code'))) {
             $this->merge([
                 'code' => strtoupper(trim($this->input('code')))
+            ]);
+        }
+
+        if ($this->has('codeNumeric')) {
+            $this->merge([
+                'codeNumeric' => trim((string) $this->input('codeNumeric'))
             ]);
         }
 

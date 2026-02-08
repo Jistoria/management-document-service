@@ -48,6 +48,11 @@ Route::prefix('public')
     // Process Categories - Categorías de Procesos
     Route::get('/process-categories', [PublicCatalogController::class, 'processCategories']);
     
+    // Processes - Procesos
+    Route::get('/processes', [PublicCatalogController::class, 'processes']);
+    Route::get('/processes/{id}', [PublicCatalogController::class, 'showProcess']);
+    Route::get('/process-categories/{id}/processes', [PublicCatalogController::class, 'processesByCategory']);
+    
     // Document Types - Tipos de Documentos
     Route::get('/document-types', [PublicCatalogController::class, 'documentTypes']);
 });

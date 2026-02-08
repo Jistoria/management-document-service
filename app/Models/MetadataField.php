@@ -74,7 +74,18 @@ class MetadataField extends Model
     {
         return $this->belongsToMany(MetadataSchema::class, 'metadata_schema_fields', 'metadata_field_id', 'metadata_schema_id')
             ->using(MetadataSchemaField::class)
-            ->withPivot(['id', 'is_required', 'is_repeatable', 'min_occurs', 'max_occurs', 'allow_duplicates', 'sort_order', 'default_value'])
+            ->withPivot([
+                'id',
+                'is_required',
+                'is_repeatable',
+                'min_occurs',
+                'max_occurs',
+                'allow_duplicates',
+                'sort_order',
+                'default_value',
+                'regex_pattern',
+                'validation_error_message'
+            ])
             ->withTimestamps();
     }
 

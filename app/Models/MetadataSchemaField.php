@@ -25,6 +25,8 @@ class MetadataSchemaField extends Pivot
         'allow_duplicates',
         'sort_order',
         'default_value',
+        'regex_pattern',
+        'validation_error_message',
         'created_by',
         'updated_by',
     ];

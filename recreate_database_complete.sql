@@ -258,6 +258,8 @@ CREATE TABLE public.metadata_schema_fields (
     is_repeatable boolean DEFAULT false NOT NULL,
     min_occurs integer DEFAULT 0 NOT NULL,
     max_occurs integer,
+    regex_pattern text,            -- El patrón regex (ej: ^\d{10}$)
+    validation_error_message text, -- Lo que ve el usuario (ej: "Debe ser una cédula de 10 dígitos")
     allow_duplicates boolean DEFAULT true NOT NULL,
     sort_order integer,
     regexs text,

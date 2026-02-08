@@ -220,29 +220,77 @@ class VinculacionPvv02002MetadataSeeder extends Seeder
         }
 
         // ============================================================
-        // 4) Asociar campos al esquema en el orden correcto
+        // 4) Asociar campos al esquema en el orden correcto con validaciones
         // ============================================================
-        $fieldIds = [
-            $documentCodeId,
-            $documentVersionId,
-            $documentTitleId,
-            $reportMonthYearId,
-            $projectNameId,
-            $academicUnitId,
-            $projectCodeId,
-            $leaderNameId,
-            $beneficiaryEntityId,
-            $projectStartDateId,
-            $projectEndDateId,
-            $directBeneficiariesId,
-            $indirectBeneficiariesId,
-            $researchLineId,
-            $odsId,
-            $careerId,
+        $fieldValidations = [
+            $documentCodeId => [
+                'regex_pattern' => '^[A-Z]{3}-\d{2}-[A-Z]-\d{3}$',
+                'validation_error_message' => 'El código debe tener formato XXX-00-X-000 (ej. PVV-02-F-002).',
+            ],
+            $documentVersionId => [
+                'regex_pattern' => '^\d+$',
+                'validation_error_message' => 'La versión debe ser un número entero.',
+            ],
+            $documentTitleId => [
+                'regex_pattern' => '^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\.]+$',
+                'validation_error_message' => 'Solo se permiten letras y espacios.',
+            ],
+            $reportMonthYearId => [
+                'regex_pattern' => '^(Enero|Febrero|Marzo|Abril|Mayo|Junio|Julio|Agosto|Septiembre|Octubre|Noviembre|Diciembre)\s\d{4}$',
+                'validation_error_message' => 'El formato debe ser "Mes AAAA" (ej. Enero 2025).',
+            ],
+            $projectNameId => [
+                'regex_pattern' => '^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\.]+$',
+                'validation_error_message' => 'Solo se permiten letras y espacios.',
+            ],
+            $academicUnitId => [
+                'regex_pattern' => '^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\.]+$',
+                'validation_error_message' => 'Solo se permiten letras y espacios.',
+            ],
+            $projectCodeId => [
+                'regex_pattern' => '^[A-Z0-9\-]+$',
+                'validation_error_message' => 'Solo se permiten letras mayúsculas, números y guiones.',
+            ],
+            $leaderNameId => [
+                'regex_pattern' => '^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\.]+$',
+                'validation_error_message' => 'Solo se permiten letras y espacios.',
+            ],
+            $beneficiaryEntityId => [
+                'regex_pattern' => '^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\.]+$',
+                'validation_error_message' => 'Solo se permiten letras y espacios.',
+            ],
+            $projectStartDateId => [
+                'regex_pattern' => null,
+                'validation_error_message' => null,
+            ],
+            $projectEndDateId => [
+                'regex_pattern' => null,
+                'validation_error_message' => null,
+            ],
+            $directBeneficiariesId => [
+                'regex_pattern' => '^\d+$',
+                'validation_error_message' => 'Debe ser un número entero positivo.',
+            ],
+            $indirectBeneficiariesId => [
+                'regex_pattern' => '^\d+$',
+                'validation_error_message' => 'Debe ser un número entero positivo.',
+            ],
+            $researchLineId => [
+                'regex_pattern' => '^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\.]+$',
+                'validation_error_message' => 'Solo se permiten letras y espacios.',
+            ],
+            $odsId => [
+                'regex_pattern' => null,
+                'validation_error_message' => null,
+            ],
+            $careerId => [
+                'regex_pattern' => null,
+                'validation_error_message' => null,
+            ],
         ];
 
         $sortOrder = 1;
-        foreach ($fieldIds as $fieldId) {
+        foreach ($fieldValidations as $fieldId => $validation) {
             $exists = DB::table('metadata_schema_fields')
                 ->where('metadata_schema_id', $schemaId)
                 ->where('metadata_field_id', $fieldId)
@@ -251,20 +299,22 @@ class VinculacionPvv02002MetadataSeeder extends Seeder
             if (! $exists) {
                 $isRequired = true;
                 DB::table('metadata_schema_fields')->insert([
-                    'id' => (string) Str::uuid(),
-                    'metadata_schema_id' => $schemaId,
-                    'metadata_field_id' => $fieldId,
-                    'is_required' => $isRequired,
-                    'is_repeatable' => false,
-                    'min_occurs' => $isRequired ? 1 : 0,
-                    'max_occurs' => 1,
-                    'allow_duplicates' => true,
-                    'sort_order' => $sortOrder++,
-                    'default_value' => null,
-                    'created_by' => 'system',
-                    'updated_by' => 'system',
-                    'created_at' => $now,
-                    'updated_at' => $now,
+                    'id'                        => (string) Str::uuid(),
+                    'metadata_schema_id'        => $schemaId,
+                    'metadata_field_id'         => $fieldId,
+                    'is_required'               => $isRequired,
+                    'is_repeatable'             => false,
+                    'min_occurs'                => $isRequired ? 1 : 0,
+                    'max_occurs'                => 1,
+                    'allow_duplicates'          => true,
+                    'sort_order'                => $sortOrder++,
+                    'default_value'             => null,
+                    'regex_pattern'             => $validation['regex_pattern'],
+                    'validation_error_message'  => $validation['validation_error_message'],
+                    'created_by'                => 'system',
+                    'updated_by'                => 'system',
+                    'created_at'                => $now,
+                    'updated_at'                => $now,
                 ]);
             }
         }

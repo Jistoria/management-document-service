@@ -13,6 +13,11 @@ class MetadataFieldResource extends BaseResource
 {
     public function toArray(Request $request): array
     {
+        // Obtener el pivot del primer esquema relacionado (cuando se filtra por schema_id)
+        $pivot = $this->relationLoaded('metadataSchemas') && $this->metadataSchemas->isNotEmpty()
+            ? $this->metadataSchemas->first()->pivot
+            : $this->pivot;
+
         return [
             'id' => $this->id,
             'fieldKey' => $this->field_key,
@@ -30,14 +35,19 @@ class MetadataFieldResource extends BaseResource
                 'label' => TypeInput::getLabel($this->type_input_id),
             ] : null,
             'dataType' => $this->data_type,
-            'schemaFieldId' => $this->pivot?->id,
-            'isRequired' => $this->pivot?->is_required,
-            'isRepeatable' => $this->pivot?->is_repeatable,
-            'minOccurs' => $this->pivot?->min_occurs,
-            'maxOccurs' => $this->pivot?->max_occurs,
-            'allowDuplicates' => $this->pivot?->allow_duplicates,
-            'sortOrder' => $this->pivot?->sort_order,
-            'defaultValue' => $this->pivot?->default_value,
+            
+            // Pivot data (cuando se filtra por schema_id o está disponible)
+            'schemaFieldId' => $pivot?->id,
+            'isRequired' => $pivot?->is_required,
+            'isRepeatable' => $pivot?->is_repeatable,
+            'minOccurs' => $pivot?->min_occurs,
+            'maxOccurs' => $pivot?->max_occurs,
+            'allowDuplicates' => $pivot?->allow_duplicates,
+            'sortOrder' => $pivot?->sort_order,
+            'defaultValue' => $pivot?->default_value,
+            'regexPattern' => $pivot?->regex_pattern,
+            'validationErrorMessage' => $pivot?->validation_error_message,
+            
             'createdBy' => $this->created_by,
             'updatedBy' => $this->updated_by,
             'createdAt' => $this->created_at?->toISOString(),

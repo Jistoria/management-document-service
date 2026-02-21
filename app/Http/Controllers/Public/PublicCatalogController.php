@@ -10,22 +10,24 @@ use App\Http\Resources\Public\CareerPublicResource;
 use App\Http\Resources\Public\ProcessCategoryPublicResource;
 use App\Http\Resources\Public\ProcessPublicResource;
 use App\Http\Resources\Public\DocumentTypePublicResource;
+use App\Http\Resources\Public\MetadataSchemaPublicResource;
 use App\Services\HeadOfficeService;
 use App\Services\DepartmentService;
 use App\Services\CareerService;
 use App\Services\ProcessCategoryService;
 use App\Services\ProcessService;
 use App\Services\DocumentTypeService;
+use App\Services\MetadataSchemaService;
 use App\Helpers\ApiIndexBuilder;
 use Illuminate\Http\JsonResponse;
 use function App\Helpers\catchSync;
 
 /**
  * Controlador para catálogos públicos
- * 
+ *
  * Endpoints sin autenticación para uso en frontend público
  * Solo expone datos seguros (id, code, name) sin información sensible
- * 
+ *
  * @OA\Tag(
  *     name="Public API",
  *     description="Endpoints públicos sin autenticación. Rate limited a 60 req/min por IP. Solo expone datos seguros sin información sensible (created_by, updated_by, version)."
@@ -39,7 +41,8 @@ class PublicCatalogController extends Controller
         protected CareerService $careerService,
         protected ProcessCategoryService $processCategoryService,
         protected ProcessService $processService,
-        protected DocumentTypeService $documentTypeService
+        protected DocumentTypeService $documentTypeService,
+        protected MetadataSchemaService $metadataSchemaService
     ) {}
 
     /**
@@ -134,7 +137,7 @@ class PublicCatalogController extends Controller
     {
         return catchSync(function () use ($request) {
             $filters = $request->getPublicFilters();
-            
+
             return ApiIndexBuilder::build(
                 service: $this->headOfficeService,
                 resource: HeadOfficePublicResource::class,
@@ -197,11 +200,11 @@ class PublicCatalogController extends Controller
     {
         return catchSync(function () use ($id) {
             $headOffice = $this->headOfficeService->findById($id);
-            
+
             if (!$headOffice) {
                 throw new \InvalidArgumentException('Sede no encontrada');
             }
-            
+
             return new HeadOfficePublicResource($headOffice);
         }, 'Sede obtenida exitosamente');
     }
@@ -252,7 +255,7 @@ class PublicCatalogController extends Controller
     {
         return catchSync(function () use ($request) {
             $filters = $request->getPublicFilters();
-            
+
             return ApiIndexBuilder::build(
                 service: $this->departmentService,
                 resource: DepartmentPublicResource::class,
@@ -289,11 +292,11 @@ class PublicCatalogController extends Controller
     {
         return catchSync(function () use ($id) {
             $department = $this->departmentService->findById($id);
-            
+
             if (!$department) {
                 throw new \InvalidArgumentException('Departamento no encontrado');
             }
-            
+
             return new DepartmentPublicResource($department);
         }, 'Departamento obtenido exitosamente');
     }
@@ -323,7 +326,7 @@ class PublicCatalogController extends Controller
     {
         return catchSync(function () use ($request) {
             $filters = $request->getPublicFilters();
-            
+
             return ApiIndexBuilder::build(
                 service: $this->careerService,
                 resource: CareerPublicResource::class,
@@ -355,11 +358,11 @@ class PublicCatalogController extends Controller
     {
         return catchSync(function () use ($id) {
             $career = $this->careerService->findById($id);
-            
+
             if (!$career) {
                 throw new \InvalidArgumentException('Carrera no encontrada');
             }
-            
+
             return new CareerPublicResource($career);
         }, 'Carrera obtenida exitosamente');
     }
@@ -398,7 +401,7 @@ class PublicCatalogController extends Controller
                 $request->getPublicFilters(),
                 ['department_id' => $id]
             );
-            
+
             return ApiIndexBuilder::build(
                 service: $this->careerService,
                 resource: CareerPublicResource::class,
@@ -432,7 +435,7 @@ class PublicCatalogController extends Controller
     {
         return catchSync(function () use ($request) {
             $filters = $request->getPublicFilters();
-            
+
             return ApiIndexBuilder::build(
                 service: $this->processCategoryService,
                 resource: ProcessCategoryPublicResource::class,
@@ -466,7 +469,7 @@ class PublicCatalogController extends Controller
     {
         return catchSync(function () use ($request) {
             $filters = $request->getPublicFilters();
-            
+
             return ApiIndexBuilder::build(
                 service: $this->documentTypeService,
                 resource: DocumentTypePublicResource::class,
@@ -536,7 +539,7 @@ class PublicCatalogController extends Controller
     {
         return catchSync(function () use ($request) {
             $filters = $request->getPublicFilters();
-            
+
             // Agregar filtros específicos de procesos
             if ($request->has('process_category_id')) {
                 $filters['processCategoryId'] = $request->input('process_category_id');
@@ -544,7 +547,7 @@ class PublicCatalogController extends Controller
             if ($request->has('parent_id')) {
                 $filters['parentId'] = $request->input('parent_id');
             }
-            
+
             return ApiIndexBuilder::build(
                 service: $this->processService,
                 resource: ProcessPublicResource::class,
@@ -582,14 +585,14 @@ class PublicCatalogController extends Controller
     {
         return catchSync(function () use ($id) {
             $process = $this->processService->findById($id);
-            
+
             if (!$process) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Proceso no encontrado'
                 ], 404);
             }
-            
+
             return new ProcessPublicResource($process);
         }, 'Proceso obtenido exitosamente');
     }
@@ -632,10 +635,10 @@ class PublicCatalogController extends Controller
                     'message' => 'Categoría de proceso no encontrada'
                 ], 404);
             }
-            
+
             $filters = $request->getPublicFilters();
             $filters['processCategoryId'] = $id;
-            
+
             return ApiIndexBuilder::build(
                 service: $this->processService,
                 resource: ProcessPublicResource::class,
@@ -644,5 +647,78 @@ class PublicCatalogController extends Controller
                 defaultPerPage: 20
             );
         }, 'Procesos obtenidos exitosamente');
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/public/metadata-schemas",
+     *     operationId="getPublicMetadataSchemas",
+     *     tags={"Public API"},
+     *     summary="Obtener esquemas de metadatos (público)",
+     *     description="Listado de esquemas de metadatos activos sin autenticación",
+     *     @OA\Parameter(name="format", in="query", @OA\Schema(type="string", enum={"collection", "minimal", "dropdown"})),
+     *     @OA\Parameter(name="search", in="query", description="Búsqueda por nombre o descripción", @OA\Schema(type="string")),
+     *     @OA\Parameter(name="perPage", in="query", @OA\Schema(type="integer", minimum=1, maximum=50)),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Esquemas obtenidas exitosamente",
+     *         @OA\JsonContent(ref="#/components/schemas/PublicSuccessResponse")
+     *     ),
+     *     @OA\Response(response=422, description="Error de validación"),
+     *     @OA\Response(response=429, description="Rate Limit")
+     * )
+     */
+    public function metadataSchemas(PublicFiltersRequest $request): JsonResponse
+    {
+        return catchSync(function () use ($request) {
+            $filters = $request->getPublicFilters();
+
+            return ApiIndexBuilder::build(
+                service: $this->metadataSchemaService,
+                resource: MetadataSchemaPublicResource::class,
+                request: $request,
+                filters: $filters,
+                defaultPerPage: 20
+            );
+        }, 'Esquemas de metadatos obtenidos exitosamente');
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/public/metadata-schemas/{id}",
+     *     operationId="getPublicMetadataSchema",
+     *     tags={"Public API"},
+     *     summary="Detalle de esquema de metadatos (público)",
+     *     description="Obtiene un esquema específico por ID sin autenticación",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID único del esquema (UUID)",
+     *         @OA\Schema(type="string", format="uuid")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Esquema obtenido exitosamente",
+     *         @OA\JsonContent(ref="#/components/schemas/PublicSuccessResponse")
+     *     ),
+     *     @OA\Response(response=404, description="Esquema no encontrado"),
+     *     @OA\Response(response=429, description="Rate Limit", @OA\JsonContent(ref="#/components/schemas/RateLimitError"))
+     * )
+     */
+    public function showMetadataSchema(string $id): JsonResponse
+    {
+        return catchSync(function () use ($id) {
+            $schema = $this->metadataSchemaService->findById($id);
+
+            if (!$schema) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Esquema de metadatos no encontrado'
+                ], 404);
+            }
+
+            return new MetadataSchemaPublicResource($schema);
+        }, 'Esquema de metadatos obtenido exitosamente');
     }
 }

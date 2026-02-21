@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 | Public Routes (No Authentication Required)
 |--------------------------------------------------------------------------
-| 
+|
 | Endpoints públicos para frontend sin autenticación.
 | Solo expone datos seguros (id, code, name) sin información sensible.
 | Rate limited a 60 requests por minuto por IP.
@@ -31,30 +31,34 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('public')
     ->middleware('throttle:public-api')
     ->group(function () {
-    
+
     // Head Offices - Sedes
     Route::get('/head-offices', [PublicCatalogController::class, 'headOffices']);
     Route::get('/head-offices/{id}', [PublicCatalogController::class, 'showHeadOffice']);
-    
+
     // Departments - Departamentos
     Route::get('/departments', [PublicCatalogController::class, 'departments']);
     Route::get('/departments/{id}', [PublicCatalogController::class, 'showDepartment']);
-    
+
     // Careers - Carreras
     Route::get('/careers', [PublicCatalogController::class, 'careers']);
     Route::get('/careers/{id}', [PublicCatalogController::class, 'showCareer']);
     Route::get('/departments/{id}/careers', [PublicCatalogController::class, 'careersByDepartment']);
-    
+
     // Process Categories - Categorías de Procesos
     Route::get('/process-categories', [PublicCatalogController::class, 'processCategories']);
-    
+
     // Processes - Procesos
     Route::get('/processes', [PublicCatalogController::class, 'processes']);
     Route::get('/processes/{id}', [PublicCatalogController::class, 'showProcess']);
     Route::get('/process-categories/{id}/processes', [PublicCatalogController::class, 'processesByCategory']);
-    
+
     // Document Types - Tipos de Documentos
     Route::get('/document-types', [PublicCatalogController::class, 'documentTypes']);
+
+    // Metadata Schemas - Esquemas de Metadatos
+    Route::get('/metadata-schemas', [PublicCatalogController::class, 'metadataSchemas']);
+    Route::get('/metadata-schemas/{id}', [PublicCatalogController::class, 'showMetadataSchema']);
 });
 
 /*
@@ -295,7 +299,7 @@ Route::prefix('metadata-fields')->group(function () {
         ->middleware(['auth.service', 'permission:metadata_field.read']);
     Route::get('/catalogs/type-inputs', [MetadataFieldController::class, 'getTypeInputs'])
         ->middleware(['auth.service', 'permission:metadata_field.read']);
-    
+
     Route::get('/', [MetadataFieldController::class, 'index'])
         ->middleware(['auth.service', 'permission:metadata_field.read']);
     Route::post('/', [MetadataFieldController::class, 'store'])

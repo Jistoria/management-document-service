@@ -1,15 +1,13 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Public;
 
 use App\Constants\EntityType;
 use App\Constants\TypeInput;
+use App\Http\Resources\BaseResource;
 use Illuminate\Http\Request;
 
-/**
- * Resource representation of a metadata field.
- */
-class MetadataFieldResource extends BaseResource
+class MetadataFieldPublicResource extends BaseResource
 {
     public function toArray(Request $request): array
     {
@@ -18,10 +16,12 @@ class MetadataFieldResource extends BaseResource
             ? $this->metadataSchemas->first()->pivot
             : $this->pivot;
 
+        $label = $pivot?->label ?? $this->label ?? 'set label';
+
         return [
             'id' => $this->id,
             'fieldKey' => $this->field_key,
-            'label' => $this->label,
+            'label' => $label,
             'entityTypeId' => $this->entity_type_id,
             'entityType' => $this->entity_type_id ? [
                 'id' => $this->entity_type_id,
@@ -47,11 +47,6 @@ class MetadataFieldResource extends BaseResource
             'defaultValue' => $pivot?->default_value,
             'regexPattern' => $pivot?->regex_pattern,
             'validationErrorMessage' => $pivot?->validation_error_message,
-
-            'createdBy' => $this->created_by,
-            'updatedBy' => $this->updated_by,
-            'createdAt' => $this->created_at?->toISOString(),
-            'updatedAt' => $this->updated_at?->toISOString(),
         ];
     }
 

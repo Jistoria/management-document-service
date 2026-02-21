@@ -118,8 +118,8 @@ class SubsystemService
         if (!empty($filters['search'])) {
             $search = $filters['search'];
             $query->where(function ($q) use ($search) {
-                $q->where('name', 'LIKE', "%{$search}%")
-                    ->orWhere('code', 'LIKE', "%{$search}%");
+                $q->whereRaw('unaccent(name) ILIKE unaccent(?)', ["%{$search}%"])
+                    ->orWhereRaw('unaccent(code) ILIKE unaccent(?)', ["%{$search}%"]);
             });
         }
         if (!empty($filters['code'])) {

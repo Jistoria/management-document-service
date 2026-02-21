@@ -325,8 +325,8 @@ class HeadOfficeService
             ->when(!empty($filters['search']), function ($q) use ($filters) {
                 $search = $filters['search'];
                 $q->where(function ($sub) use ($search) {
-                    $sub->where('name', 'ILIKE', "%{$search}%")
-                        ->orWhere('code', 'ILIKE', "%{$search}%");
+                    $sub->whereRaw('unaccent(name) ILIKE unaccent(?)', ["%{$search}%"])
+                        ->orWhereRaw('unaccent(code) ILIKE unaccent(?)', ["%{$search}%"]);
                 });
             })
             ->when(!empty($filters['code']), function ($q) use ($filters) {

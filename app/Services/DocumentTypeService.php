@@ -272,15 +272,15 @@ class DocumentTypeService
         if (isset($filters['search']) && !empty($filters['search'])) {
             $search = $filters['search'];
             $query->where(function ($q) use ($search) {
-                $q->where('name', 'LIKE', "%{$search}%")
-                  ->orWhere('code', 'LIKE', "%{$search}%")
-                  ->orWhere('description', 'LIKE', "%{$search}%");
+                $q->whereRaw('unaccent(name) ILIKE unaccent(?)', ["%{$search}%"])
+                  ->orWhereRaw('unaccent(code) ILIKE unaccent(?)', ["%{$search}%"])
+                  ->orWhereRaw('unaccent(description) ILIKE unaccent(?)', ["%{$search}%"]);
             });
         }
 
         // Code filter
         if (isset($filters['code']) && !empty($filters['code'])) {
-            $query->where('code', 'LIKE', "%{$filters['code']}%");
+            $query->whereRaw('unaccent(code) ILIKE unaccent(?)', ["%{$filters['code']}%"]);
         }
 
         // Created by filter

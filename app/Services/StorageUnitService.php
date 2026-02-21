@@ -79,8 +79,8 @@ class StorageUnitService
         if (!empty($filters['search'])) {
             $search = $filters['search'];
             $query->where(function ($q) use ($search) {
-                $q->where('label', 'LIKE', "%{$search}%")
-                  ->orWhere('code', 'LIKE', "%{$search}%");
+                $q->whereRaw('unaccent(label) ILIKE unaccent(?)', ["%{$search}%"])
+                  ->orWhereRaw('unaccent(code) ILIKE unaccent(?)', ["%{$search}%"]);
             });
         }
         if (!empty($filters['storage_unit_type_id'])) {
@@ -90,7 +90,7 @@ class StorageUnitService
             $query->where('parent_id', $filters['parent_id']);
         }
         if (!empty($filters['code'])) {
-            $query->where('code', 'LIKE', "%{$filters['code']}%");
+            $query->whereRaw('unaccent(code) ILIKE unaccent(?)', ["%{$filters['code']}%"]);
         }
         $this->applySorting($query, $filters);
     }

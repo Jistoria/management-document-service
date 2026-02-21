@@ -92,8 +92,8 @@ class MetadataSchemaService
         if (!empty($filters['search'])) {
             $search = $filters['search'];
             $query->where(function ($q) use ($search) {
-                $q->where('name', 'LIKE', "%{$search}%")
-                  ->orWhere('description', 'LIKE', "%{$search}%");
+                $q->whereRaw('unaccent(name) ILIKE unaccent(?)', ["%{$search}%"])
+                  ->orWhereRaw('unaccent(description) ILIKE unaccent(?)', ["%{$search}%"]);
             });
         }
         if (isset($filters['version'])) {

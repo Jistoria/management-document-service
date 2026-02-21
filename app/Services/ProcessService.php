@@ -154,8 +154,8 @@ class ProcessService
         $query->when(!empty($filters['search']), function ($q) use ($filters) {
             $search = $filters['search'];
             $q->where(function ($q2) use ($search) {
-                $q2->where('name', 'LIKE', "%{$search}%")
-                    ->orWhere('code', 'LIKE', "%{$search}%");
+                $q2->whereRaw('unaccent(name) ILIKE unaccent(?)', ["%{$search}%"])
+                    ->orWhereRaw('unaccent(code) ILIKE unaccent(?)', ["%{$search}%"]);
             });
         });
 

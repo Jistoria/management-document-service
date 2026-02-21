@@ -15,6 +15,7 @@
 -- Habilitar extensiones necesarias
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "plpgsql";
+CREATE EXTENSION IF NOT EXISTS "unaccent";
 
 -- Crear schema público si no existe
 CREATE SCHEMA IF NOT EXISTS public;
@@ -635,7 +636,6 @@ COMMENT ON COLUMN public.metadata_schema_events.service_version IS 'Versión del
 -- Comentarios en vistas
 COMMENT ON VIEW public.v_audit_summary_by_user IS 'Resumen de actividad de auditoría agrupada por usuario para reportes';
 COMMENT ON VIEW public.v_recent_changes IS 'Vista de cambios recientes (últimas 24h) para monitoreo en tiempo real';
-
 
 -- =====================================================================================
 -- CONFIGURACIÓN DE PERMISOS (OPCIONAL - AJUSTAR SEGÚN NECESIDADES)

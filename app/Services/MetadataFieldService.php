@@ -100,15 +100,15 @@ class MetadataFieldService
         if (!empty($filters['search'])) {
             $search = $filters['search'];
             $query->where(function ($q) use ($search) {
-                $q->where('field_key', 'LIKE', "%{$search}%")
-                    ->orWhere('label', 'LIKE', "%{$search}%");
+                $q->whereRaw('unaccent(field_key) ILIKE unaccent(?)', ["%{$search}%"])
+                    ->orWhereRaw('unaccent(label) ILIKE unaccent(?)', ["%{$search}%"]);
             });
         }
         if (!empty($filters['data_type'])) {
             $query->where('data_type', $filters['data_type']);
         }
         if (!empty($filters['field_key'])) {
-            $query->where('field_key', 'LIKE', "%{$filters['field_key']}%");
+            $query->whereRaw('unaccent(field_key) ILIKE unaccent(?)', ["%{$filters['field_key']}%"]);
         }
         if (!empty($filters['type_input_id'])) {
             $query->where('type_input_id', (int) $filters['type_input_id']);

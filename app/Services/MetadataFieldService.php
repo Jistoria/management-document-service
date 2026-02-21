@@ -129,6 +129,10 @@ class MetadataFieldService
             $q->whereHas('metadataSchemas', function (Builder $subQuery) use ($schemaId) {
                 $subQuery->where('metadata_schemas.id', $schemaId);
             });
+            // Cargar SOLO el esquema específico con su pivot completo
+            $q->with(['metadataSchemas' => function ($query) use ($schemaId) {
+                $query->where('metadata_schemas.id', $schemaId);
+            }]);
         });
     }
 

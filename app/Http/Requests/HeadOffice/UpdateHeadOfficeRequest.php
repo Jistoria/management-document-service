@@ -39,6 +39,13 @@ class UpdateHeadOfficeRequest extends BaseFormRequest
                 Rule::unique('head_offices', 'code')
                     ->ignore($headOfficeId)
                     ->whereNull('deleted_at')
+            ],
+            'codeNumeric' => [
+                'sometimes',
+                'nullable',
+                'string',
+                'max:50',
+                Rule::unique('head_offices', 'code_numeric')->ignore($headOfficeId)
             ]
         ];
     }
@@ -56,7 +63,11 @@ class UpdateHeadOfficeRequest extends BaseFormRequest
             'code.string' => 'El código debe ser una cadena de texto',
             'code.max' => 'El código no puede exceder 255 caracteres',
             'code.regex' => 'El código solo puede contener letras mayúsculas, números, guiones y guiones bajos',
-            'code.unique' => 'Ya existe una sede con este código'
+            'code.unique' => 'Ya existe una sede con este código',
+
+            'codeNumeric.string' => 'El código numérico debe ser una cadena de texto',
+            'codeNumeric.max' => 'El código numérico no puede exceder 50 caracteres',
+            'codeNumeric.unique' => 'Ya existe una sede con este código numérico'
         ];
     }
 
@@ -67,7 +78,8 @@ class UpdateHeadOfficeRequest extends BaseFormRequest
     {
         return [
             'name' => 'nombre',
-            'code' => 'código'
+            'code' => 'código',
+            'codeNumeric' => 'código numérico'
         ];
     }
 
@@ -81,6 +93,10 @@ class UpdateHeadOfficeRequest extends BaseFormRequest
         // Convert code to uppercase
         if ($this->has('code') && !empty($this->code)) {
             $data['code'] = strtoupper(trim($this->code));
+        }
+
+        if ($this->has('codeNumeric')) {
+            $data['codeNumeric'] = trim($this->codeNumeric);
         }
 
         // Trim name

@@ -6,34 +6,39 @@ use App\Http\Resources\BaseResource;
 use Illuminate\Http\Request;
 
 /**
- * Public-safe resource for Head Office
+ * Resource para exponer procesos de forma pública (sin autenticación)
+ * Solo incluye campos seguros sin información sensible
  * 
- * Expone únicamente datos seguros sin información sensible
- * Para uso en endpoints públicos sin autenticación
+ * @mixin \App\Models\Process
  */
-class HeadOfficePublicResource extends BaseResource
+class ProcessPublicResource extends BaseResource
 {
     /**
      * Transform the resource into an array.
      *
-     * @param Request $request
      * @return array<string, mixed>
      */
     public function toArray(Request $request): array
     {
         return [
             'id' => $this->id,
-            'code' => $this->code,
-            'codeNumeric' => $this->code_numeric,
+            'processCategoryId' => $this->process_category_id,
+            'parentId' => $this->parent_id,
             'name' => $this->name,
-
-            // Relaciones solo si están cargadas
-            'departmentsCount' => $this->when(
-                $this->relationLoaded('departments'),
-                fn() => $this->departments->count()
+            'code' => $this->code,
+            'order' => $this->order,
+            // Relaciones opcionales
+            'processCategory' => $this->when(
+                $this->relationLoaded('processCategory'),
+                fn () => new ProcessCategoryPublicResource($this->processCategory)
             ),
-
-            // NO exponer: created_by, updated_by, created_at, updated_at, version, deleted_at
+            'parent' => $this->when(
+                $this->relationLoaded('parent'),
+                fn () => new ProcessPublicResource($this->parent)
+            ),
+            'subProcesses' => self::collection($this->whenLoaded('children')),
+            
+            // NO exponer: created_by, updated_by, created_at, updated_at, deleted_at
         ];
     }
 
@@ -44,9 +49,11 @@ class HeadOfficePublicResource extends BaseResource
     {
         return [
             'id' => $this->id,
-            'code' => $this->code,
-            'codeNumeric' => $this->code_numeric,
+            'processCategoryId' => $this->process_category_id,
+            'parentId' => $this->parent_id,
             'name' => $this->name,
+            'code' => $this->code,
+            'order' => $this->order,
         ];
     }
 
@@ -57,9 +64,11 @@ class HeadOfficePublicResource extends BaseResource
     {
         return [
             'id' => $this->id,
-            'code' => $this->code,
-            'codeNumeric' => $this->code_numeric,
+            'processCategoryId' => $this->process_category_id,
+            'parentId' => $this->parent_id,
             'name' => $this->name,
+            'code' => $this->code,
+            'order' => $this->order,
         ];
     }
 
@@ -68,7 +77,7 @@ class HeadOfficePublicResource extends BaseResource
      */
     protected function getResourceType(): string
     {
-        return 'publicHeadOffice';
+        return 'publicProcess';
     }
 
     /**
@@ -81,7 +90,9 @@ class HeadOfficePublicResource extends BaseResource
                 'value' => $item->id,
                 'label' => $item->name,
                 'code' => $item->code,
-                'codeNumeric' => $item->code_numeric,
+                'processCategoryId' => $item->process_category_id,
+                'parentId' => $item->parent_id,
+                'order' => $item->order,
             ])->values(),
             'count' => $collection->count()
         ];

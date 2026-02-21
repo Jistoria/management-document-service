@@ -33,8 +33,7 @@ class StoreProcessRequest extends BaseFormRequest
             'parentId' => [
                 'nullable',
                 'string',
-                'uuid',
-                'exists:processes,id'
+                'uuid'
             ],
             'name' => [
                 'required',

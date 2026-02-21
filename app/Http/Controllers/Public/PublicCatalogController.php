@@ -8,11 +8,13 @@ use App\Http\Resources\Public\HeadOfficePublicResource;
 use App\Http\Resources\Public\DepartmentPublicResource;
 use App\Http\Resources\Public\CareerPublicResource;
 use App\Http\Resources\Public\ProcessCategoryPublicResource;
+use App\Http\Resources\Public\ProcessPublicResource;
 use App\Http\Resources\Public\DocumentTypePublicResource;
 use App\Services\HeadOfficeService;
 use App\Services\DepartmentService;
 use App\Services\CareerService;
 use App\Services\ProcessCategoryService;
+use App\Services\ProcessService;
 use App\Services\DocumentTypeService;
 use App\Helpers\ApiIndexBuilder;
 use Illuminate\Http\JsonResponse;
@@ -36,6 +38,7 @@ class PublicCatalogController extends Controller
         protected DepartmentService $departmentService,
         protected CareerService $careerService,
         protected ProcessCategoryService $processCategoryService,
+        protected ProcessService $processService,
         protected DocumentTypeService $documentTypeService
     ) {}
 
@@ -472,5 +475,174 @@ class PublicCatalogController extends Controller
                 defaultPerPage: 20
             );
         }, 'Tipos de documentos obtenidos exitosamente');
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/public/processes",
+     *     operationId="getPublicProcesses",
+     *     tags={"Public API"},
+     *     summary="Obtener procesos (público)",
+     *     description="Listado de procesos activos sin autenticación. Puede filtrarse por categoría de proceso.",
+     *     @OA\Parameter(
+     *         name="format",
+     *         in="query",
+     *         description="Formato de respuesta",
+     *         required=false,
+     *         @OA\Schema(
+     *             type="string",
+     *             enum={"collection", "minimal", "dropdown", "pluck", "paginate"},
+     *             default="collection"
+     *         )
+     *     ),
+     *     @OA\Parameter(
+     *         name="search",
+     *         in="query",
+     *         description="Búsqueda por nombre o código",
+     *         required=false,
+     *         @OA\Schema(type="string", maxLength=100)
+     *     ),
+     *     @OA\Parameter(
+     *         name="process_category_id",
+     *         in="query",
+     *         description="Filtrar por categoría de proceso",
+     *         required=false,
+     *         @OA\Schema(type="string", format="uuid")
+     *     ),
+     *     @OA\Parameter(
+     *         name="parent_id",
+     *         in="query",
+     *         description="Filtrar por proceso padre (null para procesos raíz)",
+     *         required=false,
+     *         @OA\Schema(type="string", format="uuid", nullable=true)
+     *     ),
+     *     @OA\Parameter(
+     *         name="perPage",
+     *         in="query",
+     *         description="Elementos por página (máximo 50)",
+     *         required=false,
+     *         @OA\Schema(type="integer", minimum=1, maximum=50, default=20)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Procesos obtenidos exitosamente",
+     *         @OA\JsonContent(ref="#/components/schemas/PublicSuccessResponse")
+     *     ),
+     *     @OA\Response(response=422, description="Error de validación"),
+     *     @OA\Response(response=429, description="Rate Limit", @OA\JsonContent(ref="#/components/schemas/RateLimitError"))
+     * )
+     */
+    public function processes(PublicFiltersRequest $request): JsonResponse
+    {
+        return catchSync(function () use ($request) {
+            $filters = $request->getPublicFilters();
+            
+            // Agregar filtros específicos de procesos
+            if ($request->has('process_category_id')) {
+                $filters['processCategoryId'] = $request->input('process_category_id');
+            }
+            if ($request->has('parent_id')) {
+                $filters['parentId'] = $request->input('parent_id');
+            }
+            
+            return ApiIndexBuilder::build(
+                service: $this->processService,
+                resource: ProcessPublicResource::class,
+                request: $request,
+                filters: $filters,
+                defaultPerPage: 20
+            );
+        }, 'Procesos obtenidos exitosamente');
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/public/processes/{id}",
+     *     operationId="getPublicProcess",
+     *     tags={"Public API"},
+     *     summary="Detalle de proceso (público)",
+     *     description="Obtiene un proceso específico por ID sin autenticación",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID único del proceso (UUID)",
+     *         @OA\Schema(type="string", format="uuid")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Proceso obtenido exitosamente",
+     *         @OA\JsonContent(ref="#/components/schemas/PublicSuccessResponse")
+     *     ),
+     *     @OA\Response(response=404, description="Proceso no encontrado"),
+     *     @OA\Response(response=429, description="Rate Limit", @OA\JsonContent(ref="#/components/schemas/RateLimitError"))
+     * )
+     */
+    public function showProcess(string $id): JsonResponse
+    {
+        return catchSync(function () use ($id) {
+            $process = $this->processService->findById($id);
+            
+            if (!$process) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Proceso no encontrado'
+                ], 404);
+            }
+            
+            return new ProcessPublicResource($process);
+        }, 'Proceso obtenido exitosamente');
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/public/process-categories/{id}/processes",
+     *     operationId="getPublicProcessesByCategory",
+     *     tags={"Public API"},
+     *     summary="Procesos por categoría (público)",
+     *     description="Obtiene todos los procesos de una categoría específica",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID de la categoría de proceso",
+     *         @OA\Schema(type="string", format="uuid")
+     *     ),
+     *     @OA\Parameter(name="format", in="query", @OA\Schema(type="string", enum={"collection", "minimal", "dropdown", "pluck"})),
+     *     @OA\Parameter(name="search", in="query", description="Búsqueda por nombre o código", @OA\Schema(type="string")),
+     *     @OA\Parameter(name="perPage", in="query", @OA\Schema(type="integer", minimum=1, maximum=50)),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Procesos obtenidos exitosamente",
+     *         @OA\JsonContent(ref="#/components/schemas/PublicSuccessResponse")
+     *     ),
+     *     @OA\Response(response=404, description="Categoría no encontrada"),
+     *     @OA\Response(response=422, description="Error de validación"),
+     *     @OA\Response(response=429, description="Rate Limit")
+     * )
+     */
+    public function processesByCategory(PublicFiltersRequest $request, string $id): JsonResponse
+    {
+        return catchSync(function () use ($request, $id) {
+            // Verificar que la categoría existe
+            $category = $this->processCategoryService->findById($id);
+            if (!$category) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Categoría de proceso no encontrada'
+                ], 404);
+            }
+            
+            $filters = $request->getPublicFilters();
+            $filters['processCategoryId'] = $id;
+            
+            return ApiIndexBuilder::build(
+                service: $this->processService,
+                resource: ProcessPublicResource::class,
+                request: $request,
+                filters: $filters,
+                defaultPerPage: 20
+            );
+        }, 'Procesos obtenidos exitosamente');
     }
 }

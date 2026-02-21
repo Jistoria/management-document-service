@@ -37,34 +37,76 @@ class VinculacionDefaultMetadataSeeder extends Seeder
         ]);
 
         // Obtener campos de metadata universitarios comunes para vinculación
-        $fieldsMap = [
-            'project_name' => 1,
-            'project_code' => 2,
-            'author' => 3,
-            'academic_period' => 4,
-            'document_date' => 5,
-            'career' => 6,
-            'department' => 7,
-            'beneficiary_entity' => 8,
+        $fieldsConfig = [
+            'project_name' => [
+                'order' => 1,
+                'required' => true,
+                'regex' => '^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\.]+$',
+                'error_msg' => 'Solo se permiten letras y espacios.',
+            ],
+            'project_code' => [
+                'order' => 2,
+                'required' => false,
+                'regex' => '^[A-Z0-9\-]+$',
+                'error_msg' => 'Solo se permiten letras mayúsculas, números y guiones.',
+            ],
+            'author' => [
+                'order' => 3,
+                'required' => true,
+                'regex' => null,
+                'error_msg' => null,
+            ],
+            'academic_period' => [
+                'order' => 4,
+                'required' => true,
+                'regex' => '^\d{4}-\d{1}$',
+                'error_msg' => 'El formato debe ser AAAA-P (ej. 2025-1).',
+            ],
+            'document_date' => [
+                'order' => 5,
+                'required' => false,
+                'regex' => null,
+                'error_msg' => null,
+            ],
+            'career' => [
+                'order' => 6,
+                'required' => false,
+                'regex' => null,
+                'error_msg' => null,
+            ],
+            'department' => [
+                'order' => 7,
+                'required' => false,
+                'regex' => null,
+                'error_msg' => null,
+            ],
+            'beneficiary_entity' => [
+                'order' => 8,
+                'required' => false,
+                'regex' => '^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\.]+$',
+                'error_msg' => 'Solo se permiten letras y espacios.',
+            ],
         ];
 
-        // Asignar campos al esquema
-        foreach ($fieldsMap as $fieldCode => $order) {
+        // Asignar campos al esquema con validaciones
+        foreach ($fieldsConfig as $fieldCode => $config) {
             $fieldId = DB::table('metadata_fields')
                 ->where('field_key', $fieldCode)
                 ->value('id');
 
             if ($fieldId) {
                 DB::table('metadata_schema_fields')->insert([
-                    'id' => (string) Str::uuid7(),
-                    'metadata_schema_id' => $schemaId,
-                    'metadata_field_id' => $fieldId,
-                    'is_required' => in_array($fieldCode, ['project_name', 'author', 'academic_period']),
-                    'sort_order' => $order,
-                    'created_at' => $now,
-                    'updated_at' => $now,
-                    'created_by' => 'system',
-                    'updated_by' => 'system',
+                    'id'                        => (string) Str::uuid7(),
+                    'metadata_schema_id'        => $schemaId,
+                    'metadata_field_id'         => $fieldId,
+                    'is_required'               => $config['required'],
+                    'sort_order'                => $config['order'],
+                    'regex_pattern'             => $config['regex'],
+                    'validation_error_message'  => $config['error_msg'],
+                    'created_at'                => $now,
+                    'updated_at'                => $now,
+                    'created_by'                => 'system',
+                    'updated_by'                => 'system',
                 ]);
             }
         }

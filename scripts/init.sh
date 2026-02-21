@@ -132,5 +132,8 @@ else
   echo "=== Omitiendo caches pesadas (APP_ENV=$APP_ENV_VALUE) ==="
 fi
 
+echo "=== Generando documentación Swagger ==="
+su -s /bin/bash "$APP_USER" -c "php artisan l5-swagger:generate" || echo "⚠️ Advertencia: No se pudo generar la documentación Swagger"
+
 echo "🎉 Inicialización completada exitosamente"
 exit 0

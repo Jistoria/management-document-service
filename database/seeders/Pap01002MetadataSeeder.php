@@ -119,16 +119,32 @@ class Pap01002MetadataSeeder extends Seeder
         }
 
         // 3) Relación esquema-campos (ordenados y requeridos)
-        $sortOrder = 1;
-        $fieldIds = [
-            $authorId,
-            $tutorId,
-            $facultyId,
-            $careerId,
-            $academicPeriodId,
+        // Definir validaciones por campo
+        $fieldValidations = [
+            $authorId => [
+                'regex_pattern' => null,
+                'validation_error_message' => null,
+            ],
+            $tutorId => [
+                'regex_pattern' => null,
+                'validation_error_message' => null,
+            ],
+            $facultyId => [
+                'regex_pattern' => null,
+                'validation_error_message' => null,
+            ],
+            $careerId => [
+                'regex_pattern' => null,
+                'validation_error_message' => null,
+            ],
+            $academicPeriodId => [
+                'regex_pattern' => '^\d{4}-\d{1}$',
+                'validation_error_message' => 'El formato debe ser AAAA-P (ej. 2025-1).',
+            ],
         ];
 
-        foreach ($fieldIds as $fieldId) {
+        $sortOrder = 1;
+        foreach ($fieldValidations as $fieldId => $validation) {
             $exists = DB::table('metadata_schema_fields')
                 ->where('metadata_schema_id', $schemaId)
                 ->where('metadata_field_id', $fieldId)
@@ -137,20 +153,22 @@ class Pap01002MetadataSeeder extends Seeder
             if (! $exists) {
                 $isRequired = true;
                 DB::table('metadata_schema_fields')->insert([
-                    'id'                  => (string) Str::uuid(),
-                    'metadata_schema_id'  => $schemaId,
-                    'metadata_field_id'   => $fieldId,
-                    'is_required'         => $isRequired,
-                    'is_repeatable'       => false,
-                    'min_occurs'          => $isRequired ? 1 : 0,
-                    'max_occurs'          => 1,
-                    'allow_duplicates'    => true,
-                    'sort_order'          => $sortOrder++,
-                    'default_value'       => null,
-                    'created_by'          => 'system',
-                    'updated_by'          => 'system',
-                    'created_at'          => $now,
-                    'updated_at'          => $now,
+                    'id'                        => (string) Str::uuid(),
+                    'metadata_schema_id'        => $schemaId,
+                    'metadata_field_id'         => $fieldId,
+                    'is_required'               => $isRequired,
+                    'is_repeatable'             => false,
+                    'min_occurs'                => $isRequired ? 1 : 0,
+                    'max_occurs'                => 1,
+                    'allow_duplicates'          => true,
+                    'sort_order'                => $sortOrder++,
+                    'default_value'             => null,
+                    'regex_pattern'             => $validation['regex_pattern'],
+                    'validation_error_message'  => $validation['validation_error_message'],
+                    'created_by'                => 'system',
+                    'updated_by'                => 'system',
+                    'created_at'                => $now,
+                    'updated_at'                => $now,
                 ]);
             }
         }

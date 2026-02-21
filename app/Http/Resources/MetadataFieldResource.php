@@ -29,6 +29,7 @@ class MetadataFieldResource extends BaseResource
                 'key' => TypeInput::getKey($this->type_input_id),
                 'label' => TypeInput::getLabel($this->type_input_id),
             ] : null,
+            'label' => $this->label ?? 'set label',
             'dataType' => $this->data_type,
             'schemaFieldId' => $this->pivot?->id,
             'isRequired' => $this->pivot?->is_required,

@@ -250,8 +250,7 @@ Route::prefix('document-types')->group(function () {
 
 // Required Documents Routes
 Route::prefix('required-documents')->group(function () {
-    Route::get('/', [RequiredDocumentController::class, 'index'])
-        ->middleware(['auth.service', 'permission:required_document.read']);
+    Route::get('/', [RequiredDocumentController::class, 'index']);
     Route::post('/', [RequiredDocumentController::class, 'store'])
         ->middleware(['auth.service', 'permission:required_document.create']);
     Route::get('/{required_document}', [RequiredDocumentController::class, 'show'])

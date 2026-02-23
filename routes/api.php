@@ -253,8 +253,7 @@ Route::prefix('required-documents')->group(function () {
     Route::get('/', [RequiredDocumentController::class, 'index']);
     Route::post('/', [RequiredDocumentController::class, 'store'])
         ->middleware(['auth.service', 'permission:required_document.create']);
-    Route::get('/{required_document}', [RequiredDocumentController::class, 'show'])
-        ->middleware(['auth.service', 'permission:required_document.read']);
+    Route::get('/{required_document}', [RequiredDocumentController::class, 'show']);
     Route::put('/{required_document}', [RequiredDocumentController::class, 'update'])
         ->middleware(['auth.service', 'permission:required_document.update']);
     Route::patch('/{required_document}', [RequiredDocumentController::class, 'update'])

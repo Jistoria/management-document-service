@@ -24,7 +24,7 @@ class UpdateProcessCategoryRequest extends BaseFormRequest
      */
     public function rules(): array
     {
-        $processCategoryId = $this->route('processCategory');
+        $processCategoryId = $this->route('category');
         return [
             'name' => [
                 'required',

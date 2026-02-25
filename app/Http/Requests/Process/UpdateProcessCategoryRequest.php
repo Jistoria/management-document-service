@@ -28,13 +28,11 @@ class UpdateProcessCategoryRequest extends BaseFormRequest
         return [
             'name' => [
                 'required',
-                'string',
-                Rule::unique('process_categories', 'name')->ignore($processCategoryId)->whereNull('deleted_at')
+                'string'
             ],
             'code' => [
                 'required',
-                'string',
-                Rule::unique('process_categories', 'code')->ignore($processCategoryId)->whereNull('deleted_at')
+                'string'
             ]
         ];
     }

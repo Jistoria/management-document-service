@@ -14,6 +14,8 @@ class StoreRequiredDocumentRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
+            'name' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string', 'max:1000'],
             'processId' => ['nullable', 'uuid', 'exists:processes,id', 'required_without:metadataSchemaId'],
             'documentTypeId' => ['required', 'uuid', 'exists:document_types,id'],
             'metadataSchemaId' => ['nullable', 'uuid', 'exists:metadata_schemas,id', 'required_without:processId'],
@@ -29,6 +31,13 @@ class StoreRequiredDocumentRequest extends BaseFormRequest
     public function messages(): array
     {
         return [
+            'name.required' => 'El nombre del documento es requerido',
+            'name.string' => 'El nombre debe ser una cadena de texto',
+            'name.max' => 'El nombre no puede exceder 255 caracteres',
+
+            'description.string' => 'La descripción debe ser una cadena de texto',
+            'description.max' => 'La descripción no puede exceder 1000 caracteres',
+
             'processId.uuid' => 'El campo proceso debe ser un UUID válido',
             'processId.exists' => 'El proceso seleccionado no existe',
             'processId.required_without' => 'El proceso es requerido cuando no se proporciona un esquema de metadatos',
@@ -61,6 +70,8 @@ class StoreRequiredDocumentRequest extends BaseFormRequest
     public function attributes(): array
     {
         return [
+            'name' => 'nombre',
+            'description' => 'descripción',
             'processId' => 'proceso',
             'documentTypeId' => 'tipo de documento',
             'academicRoleId' => 'rol académico',

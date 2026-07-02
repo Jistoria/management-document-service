@@ -14,6 +14,8 @@ class UpdateRequiredDocumentRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
+            'name' => ['sometimes', 'required', 'string', 'max:255'],
+            'description' => ['sometimes', 'nullable', 'string', 'max:1000'],
             'processId' => ['sometimes', 'nullable', 'uuid', 'exists:processes,id', 'required_without:metadataSchemaId'],
             'documentTypeId' => ['sometimes', 'uuid', 'exists:document_types,id'],
             'academicRoleId' => ['sometimes', 'nullable', 'uuid', 'exists:academic_roles,id'],

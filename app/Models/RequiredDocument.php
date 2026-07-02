@@ -20,6 +20,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $id
  * @property string $process_id
  * @property string $document_type_id
+ * @property string $name
+ * @property string|null $description
  * @property int $order
  * @property string $code_default
  * @property bool $is_public
@@ -48,6 +50,8 @@ class RequiredDocument extends Model
         'process_id',
         'document_type_id',
         'academic_role_id',
+        'name',
+        'description',
         'code_default',
         'is_public',
         'metadata_schema_id',
